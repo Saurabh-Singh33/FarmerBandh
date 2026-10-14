@@ -109,6 +109,14 @@ var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? builder.Configurat
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? builder.Configuration["Jwt:Issuer"] ?? "FarmerBandh";
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? builder.Configuration["Jwt:Audience"] ?? "FarmerBandhClient";
 
+builder.Configuration["Jwt:Key"] = jwtKey;
+builder.Configuration["Jwt:Issuer"] = jwtIssuer;
+builder.Configuration["Jwt:Audience"] = jwtAudience;
+if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_MINUTES")))
+    builder.Configuration["Jwt:AccessTokenMinutes"] = Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_MINUTES");
+if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_DAYS")))
+    builder.Configuration["Jwt:RefreshTokenDays"] = Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_DAYS");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

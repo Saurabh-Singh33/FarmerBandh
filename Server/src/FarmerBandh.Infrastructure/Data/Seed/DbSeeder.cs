@@ -154,6 +154,41 @@ public static class DbSeeder
 
             await context.SaveChangesAsync();
         }
+        else
+        {
+            // Sync Admin password and email from .env even if database already has users
+            var existingAdmin = await context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Admin || u.Email == defaultAdminEmail);
+            if (existingAdmin != null)
+            {
+                existingAdmin.Email = defaultAdminEmail;
+                existingAdmin.Role = UserRole.Admin;
+                existingAdmin.Status = UserStatus.Active;
+                if (!string.IsNullOrEmpty(defaultAdminPassword))
+                {
+                    existingAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(defaultAdminPassword);
+                }
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                var newAdmin = new User
+                {
+                    Id = Guid.NewGuid(),
+                    FullName = "System Admin",
+                    Email = defaultAdminEmail,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(defaultAdminPassword),
+                    Role = UserRole.Admin,
+                    Status = UserStatus.Active,
+                    State = "Gujarat",
+                    District = "Ahmedabad",
+                    City = "Ahmedabad",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await context.Users.AddAsync(newAdmin);
+                await context.SaveChangesAsync();
+            }
+        }
 
         // 2. Seed Categories if missing
         if (!await context.Categories.AnyAsync())
