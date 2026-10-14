@@ -1491,7 +1491,117 @@ public static class DbSeeder
                 }
             }
 
+            // -------------------------------------------------------------
+            // PHASE 8: NOTIFICATIONS & NOTIFICATION PREFERENCES
+            // -------------------------------------------------------------
+            // 1. Notification Preferences for all existing users
+            var allUsers = await context.Users.ToListAsync();
+            foreach (var u in allUsers)
+            {
+                var hasPref = await context.NotificationPreferences.AnyAsync(p => p.UserId == u.Id);
+                if (!hasPref)
+                {
+                    await context.NotificationPreferences.AddAsync(new NotificationPreference
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = u.Id,
+                        OrderUpdates = true,
+                        NegotiationUpdates = true,
+                        ReturnDisputeUpdates = true,
+                        PayoutUpdates = true,
+                        VerificationUpdates = true,
+                        ReviewUpdates = true,
+                        SystemAnnouncements = true,
+                        UpdatedAt = now
+                    });
+                }
+            }
             await context.SaveChangesAsync();
+
+            // 2. Seed realistic notifications for anita, ramesh, sunita
+            var anita = await context.Users.FirstOrDefaultAsync(u => u.Email == "anita@farm.com");
+            var ramesh = await context.Users.FirstOrDefaultAsync(u => u.Email == "ramesh@farm.com");
+            var sunita = await context.Users.FirstOrDefaultAsync(u => u.Email == "sunita@farm.com");
+
+            var seedNotifs = new List<Notification>();
+
+            if (anita != null)
+            {
+                AddNotificationIfMissing(seedNotifs, context, anita.Id, NotificationType.ORDER_PACKED, NotificationCategory.Order,
+                    "Order Packed", "Your order #FB-20261012-0018 is packed and ready to ship.", "/orders", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, anita.Id, NotificationType.NEGOTIATION_REPLIED, NotificationCategory.Negotiation,
+                    "Negotiation Countered", "Ramesh Farms countered your offer at ₹2,100 / quintal.", "/negotiations", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, anita.Id, NotificationType.ORDER_DELIVERED, NotificationCategory.Order,
+                    "Order Delivered", "Your order #FB-20261010-0015 was delivered. Leave a review?", "/orders", isRead: true, readAt: now.AddDays(-2));
+
+                AddNotificationIfMissing(seedNotifs, context, anita.Id, NotificationType.SYSTEM_ANNOUNCEMENT, NotificationCategory.System,
+                    "Welcome to FarmerBandh!", "Welcome to FarmerBandh! Explore direct local produce near you.", "/marketplace", isRead: true, readAt: now.AddDays(-5));
+            }
+
+            if (ramesh != null)
+            {
+                AddNotificationIfMissing(seedNotifs, context, ramesh.Id, NotificationType.ORDER_PLACED, NotificationCategory.Order,
+                    "New order received", "Saurabh Singh placed an order for 2 quintals of Wheat — Grade A.", "/seller/orders", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, ramesh.Id, NotificationType.NEGOTIATION_STARTED, NotificationCategory.Negotiation,
+                    "New negotiation started", "Anita Desai wants to negotiate on Wheat — Grade A. Initial offer ₹2,000 / quintal.", "/seller/negotiations", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, ramesh.Id, NotificationType.VERIFICATION_APPROVED, NotificationCategory.Verification,
+                    "Verification Approved", "Your farm verification was approved. Verified badge is now live.", "/seller/verification", isRead: true, readAt: now.AddDays(-10));
+
+                AddNotificationIfMissing(seedNotifs, context, ramesh.Id, NotificationType.PAYOUT_PROCESSED, NotificationCategory.Payout,
+                    "Payout Processed", "Your payout of ₹22,000 has been processed. Reference TXN-MOCK-202609-001.", "/seller/payouts", isRead: true, readAt: now.AddDays(-7));
+            }
+
+            if (sunita != null)
+            {
+                AddNotificationIfMissing(seedNotifs, context, sunita.Id, NotificationType.RETURN_REQUESTED, NotificationCategory.ReturnDispute,
+                    "Return Requested", "Vivek Shah requested a return on order #FB-20261008-0012.", "/seller/returns", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, sunita.Id, NotificationType.REVIEW_RECEIVED, NotificationCategory.Review,
+                    "5-Star Review Received", "Anita Desai left a 5-star review on Tomato.", "/seller/dashboard", isRead: true, readAt: now.AddDays(-4));
+            }
+
+            if (seedNotifs.Count > 0)
+            {
+                await context.Notifications.AddRangeAsync(seedNotifs);
+                await context.SaveChangesAsync();
+            }
+
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static void AddNotificationIfMissing(
+        List<Notification> list,
+        AppDbContext context,
+        Guid userId,
+        NotificationType type,
+        NotificationCategory cat,
+        string title,
+        string body,
+        string link,
+        bool isRead,
+        DateTime? readAt = null)
+    {
+        var exists = context.Notifications.Any(n => n.UserId == userId && n.Title == title);
+        if (!exists)
+        {
+            list.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Type = type,
+                Category = cat,
+                Title = title,
+                Body = body,
+                Link = link,
+                IsRead = isRead,
+                ReadAt = isRead ? (readAt ?? DateTime.UtcNow) : null,
+                CreatedAt = readAt ?? DateTime.UtcNow
+            });
         }
     }
 }

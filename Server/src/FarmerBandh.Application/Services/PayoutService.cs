@@ -9,10 +9,12 @@ namespace FarmerBandh.Application.Services;
 public class PayoutService : IPayoutService
 {
     private readonly ISellerOperationsRepository _repository;
+    private readonly INotificationService _notificationService;
 
-    public PayoutService(ISellerOperationsRepository repository)
+    public PayoutService(ISellerOperationsRepository repository, INotificationService notificationService)
     {
         _repository = repository;
+        _notificationService = notificationService;
     }
 
     public async Task<PagedResultDto<PayoutItemDto>> GetPayoutsAsync(Guid userId, PayoutQueryParams queryParams)
@@ -117,6 +119,17 @@ public class PayoutService : IPayoutService
 
         await _repository.AddPayoutAsync(payout);
         await _repository.SaveChangesAsync();
+
+        // Notify farmer (self-confirmation)
+        await _notificationService.CreateAsync(
+            userId,
+            NotificationType.PAYOUT_REQUESTED,
+            "Payout Requested",
+            $"Your payout request {payout.PayoutNumber} for ₹{payout.Amount:N2} was submitted and is pending review.",
+            "/seller/payouts",
+            "Payout",
+            payout.Id
+        );
 
         return MapToDto(payout);
     }

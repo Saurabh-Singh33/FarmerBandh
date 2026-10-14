@@ -8,10 +8,12 @@ namespace FarmerBandh.Application.Services;
 public class VerificationService : IVerificationService
 {
     private readonly ISellerOperationsRepository _repository;
+    private readonly INotificationService _notificationService;
 
-    public VerificationService(ISellerOperationsRepository repository)
+    public VerificationService(ISellerOperationsRepository repository, INotificationService notificationService)
     {
         _repository = repository;
+        _notificationService = notificationService;
     }
 
     public async Task<VerificationStatusDto> GetVerificationStatusAsync(Guid userId)
@@ -78,6 +80,17 @@ public class VerificationService : IVerificationService
 
         await _repository.AddVerificationRequestAsync(vr);
         await _repository.SaveChangesAsync();
+
+        // Notify farmer (self-confirmation)
+        await _notificationService.CreateAsync(
+            userId,
+            NotificationType.VERIFICATION_SUBMITTED,
+            "Verification Submitted",
+            $"Your farm verification request {vr.RequestNumber} was submitted and is under review.",
+            "/seller/verification",
+            "Verification",
+            vr.Id
+        );
 
         return MapToDto(vr);
     }

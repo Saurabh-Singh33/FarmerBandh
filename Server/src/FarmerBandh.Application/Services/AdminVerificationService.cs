@@ -9,11 +9,16 @@ public class AdminVerificationService : IAdminVerificationService
 {
     private readonly IAdminRepository _adminRepository;
     private readonly IActivityLogger _activityLogger;
+    private readonly INotificationService _notificationService;
 
-    public AdminVerificationService(IAdminRepository adminRepository, IActivityLogger activityLogger)
+    public AdminVerificationService(
+        IAdminRepository adminRepository,
+        IActivityLogger activityLogger,
+        INotificationService notificationService)
     {
         _adminRepository = adminRepository;
         _activityLogger = activityLogger;
+        _notificationService = notificationService;
     }
 
     public async Task<(IEnumerable<AdminVerificationListItemDto> Items, int TotalCount)> GetVerificationsAsync(AdminVerificationQuery query)
@@ -55,6 +60,19 @@ public class AdminVerificationService : IAdminVerificationService
             actorUserId: currentAdminId
         );
 
+        if (farmer?.UserId != null)
+        {
+            await _notificationService.CreateAsync(
+                farmer.UserId,
+                NotificationType.VERIFICATION_APPROVED,
+                "Farm Verification Approved",
+                "Your farm verification was approved. Verified badge is now live.",
+                "/seller/verification",
+                "Verification",
+                v.Id
+            );
+        }
+
         return true;
     }
 
@@ -87,6 +105,19 @@ public class AdminVerificationService : IAdminVerificationService
             httpContext: httpContext,
             actorUserId: currentAdminId
         );
+
+        if (farmer?.UserId != null)
+        {
+            await _notificationService.CreateAsync(
+                farmer.UserId,
+                NotificationType.VERIFICATION_REJECTED,
+                "Farm Verification Rejected",
+                $"Your farm verification request was rejected. Reason: {request.Reason}",
+                "/seller/verification",
+                "Verification",
+                v.Id
+            );
+        }
 
         return true;
     }

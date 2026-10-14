@@ -12,17 +12,20 @@ public class NegotiationService : INegotiationService
     private readonly IProductRepository _productRepository;
     private readonly IUserRepository _userRepository;
     private readonly IFarmerRepository _farmerRepository;
+    private readonly INotificationService _notificationService;
 
     public NegotiationService(
         INegotiationRepository negotiationRepository,
         IProductRepository productRepository,
         IUserRepository userRepository,
-        IFarmerRepository farmerRepository)
+        IFarmerRepository farmerRepository,
+        INotificationService notificationService)
     {
         _negotiationRepository = negotiationRepository;
         _productRepository = productRepository;
         _userRepository = userRepository;
         _farmerRepository = farmerRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<NegotiationDetailDto> StartNegotiationAsync(Guid buyerUserId, CreateNegotiationRequestDto request)
@@ -128,6 +131,22 @@ public class NegotiationService : INegotiationService
             await _negotiationRepository.AddMessageAsync(firstMessage);
             await _negotiationRepository.SaveChangesAsync();
 
+            // Notify farmer of bundle negotiation
+            var farmerOwner = await _farmerRepository.GetByIdAsync(farmerId!.Value);
+            if (farmerOwner != null)
+            {
+                var buyerName = buyer.User?.FullName ?? "A buyer";
+                await _notificationService.CreateAsync(
+                    farmerOwner.UserId,
+                    NotificationType.NEGOTIATION_STARTED,
+                    "New negotiation started",
+                    $"{buyerName} initiated a bundle price negotiation for {bundleList.Count} items.",
+                    $"/seller/negotiations/{negotiation.Id}",
+                    "Negotiation",
+                    negotiation.Id
+                );
+            }
+
             return await GetBuyerNegotiationDetailAsync(buyerUserId, negotiation.Id);
         }
 
@@ -189,6 +208,22 @@ public class NegotiationService : INegotiationService
 
         await _negotiationRepository.AddMessageAsync(singleFirstMessage);
         await _negotiationRepository.SaveChangesAsync();
+
+        // Notify farmer of single negotiation
+        var singleFarmer = await _farmerRepository.GetByIdAsync(product.FarmerId);
+        if (singleFarmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "A buyer";
+            await _notificationService.CreateAsync(
+                singleFarmer.UserId,
+                NotificationType.NEGOTIATION_STARTED,
+                "New negotiation started",
+                $"{buyerName} wants to negotiate on {product.Name}. Initial offer: ₹{request.OfferedPricePerQuintal:N0} / quintal.",
+                $"/seller/negotiations/{singleNegotiation.Id}",
+                "Negotiation",
+                singleNegotiation.Id
+            );
+        }
 
         return await GetBuyerNegotiationDetailAsync(buyerUserId, singleNegotiation.Id);
     }
@@ -341,6 +376,22 @@ public class NegotiationService : INegotiationService
         await _negotiationRepository.UpdateAsync(negotiation);
         await _negotiationRepository.SaveChangesAsync();
 
+        // Notify farmer of counter/reply
+        var replyFarmer = await _farmerRepository.GetByIdAsync(negotiation.FarmerId);
+        if (replyFarmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "Buyer";
+            await _notificationService.CreateAsync(
+                replyFarmer.UserId,
+                NotificationType.NEGOTIATION_REPLIED,
+                "Negotiation updated",
+                $"{buyerName} sent an update: ₹{negotiation.CurrentOfferPrice:N0} / quintal.",
+                $"/seller/negotiations/{negotiation.Id}",
+                "Negotiation",
+                negotiation.Id
+            );
+        }
+
         return await GetBuyerNegotiationDetailAsync(buyerUserId, negotiationId);
     }
 
@@ -405,6 +456,22 @@ public class NegotiationService : INegotiationService
         await _negotiationRepository.UpdateAsync(negotiation);
         await _negotiationRepository.SaveChangesAsync();
 
+        // Notify farmer of acceptance
+        var acceptFarmer = await _farmerRepository.GetByIdAsync(negotiation.FarmerId);
+        if (acceptFarmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "Buyer";
+            await _notificationService.CreateAsync(
+                acceptFarmer.UserId,
+                NotificationType.NEGOTIATION_ACCEPTED,
+                "Offer accepted!",
+                $"{buyerName} accepted your offer of ₹{negotiation.AgreedPricePerQuintal:N0} / quintal.",
+                $"/seller/negotiations/{negotiation.Id}",
+                "Negotiation",
+                negotiation.Id
+            );
+        }
+
         return await GetBuyerNegotiationDetailAsync(buyerUserId, negotiationId);
     }
 
@@ -447,6 +514,22 @@ public class NegotiationService : INegotiationService
         await _negotiationRepository.AddMessageAsync(msg);
         await _negotiationRepository.UpdateAsync(negotiation);
         await _negotiationRepository.SaveChangesAsync();
+
+        // Notify farmer of rejection
+        var rejectFarmer = await _farmerRepository.GetByIdAsync(negotiation.FarmerId);
+        if (rejectFarmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "Buyer";
+            await _notificationService.CreateAsync(
+                rejectFarmer.UserId,
+                NotificationType.NEGOTIATION_REJECTED,
+                "Negotiation rejected",
+                $"{buyerName} rejected the negotiation.",
+                $"/seller/negotiations/{negotiation.Id}",
+                "Negotiation",
+                negotiation.Id
+            );
+        }
 
         return await GetBuyerNegotiationDetailAsync(buyerUserId, negotiationId);
     }
@@ -640,6 +723,22 @@ public class NegotiationService : INegotiationService
         await _negotiationRepository.UpdateAsync(negotiation);
         await _negotiationRepository.SaveChangesAsync();
 
+        // Notify buyer of farmer's reply
+        var targetBuyer = await _negotiationRepository.GetByIdAsync(negotiationId);
+        var buyerUserId = targetBuyer?.Buyer?.UserId;
+        if (buyerUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                buyerUserId.Value,
+                NotificationType.NEGOTIATION_REPLIED,
+                "Farmer replied to negotiation",
+                $"{farmer.FarmName} countered your offer at ₹{negotiation.CurrentOfferPrice:N0} / quintal.",
+                $"/negotiations/{negotiation.Id}",
+                "Negotiation",
+                negotiation.Id
+            );
+        }
+
         return await GetSellerNegotiationDetailAsync(farmerUserId, negotiationId);
     }
 
@@ -704,6 +803,22 @@ public class NegotiationService : INegotiationService
         await _negotiationRepository.UpdateAsync(negotiation);
         await _negotiationRepository.SaveChangesAsync();
 
+        // Notify buyer of acceptance
+        var acceptedBuyer = await _negotiationRepository.GetByIdAsync(negotiationId);
+        var buyerAcceptUserId = acceptedBuyer?.Buyer?.UserId;
+        if (buyerAcceptUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                buyerAcceptUserId.Value,
+                NotificationType.NEGOTIATION_ACCEPTED,
+                "Offer accepted!",
+                $"{farmer.FarmName} accepted your offer of ₹{negotiation.AgreedPricePerQuintal:N0} / quintal.",
+                $"/negotiations/{negotiation.Id}",
+                "Negotiation",
+                negotiation.Id
+            );
+        }
+
         return await GetSellerNegotiationDetailAsync(farmerUserId, negotiationId);
     }
 
@@ -747,6 +862,22 @@ public class NegotiationService : INegotiationService
         await _negotiationRepository.UpdateAsync(negotiation);
         await _negotiationRepository.SaveChangesAsync();
 
+        // Notify buyer of rejection
+        var rejectedBuyer = await _negotiationRepository.GetByIdAsync(negotiationId);
+        var buyerRejectUserId = rejectedBuyer?.Buyer?.UserId;
+        if (buyerRejectUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                buyerRejectUserId.Value,
+                NotificationType.NEGOTIATION_REJECTED,
+                "Negotiation rejected",
+                $"{farmer.FarmName} rejected the negotiation.",
+                $"/negotiations/{negotiation.Id}",
+                "Negotiation",
+                negotiation.Id
+            );
+        }
+
         return await GetSellerNegotiationDetailAsync(farmerUserId, negotiationId);
     }
 
@@ -785,6 +916,36 @@ public class NegotiationService : INegotiationService
         if (stale.Any())
         {
             await _negotiationRepository.SaveChangesAsync();
+
+            // Notify both parties of expiry
+            foreach (var neg in stale)
+            {
+                if (neg.Buyer?.UserId != null)
+                {
+                    await _notificationService.CreateAsync(
+                        neg.Buyer.UserId,
+                        NotificationType.NEGOTIATION_EXPIRED,
+                        "Negotiation expired",
+                        "Your negotiation expired due to 48 hours of inactivity.",
+                        $"/negotiations/{neg.Id}",
+                        "Negotiation",
+                        neg.Id
+                    );
+                }
+
+                if (neg.Farmer?.UserId != null)
+                {
+                    await _notificationService.CreateAsync(
+                        neg.Farmer.UserId,
+                        NotificationType.NEGOTIATION_EXPIRED,
+                        "Negotiation expired",
+                        "Negotiation expired due to 48 hours of inactivity.",
+                        $"/seller/negotiations/{neg.Id}",
+                        "Negotiation",
+                        neg.Id
+                    );
+                }
+            }
         }
     }
 

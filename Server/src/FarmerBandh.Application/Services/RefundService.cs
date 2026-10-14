@@ -12,17 +12,20 @@ public class RefundService : IRefundService
     private readonly IReturnRepository _returnRepository;
     private readonly IProductRepository _productRepository;
     private readonly ITimelineService _timelineService;
+    private readonly INotificationService _notificationService;
 
     public RefundService(
         IRefundRepository refundRepository,
         IReturnRepository returnRepository,
         IProductRepository productRepository,
-        ITimelineService timelineService)
+        ITimelineService timelineService,
+        INotificationService notificationService)
     {
         _refundRepository = refundRepository;
         _returnRepository = returnRepository;
         _productRepository = productRepository;
         _timelineService = timelineService;
+        _notificationService = notificationService;
     }
 
     public async Task<RefundDto> ProcessRefundAsync(Guid userId, Guid refundId)
@@ -58,6 +61,21 @@ public class RefundService : IRefundService
             await _returnRepository.UpdateAsync(returnReq);
 
             await _timelineService.LogStatusChangeAsync(refund.OrderId, returnReq.Order?.Status ?? OrderStatus.Delivered, userId, UserRole.Farmer, $"Mock Refund Processed: ₹{refund.Amount} (Ref: {refund.Reference})");
+        }
+
+        // Notify buyer of completed refund
+        var buyerUserId = refund.Buyer?.UserId ?? returnReq?.Buyer?.UserId;
+        if (buyerUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                buyerUserId.Value,
+                NotificationType.REFUND_PROCESSED,
+                "Refund processed",
+                $"Your refund of ₹{refund.Amount:N2} on order #{refund.Order?.OrderNumber ?? returnReq?.Order?.OrderNumber} has been processed (Ref: {refund.Reference}).",
+                $"/returns/{refund.ReturnRequestId}",
+                "Refund",
+                refund.Id
+            );
         }
 
         return MapToDto(refund);

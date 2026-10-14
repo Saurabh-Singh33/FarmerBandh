@@ -97,6 +97,22 @@ authClient.interceptors.response.use(
       }
     }
 
+    // Network error retry once
+    if (!error.response && !originalRequest._networkRetry) {
+      originalRequest._networkRetry = true;
+      try {
+        return await authClient(originalRequest);
+      } catch (retryErr) {
+        toast.error('Network connection issue. Please verify your internet connection.', 'Connection Error');
+        return Promise.reject(retryErr);
+      }
+    }
+
+    // Trigger toast on 500 or 503
+    if (error.response && (error.response.status === 500 || error.response.status === 503)) {
+      toast.error('The server encountered an issue. Please try again shortly.', 'Server Error');
+    }
+
     return Promise.reject(error);
   }
 );

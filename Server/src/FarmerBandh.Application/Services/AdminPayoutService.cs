@@ -9,11 +9,16 @@ public class AdminPayoutService : IAdminPayoutService
 {
     private readonly IAdminRepository _adminRepository;
     private readonly IActivityLogger _activityLogger;
+    private readonly INotificationService _notificationService;
 
-    public AdminPayoutService(IAdminRepository adminRepository, IActivityLogger activityLogger)
+    public AdminPayoutService(
+        IAdminRepository adminRepository,
+        IActivityLogger activityLogger,
+        INotificationService notificationService)
     {
         _adminRepository = adminRepository;
         _activityLogger = activityLogger;
+        _notificationService = notificationService;
     }
 
     public async Task<(IEnumerable<AdminPayoutListItemDto> Items, int TotalCount)> GetPayoutsAsync(AdminPayoutQuery query)
@@ -48,6 +53,19 @@ public class AdminPayoutService : IAdminPayoutService
             actorUserId: currentAdminId
         );
 
+        if (payout.Farmer?.UserId != null)
+        {
+            await _notificationService.CreateAsync(
+                payout.Farmer.UserId,
+                NotificationType.PAYOUT_PROCESSED,
+                "Payout Processed",
+                $"Your payout of ₹{payout.Amount:N2} has been processed. Reference: {payout.Reference}",
+                "/seller/payouts",
+                "Payout",
+                payout.Id
+            );
+        }
+
         return true;
     }
 
@@ -71,6 +89,19 @@ public class AdminPayoutService : IAdminPayoutService
             httpContext: httpContext,
             actorUserId: currentAdminId
         );
+
+        if (payout.Farmer?.UserId != null)
+        {
+            await _notificationService.CreateAsync(
+                payout.Farmer.UserId,
+                NotificationType.PAYOUT_FAILED,
+                "Payout Failed",
+                $"Your payout of ₹{payout.Amount:N2} failed. Reason: {request.Reason}",
+                "/seller/payouts",
+                "Payout",
+                payout.Id
+            );
+        }
 
         return true;
     }
@@ -125,6 +156,19 @@ public class AdminPayoutService : IAdminPayoutService
                     httpContext: httpContext,
                     actorUserId: currentAdminId
                 );
+
+                if (payout.Farmer?.UserId != null)
+                {
+                    await _notificationService.CreateAsync(
+                        payout.Farmer.UserId,
+                        NotificationType.PAYOUT_PROCESSED,
+                        "Payout Processed",
+                        $"Your payout of ₹{payout.Amount:N2} has been processed. Reference: {payout.Reference}",
+                        "/seller/payouts",
+                        "Payout",
+                        payout.Id
+                    );
+                }
 
                 processedCount++;
             }

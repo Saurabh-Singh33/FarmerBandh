@@ -16,6 +16,7 @@ public class OrderService : IOrderService
     private readonly IPlatformSettingRepository _settingRepository;
     private readonly ICartService _cartService;
     private readonly ITimelineService _timelineService;
+    private readonly INotificationService _notificationService;
 
     public OrderService(
         IOrderRepository orderRepository,
@@ -25,7 +26,8 @@ public class OrderService : IOrderService
         ICouponRepository couponRepository,
         IPlatformSettingRepository settingRepository,
         ICartService cartService,
-        ITimelineService timelineService)
+        ITimelineService timelineService,
+        INotificationService notificationService)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
@@ -35,6 +37,7 @@ public class OrderService : IOrderService
         _settingRepository = settingRepository;
         _cartService = cartService;
         _timelineService = timelineService;
+        _notificationService = notificationService;
     }
 
     public async Task<OrderPlacementResultDto> CreateOrderAsync(Guid userId, CreateOrderRequest request)
@@ -209,6 +212,24 @@ public class OrderService : IOrderService
 
             await _orderRepository.CreateOrderAsync(order);
             await _timelineService.LogStatusChangeAsync(order.Id, OrderStatus.Pending, userId, UserRole.Buyer, "Order Placed by Buyer");
+
+            // Notify seller after order is created
+            var sellerFarmer = await _productRepository.GetFarmerByIdAsync(order.SellerId);
+            if (sellerFarmer != null)
+            {
+                var buyerName = buyer.User?.FullName ?? "A customer";
+                var firstItemName = order.Items.FirstOrDefault()?.ProductNameSnapshot ?? "Produce";
+                await _notificationService.CreateAsync(
+                    sellerFarmer.UserId,
+                    NotificationType.ORDER_PLACED,
+                    "New order received",
+                    $"{buyerName} placed order #{order.OrderNumber} ({firstItemName}, Total: ₹{order.TotalAmount:N2}).",
+                    $"/seller/orders/{order.Id}",
+                    "Order",
+                    order.Id
+                );
+            }
+
             createdOrders.Add(order);
             grandTotal += orderTotal;
         }
@@ -305,6 +326,22 @@ public class OrderService : IOrderService
 
         await _orderRepository.UpdateOrderAsync(order);
         await _timelineService.LogStatusChangeAsync(order.Id, OrderStatus.Cancelled, userId, UserRole.Buyer, order.CancellationReason);
+
+        // Notify seller after buyer cancellation
+        var sellerFarmer = await _productRepository.GetFarmerByIdAsync(order.SellerId);
+        if (sellerFarmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "Buyer";
+            await _notificationService.CreateAsync(
+                sellerFarmer.UserId,
+                NotificationType.ORDER_CANCELLED,
+                "Order cancelled",
+                $"{buyerName} cancelled order #{order.OrderNumber}. Reason: {order.CancellationReason}",
+                $"/seller/orders/{order.Id}",
+                "Order",
+                order.Id
+            );
+        }
     }
 
     public async Task DeleteBuyerOrderAsync(Guid userId, Guid orderId)
@@ -437,6 +474,34 @@ public class OrderService : IOrderService
             }
             await _orderRepository.UpdateOrderAsync(order);
             await _timelineService.LogStatusChangeAsync(order.Id, newStatus, userId, UserRole.Farmer, $"Order Status updated to {newStatus}");
+
+            // Notify buyer of status update
+            var buyerUserId = order.Buyer?.UserId ?? (await _orderRepository.GetByIdAsync(order.Id))?.Buyer?.UserId;
+            if (buyerUserId.HasValue && buyerUserId.Value != Guid.Empty)
+            {
+                var (title, body, notifType) = newStatus switch
+                {
+                    OrderStatus.Confirmed => ("Order Confirmed", $"Your order #{order.OrderNumber} has been confirmed by the farmer.", NotificationType.ORDER_CONFIRMED),
+                    OrderStatus.Packed => ("Order Packed", $"Your order #{order.OrderNumber} is packed and ready to ship.", NotificationType.ORDER_PACKED),
+                    OrderStatus.InTransit => ("Order Shipped", $"Your order #{order.OrderNumber} is out for delivery / ready for pickup.", NotificationType.ORDER_SHIPPED),
+                    OrderStatus.Delivered => ("Order Delivered", $"Your order #{order.OrderNumber} has been delivered. Leave a review?", NotificationType.ORDER_DELIVERED),
+                    OrderStatus.Cancelled => ("Order Cancelled", $"Your order #{order.OrderNumber} was cancelled by the seller.", NotificationType.ORDER_CANCELLED),
+                    _ => (string.Empty, string.Empty, (NotificationType)0)
+                };
+
+                if (!string.IsNullOrEmpty(title))
+                {
+                    await _notificationService.CreateAsync(
+                        buyerUserId.Value,
+                        notifType,
+                        title,
+                        body,
+                        $"/orders/{order.Id}",
+                        "Order",
+                        order.Id
+                    );
+                }
+            }
         }
 
         return MapToDetail(order);
@@ -476,6 +541,20 @@ public class OrderService : IOrderService
 
         await _orderRepository.UpdateOrderAsync(order);
         await _timelineService.LogStatusChangeAsync(order.Id, OrderStatus.Cancelled, userId, UserRole.Farmer, order.CancellationReason);
+
+        var buyerUserId = order.Buyer?.UserId ?? (await _orderRepository.GetByIdAsync(order.Id))?.Buyer?.UserId;
+        if (buyerUserId.HasValue && buyerUserId.Value != Guid.Empty)
+        {
+            await _notificationService.CreateAsync(
+                buyerUserId.Value,
+                NotificationType.ORDER_CANCELLED,
+                "Order Rejected",
+                $"Your order #{order.OrderNumber} was rejected by the seller. Reason: {order.CancellationReason}",
+                $"/orders/{order.Id}",
+                "Order",
+                order.Id
+            );
+        }
         return MapToDetail(order);
     }
 

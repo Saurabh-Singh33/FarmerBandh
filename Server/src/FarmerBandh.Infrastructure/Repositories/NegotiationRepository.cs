@@ -108,6 +108,10 @@ public class NegotiationRepository : INegotiationRepository
     public async Task<IEnumerable<Negotiation>> GetExpiredNegotiationsAsync(DateTime threshold)
     {
         return await _context.Negotiations
+            .Include(n => n.Buyer)
+                .ThenInclude(b => b!.User)
+            .Include(n => n.Farmer)
+                .ThenInclude(f => f!.User)
             .Where(n => (n.Status == NegotiationStatus.Open || n.Status == NegotiationStatus.Countered) &&
                         n.ExpiresAt < threshold)
             .ToListAsync();

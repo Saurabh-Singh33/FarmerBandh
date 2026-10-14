@@ -12,17 +12,20 @@ public class DisputeService : IDisputeService
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
     private readonly IUserRepository _userRepository;
+    private readonly INotificationService _notificationService;
 
     public DisputeService(
         IDisputeRepository disputeRepository,
         IOrderRepository orderRepository,
         IProductRepository productRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        INotificationService notificationService)
     {
         _disputeRepository = disputeRepository;
         _orderRepository = orderRepository;
         _productRepository = productRepository;
         _userRepository = userRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<DisputeDetailDto> CreateDisputeAsync(Guid userId, Guid orderId, CreateDisputeRequest request)
@@ -95,6 +98,21 @@ public class DisputeService : IDisputeService
         dispute.RaisedByUser = user;
         dispute.AgainstUser = isBuyer ? order.Seller?.User : order.Buyer?.User;
 
+        // Notify the opposing party
+        if (againstUserId != Guid.Empty)
+        {
+            var senderName = user.FullName;
+            await _notificationService.CreateAsync(
+                againstUserId,
+                NotificationType.DISPUTE_OPENED,
+                "Dispute opened",
+                $"{senderName} raised a dispute on order #{order.OrderNumber}. Subject: {request.Subject}",
+                isBuyer ? $"/seller/disputes/{dispute.Id}" : $"/disputes/{dispute.Id}",
+                "Dispute",
+                dispute.Id
+            );
+        }
+
         return MapToDetail(dispute);
     }
 
@@ -165,6 +183,21 @@ public class DisputeService : IDisputeService
         await _disputeRepository.AddMessageAsync(message);
         await _disputeRepository.UpdateAsync(dispute);
 
+        // Notify the other party of new dispute message
+        var recipientUserId = dispute.RaisedByUserId == userId ? dispute.AgainstUserId : dispute.RaisedByUserId;
+        if (recipientUserId != Guid.Empty)
+        {
+            await _notificationService.CreateAsync(
+                recipientUserId,
+                NotificationType.DISPUTE_MESSAGE,
+                "New dispute message",
+                $"New message from {user.FullName} on dispute #{dispute.Order?.OrderNumber ?? "order"}.",
+                $"/disputes/{dispute.Id}",
+                "Dispute",
+                dispute.Id
+            );
+        }
+
         return MapToDetail(dispute);
     }
 
@@ -181,6 +214,28 @@ public class DisputeService : IDisputeService
         dispute.ResolutionNote = string.IsNullOrWhiteSpace(request.Note) ? "Resolved by mutual agreement" : request.Note;
 
         await _disputeRepository.UpdateAsync(dispute);
+
+        // Notify both parties of resolution
+        await _notificationService.CreateAsync(
+            dispute.RaisedByUserId,
+            NotificationType.DISPUTE_RESOLVED,
+            "Dispute resolved",
+            $"The dispute on order #{dispute.Order?.OrderNumber ?? "order"} has been resolved.",
+            $"/disputes/{dispute.Id}",
+            "Dispute",
+            dispute.Id
+        );
+
+        await _notificationService.CreateAsync(
+            dispute.AgainstUserId,
+            NotificationType.DISPUTE_RESOLVED,
+            "Dispute resolved",
+            $"The dispute on order #{dispute.Order?.OrderNumber ?? "order"} has been resolved.",
+            $"/disputes/{dispute.Id}",
+            "Dispute",
+            dispute.Id
+        );
+
         return MapToDetail(dispute);
     }
 

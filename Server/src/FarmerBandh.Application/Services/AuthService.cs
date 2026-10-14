@@ -57,7 +57,19 @@ public class AuthService : IAuthService
             District = request.District,
             City = request.City,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            NotificationPreference = new NotificationPreference
+            {
+                Id = Guid.NewGuid(),
+                OrderUpdates = true,
+                NegotiationUpdates = true,
+                ReturnDisputeUpdates = true,
+                PayoutUpdates = true,
+                VerificationUpdates = true,
+                ReviewUpdates = true,
+                SystemAnnouncements = true,
+                UpdatedAt = DateTime.UtcNow
+            }
         };
 
         await _userRepository.AddAsync(user);

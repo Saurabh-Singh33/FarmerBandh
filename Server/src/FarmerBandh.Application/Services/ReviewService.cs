@@ -11,15 +11,18 @@ public class ReviewService : IReviewService
     private readonly IReviewRepository _reviewRepository;
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
+    private readonly INotificationService _notificationService;
 
     public ReviewService(
         IReviewRepository reviewRepository,
         IOrderRepository orderRepository,
-        IProductRepository productRepository)
+        IProductRepository productRepository,
+        INotificationService notificationService)
     {
         _reviewRepository = reviewRepository;
         _orderRepository = orderRepository;
         _productRepository = productRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<List<ReviewDto>> CreateOrderReviewsAsync(Guid userId, Guid orderId, CreateOrderReviewsRequest request)
@@ -95,6 +98,23 @@ public class ReviewService : IReviewService
             await _reviewRepository.RecalculateProductRatingAsync(prodId);
         }
         await _reviewRepository.RecalculateFarmerRatingAsync(order.SellerId);
+
+        // Notify farmer of new review
+        var sellerFarmer = await _productRepository.GetFarmerByIdAsync(order.SellerId);
+        if (sellerFarmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "A customer";
+            var firstItemName = order.Items.FirstOrDefault()?.ProductNameSnapshot ?? "produce";
+            await _notificationService.CreateAsync(
+                sellerFarmer.UserId,
+                NotificationType.REVIEW_RECEIVED,
+                "New Review Received",
+                $"{buyerName} left a review on your {firstItemName} for order #{order.OrderNumber}.",
+                "/seller/dashboard",
+                "Review",
+                order.Id
+            );
+        }
 
         return resultReviews.Select(MapToDto).ToList();
     }

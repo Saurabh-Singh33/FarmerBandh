@@ -97,6 +97,10 @@ builder.Services.AddScoped<IAdminSettingsService, AdminSettingsService>();
 builder.Services.AddScoped<IAdminActivityService, AdminActivityService>();
 builder.Services.AddScoped<IAdminProfileService, AdminProfileService>();
 
+// Phase 8 Repositories & Services (Notifications)
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 // Hosted background service for expiring stale negotiations every 15 min
 builder.Services.AddHostedService<NegotiationExpiryService>();
 

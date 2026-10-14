@@ -14,19 +14,22 @@ public class ReturnService : IReturnService
     private readonly IProductRepository _productRepository;
     private readonly ITimelineService _timelineService;
     private readonly IRefundRepository _refundRepository;
+    private readonly INotificationService _notificationService;
 
     public ReturnService(
         IReturnRepository returnRepository,
         IOrderRepository orderRepository,
         IProductRepository productRepository,
         ITimelineService timelineService,
-        IRefundRepository refundRepository)
+        IRefundRepository refundRepository,
+        INotificationService notificationService)
     {
         _returnRepository = returnRepository;
         _orderRepository = orderRepository;
         _productRepository = productRepository;
         _timelineService = timelineService;
         _refundRepository = refundRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<ReturnDetailDto> CreateReturnAsync(Guid userId, Guid orderId, CreateReturnRequest request)
@@ -105,6 +108,22 @@ public class ReturnService : IReturnService
 
         await _returnRepository.CreateAsync(returnRequest);
         await _timelineService.LogStatusChangeAsync(orderId, order.Status, userId, UserRole.Buyer, $"Return Requested ({category}): {request.Reason}");
+
+        // Notify farmer of return request
+        var farmer = await _productRepository.GetFarmerByIdAsync(order.SellerId);
+        if (farmer != null)
+        {
+            var buyerName = buyer.User?.FullName ?? "Buyer";
+            await _notificationService.CreateAsync(
+                farmer.UserId,
+                NotificationType.RETURN_REQUESTED,
+                "Return requested",
+                $"{buyerName} requested a return on order #{order.OrderNumber}. Reason: {request.Reason}",
+                $"/seller/returns/{returnRequest.Id}",
+                "Return",
+                returnRequest.Id
+            );
+        }
 
         return MapToDetail(returnRequest);
     }
@@ -292,6 +311,21 @@ public class ReturnService : IReturnService
         await _returnRepository.UpdateAsync(ret);
         await _timelineService.LogStatusChangeAsync(ret.OrderId, ret.Order?.Status ?? OrderStatus.Delivered, userId, UserRole.Farmer, $"Return Approved: {ret.SellerResponse}");
 
+        // Notify buyer of return approval
+        var buyerUserId = ret.Buyer?.UserId ?? (await _orderRepository.GetByIdAsync(ret.OrderId))?.Buyer?.UserId;
+        if (buyerUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                buyerUserId.Value,
+                NotificationType.RETURN_APPROVED,
+                "Return Approved",
+                $"Your return request on order #{ret.Order?.OrderNumber} was approved. Refund of ₹{refundAmount:N2} is queued.",
+                $"/returns/{ret.Id}",
+                "Return",
+                ret.Id
+            );
+        }
+
         return MapToDetail(ret);
     }
 
@@ -320,6 +354,21 @@ public class ReturnService : IReturnService
 
         await _returnRepository.UpdateAsync(ret);
         await _timelineService.LogStatusChangeAsync(ret.OrderId, ret.Order?.Status ?? OrderStatus.Delivered, userId, UserRole.Farmer, $"Return Rejected: {ret.SellerResponse}");
+
+        // Notify buyer of return rejection
+        var buyerUserId = ret.Buyer?.UserId ?? (await _orderRepository.GetByIdAsync(ret.OrderId))?.Buyer?.UserId;
+        if (buyerUserId.HasValue)
+        {
+            await _notificationService.CreateAsync(
+                buyerUserId.Value,
+                NotificationType.RETURN_REJECTED,
+                "Return Rejected",
+                $"Your return request on order #{ret.Order?.OrderNumber} was rejected by the seller. Reason: {ret.SellerResponse}",
+                $"/returns/{ret.Id}",
+                "Return",
+                ret.Id
+            );
+        }
 
         return MapToDetail(ret);
     }

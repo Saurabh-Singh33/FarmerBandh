@@ -201,6 +201,11 @@ public class ProductRepository : IProductRepository
         return null;
     }
 
+    public async Task<Farmer?> GetFarmerByIdAsync(Guid farmerId)
+    {
+        return await _context.Farmers.Include(f => f.User).FirstOrDefaultAsync(f => f.Id == farmerId);
+    }
+
     public async Task<Buyer?> GetBuyerByUserIdAsync(Guid userId)
     {
         return await _context.Buyers.FirstOrDefaultAsync(b => b.UserId == userId);
