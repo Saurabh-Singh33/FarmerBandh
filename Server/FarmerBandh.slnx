@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FarmerBandh.API/FarmerBandh.API.csproj" />
+    <Project Path="src/FarmerBandh.Application/FarmerBandh.Application.csproj" />
+    <Project Path="src/FarmerBandh.Domain/FarmerBandh.Domain.csproj" />
+    <Project Path="src/FarmerBandh.Infrastructure/FarmerBandh.Infrastructure.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,32 @@
+# Build & Compilation Results
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# Environment Variables & Secrets (CRITICAL: Do not commit to git!)
+.env
+.env.*
+!.env.example
+*.env.local
+
+# Visual Studio & Rider Cache/User files
+.vs/
+.idea/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Local Database Files & Logs
+*.db
+*.sqlite
+*.log
+logs/
+mysql_data/
+
+# Publish output
+publish/
+Release/
+Debug/

@@ -1,0 +1,57 @@
+# ====================================================================
+# FarmerBandh Global Git Ignore
+# Protects secrets, credentials, environment files, and build outputs
+# ====================================================================
+
+# 1. Environment Variables & Secrets (CRITICAL)
+.env
+.env.*
+!.env.example
+*.env.local
+
+# 2. Node.js & Frontend Dependencies / Bundles
+node_modules/
+*/node_modules/
+Client/node_modules/
+dist/
+Client/dist/
+dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 3. .NET Build Output & Assemblies
+bin/
+*/bin/
+Server/**/bin/
+obj/
+*/obj/
+Server/**/obj/
+publish/
+*/publish/
+
+# 4. Local Database Storage & Dumps
+mysql_data/
+*/mysql_data/
+*.sqlite
+*.db
+
+# 5. IDE & Editor Files
+.vs/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 6. Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 7. Diagnostic & Temporary Logs
+logs/
+*.log
