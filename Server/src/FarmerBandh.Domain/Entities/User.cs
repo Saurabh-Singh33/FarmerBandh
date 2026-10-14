@@ -20,4 +20,6 @@ public class User
     public Farmer? Farmer { get; set; }
     public Buyer? Buyer { get; set; }
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public NotificationPreference? NotificationPreference { get; set; }
 }

@@ -768,6 +768,129 @@ namespace FarmerBandh.Infrastructure.Migrations
                     b.ToTable("NegotiationMessages", (string)null);
                 });
 
+            modelBuilder.Entity("FarmerBandh.Domain.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Link")
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("RelatedEntityId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("RelatedEntityType")
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("IX_Notifications_CreatedAt");
+
+                    b.HasIndex("RelatedEntityType", "RelatedEntityId")
+                        .HasDatabaseName("IX_Notifications_RelatedEntity");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("IX_Notifications_UserId_CreatedAt");
+
+                    b.HasIndex("UserId", "Category", "CreatedAt")
+                        .HasDatabaseName("IX_Notifications_UserId_Category_CreatedAt");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAt")
+                        .HasDatabaseName("IX_Notifications_UserId_IsRead_CreatedAt");
+
+                    b.ToTable("Notifications", (string)null);
+                });
+
+            modelBuilder.Entity("FarmerBandh.Domain.Entities.NotificationPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("NegotiationUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("OrderUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("PayoutUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("ReturnDisputeUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("ReviewUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("SystemAnnouncements")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("VerificationUpdates")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_NotificationPreferences_UserId");
+
+                    b.ToTable("NotificationPreferences", (string)null);
+                });
+
             modelBuilder.Entity("FarmerBandh.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1937,6 +2060,28 @@ namespace FarmerBandh.Infrastructure.Migrations
                     b.Navigation("SenderUser");
                 });
 
+            modelBuilder.Entity("FarmerBandh.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("FarmerBandh.Domain.Entities.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FarmerBandh.Domain.Entities.NotificationPreference", b =>
+                {
+                    b.HasOne("FarmerBandh.Domain.Entities.User", "User")
+                        .WithOne("NotificationPreference")
+                        .HasForeignKey("FarmerBandh.Domain.Entities.NotificationPreference", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FarmerBandh.Domain.Entities.Order", b =>
                 {
                     b.HasOne("FarmerBandh.Domain.Entities.Address", "Address")
@@ -2299,6 +2444,10 @@ namespace FarmerBandh.Infrastructure.Migrations
                     b.Navigation("Buyer");
 
                     b.Navigation("Farmer");
+
+                    b.Navigation("NotificationPreference");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("RefreshTokens");
                 });

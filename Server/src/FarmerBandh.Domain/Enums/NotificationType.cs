@@ -1,0 +1,40 @@
+namespace FarmerBandh.Domain.Enums;
+
+/// <summary>
+/// Distinct notification types across all platform operational domains.
+/// </summary>
+public enum NotificationType
+{
+    ORDER_PLACED = 1,
+    ORDER_CONFIRMED = 2,
+    ORDER_PACKED = 3,
+    ORDER_SHIPPED = 4,
+    ORDER_DELIVERED = 5,
+    ORDER_CANCELLED = 6,
+
+    NEGOTIATION_STARTED = 10,
+    NEGOTIATION_REPLIED = 11,
+    NEGOTIATION_ACCEPTED = 12,
+    NEGOTIATION_REJECTED = 13,
+    NEGOTIATION_EXPIRED = 14,
+
+    RETURN_REQUESTED = 20,
+    RETURN_APPROVED = 21,
+    RETURN_REJECTED = 22,
+    REFUND_PROCESSED = 23,
+    DISPUTE_OPENED = 24,
+    DISPUTE_MESSAGE = 25,
+    DISPUTE_RESOLVED = 26,
+
+    PAYOUT_REQUESTED = 30,
+    PAYOUT_PROCESSED = 31,
+    PAYOUT_FAILED = 32,
+
+    VERIFICATION_SUBMITTED = 40,
+    VERIFICATION_APPROVED = 41,
+    VERIFICATION_REJECTED = 42,
+
+    REVIEW_RECEIVED = 50,
+
+    SYSTEM_ANNOUNCEMENT = 60
+}

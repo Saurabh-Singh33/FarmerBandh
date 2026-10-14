@@ -48,6 +48,10 @@ public class AppDbContext : DbContext
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
     public DbSet<FeaturedListing> FeaturedListings => Set<FeaturedListing>();
 
+    // Phase 8 DbSets
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationPreference> NotificationPreferences => Set<NotificationPreference>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
