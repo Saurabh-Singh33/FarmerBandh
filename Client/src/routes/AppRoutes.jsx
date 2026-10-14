@@ -1,7 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
-import { Home } from '../pages/shared/Home';
+import { Landing } from '../pages/shared/Landing';
+import { About } from '../pages/shared/About';
+import { Contact } from '../pages/shared/Contact';
+import { Help } from '../pages/shared/Help';
 import { LoginRegister } from '../pages/shared/LoginRegister';
 import { Marketplace } from '../pages/buyer/Marketplace';
 import { ProductDetails } from '../pages/buyer/ProductDetails';
@@ -56,12 +59,18 @@ import { Categories as AdminCategories } from '../pages/admin/Categories';
 import { AdminSettings } from '../pages/admin/AdminSettings';
 import { ActivityLogs as AdminActivityLogs } from '../pages/admin/ActivityLogs';
 import { AdminProfile } from '../pages/admin/AdminProfile';
+import { Notifications } from '../pages/shared/Notifications';
+import { NotificationPreferences } from '../pages/shared/NotificationPreferences';
+import { NotFound } from '../pages/shared/NotFound';
 
 export const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Landing />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/help" element={<Help />} />
       <Route path="/auth" element={<LoginRegister />} />
       <Route path="/products/:idOrSlug" element={<ProductDetails />} />
       <Route path="/farmers/:id" element={<FarmerPublicProfile />} />
@@ -481,8 +490,26 @@ export const AppRoutes = () => {
         }
       />
 
-      {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Shared Authenticated Routes */}
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications/preferences"
+        element={
+          <ProtectedRoute>
+            <NotificationPreferences />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 404 Catch-all */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

@@ -19,13 +19,15 @@ import {
   Activity,
   User,
   LogOut,
-  Store
+  Store,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { notify } from '../../context/NotificationContext';
+import { useNotifications, notify } from '../../context/NotificationContext';
 
 export const AdminSidebar = () => {
   const { user, logout } = useAuth();
+  const { unreadCount: notifUnreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -72,6 +74,7 @@ export const AdminSidebar = () => {
     {
       title: 'INSIGHTS & SYSTEM',
       items: [
+        { name: 'Notifications', path: '/notifications', icon: Bell, badge: notifUnreadCount > 0 ? `${notifUnreadCount}` : null },
         { name: 'Reports & Analytics', path: '/admin/reports', icon: BarChart3 },
         { name: 'Activity Audit Logs', path: '/admin/activity-logs', icon: Activity },
         { name: 'Platform Settings', path: '/admin/settings', icon: Settings },
@@ -83,8 +86,8 @@ export const AdminSidebar = () => {
   return (
     <aside
       style={{
-        width: '270px',
-        minWidth: '270px',
+        width: '260px',
+        minWidth: '260px',
         height: '100vh',
         position: 'sticky',
         top: 0,
@@ -94,7 +97,7 @@ export const AdminSidebar = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '1.25rem 1rem',
+        padding: '0.75rem 0.75rem',
         boxSizing: 'border-box',
         zIndex: 90,
         boxShadow: '1px 0 6px rgba(0,0,0,0.03)',
@@ -108,34 +111,34 @@ export const AdminSidebar = () => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.75rem',
+            gap: '0.6rem',
             textDecoration: 'none',
-            padding: '0.5rem 0.5rem 1.25rem 0.5rem',
+            padding: '0.2rem 0.35rem 0.65rem 0.35rem',
             borderBottom: '1px solid #F3F4F6',
-            marginBottom: '1rem'
+            marginBottom: '0.5rem'
           }}
         >
           <div
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
               backgroundColor: '#1B4D3E',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#FFFFFF',
-              boxShadow: '0 2px 6px rgba(27,77,62,0.25)',
+              boxShadow: '0 2px 5px rgba(27,77,62,0.2)',
               flexShrink: 0
             }}
           >
-            <ShieldAlert size={22} color="#FFFFFF" strokeWidth={2.2} />
+            <ShieldAlert size={18} color="#FFFFFF" strokeWidth={2.2} />
           </div>
           <div>
             <div
               style={{
                 fontFamily: 'Playfair Display, Georgia, serif',
-                fontSize: '1.28rem',
+                fontSize: '1.15rem',
                 fontWeight: 700,
                 color: '#1B4D3E',
                 letterSpacing: '-0.02em',
@@ -146,13 +149,13 @@ export const AdminSidebar = () => {
             </div>
             <div
               style={{
-                fontSize: '0.72rem',
+                fontSize: '0.66rem',
                 color: '#2E7D32',
                 fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                marginTop: '3px',
+                marginTop: '1px',
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em'
               }}
@@ -163,22 +166,22 @@ export const AdminSidebar = () => {
         </Link>
 
         {/* Navigation Sections */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
           {navSections.map((section) => (
             <div key={section.title}>
               <div
                 style={{
-                  fontSize: '0.68rem',
+                  fontSize: '0.64rem',
                   fontWeight: 700,
                   color: '#9CA3AF',
                   letterSpacing: '0.08em',
-                  padding: '0 0.75rem 0.4rem 0.75rem',
+                  padding: '0 0.5rem 0.2rem 0.5rem',
                   textTransform: 'uppercase'
                 }}
               >
                 {section.title}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   const isActive =
@@ -193,15 +196,15 @@ export const AdminSidebar = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '0.6rem 0.75rem',
-                        borderRadius: '8px',
+                        padding: '0.38rem 0.65rem',
+                        borderRadius: '7px',
                         textDecoration: 'none',
-                        fontSize: '0.85rem',
+                        fontSize: '0.82rem',
                         fontWeight: isActive ? 700 : 500,
                         color: isActive ? '#1B4D3E' : '#4B5563',
                         backgroundColor: isActive ? '#E8F5E9' : 'transparent',
                         borderLeft: isActive ? '3px solid #1B4D3E' : '3px solid transparent',
-                        transition: 'all 0.15s ease'
+                        transition: 'all 0.12s ease'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
@@ -216,8 +219,8 @@ export const AdminSidebar = () => {
                         }
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <Icon size={18} color={isActive ? '#1B4D3E' : '#6B7280'} strokeWidth={isActive ? 2.2 : 1.8} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <Icon size={16} color={isActive ? '#1B4D3E' : '#6B7280'} strokeWidth={isActive ? 2.2 : 1.8} />
                         <span>{item.name}</span>
                       </div>
                     </Link>
@@ -233,28 +236,28 @@ export const AdminSidebar = () => {
       <div
         style={{
           borderTop: '1px solid #F3F4F6',
-          paddingTop: '1rem',
-          marginTop: '1rem',
+          paddingTop: '0.45rem',
+          marginTop: '0.45rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.75rem'
+          gap: '0.4rem'
         }}
       >
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.75rem',
-            padding: '0.65rem',
+            gap: '0.55rem',
+            padding: '0.35rem 0.5rem',
             backgroundColor: '#F9FBF8',
-            borderRadius: '10px',
+            borderRadius: '8px',
             border: '1px solid #E5E7EB'
           }}
         >
           <div
             style={{
-              width: '36px',
-              height: '36px',
+              width: '30px',
+              height: '30px',
               borderRadius: '50%',
               backgroundColor: '#1B4D3E',
               color: '#FFFFFF',
@@ -262,7 +265,7 @@ export const AdminSidebar = () => {
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
-              fontSize: '0.85rem',
+              fontSize: '0.78rem',
               flexShrink: 0
             }}
           >
@@ -271,23 +274,24 @@ export const AdminSidebar = () => {
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
-                fontSize: '0.84rem',
+                fontSize: '0.8rem',
                 fontWeight: 700,
                 color: '#1B4D3E',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis'
+                textOverflow: 'ellipsis',
+                lineHeight: 1.2
               }}
             >
               {user?.fullName || 'System Admin'}
             </div>
-            <div style={{ fontSize: '0.72rem', color: '#2E7D32', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.66rem', color: '#2E7D32', fontWeight: 600, lineHeight: 1.1, marginTop: '1px' }}>
               Platform Administrator
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem' }}>
           <Link
             to="/marketplace"
             style={{
@@ -295,9 +299,9 @@ export const AdminSidebar = () => {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
-              padding: '0.5rem',
-              borderRadius: '8px',
+              gap: '4px',
+              padding: '0.38rem 0.5rem',
+              borderRadius: '6px',
               backgroundColor: '#E8F5E9',
               color: '#1B4D3E',
               border: '1px solid #C8E6C9',
@@ -306,7 +310,7 @@ export const AdminSidebar = () => {
               textDecoration: 'none'
             }}
           >
-            <Store size={14} /> Market
+            <Store size={13} /> Market
           </Link>
           <button
             onClick={handleLogout}
@@ -315,9 +319,9 @@ export const AdminSidebar = () => {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
-              padding: '0.5rem',
-              borderRadius: '8px',
+              gap: '4px',
+              padding: '0.38rem 0.5rem',
+              borderRadius: '6px',
               backgroundColor: '#FEE2E2',
               color: '#B91C1C',
               border: '1px solid #FECACA',
@@ -326,7 +330,7 @@ export const AdminSidebar = () => {
               cursor: 'pointer'
             }}
           >
-            <LogOut size={14} /> Logout
+            <LogOut size={13} /> Logout
           </button>
         </div>
       </div>

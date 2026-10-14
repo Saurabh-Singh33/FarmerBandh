@@ -33,6 +33,9 @@ export function getProductImageUrl(product) {
 
   // 1. If explicit ImageUrl is provided by backend API
   if (product.imageUrl && typeof product.imageUrl === 'string' && product.imageUrl.trim() !== '') {
+    if (product.imageUrl.startsWith('/uploads/')) {
+      return `http://localhost:5000${product.imageUrl}`;
+    }
     return product.imageUrl;
   }
 

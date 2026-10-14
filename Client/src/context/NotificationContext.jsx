@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { notificationApi } from '../services/notificationApi';
 import { useAuth } from './AuthContext';
+import { toast } from './ToastContext';
 
 const NotificationContext = createContext(null);
 
@@ -159,3 +160,7 @@ export const useNotifications = () => {
   }
   return context;
 };
+
+export const useNotification = useNotifications;
+
+export const notify = toast;

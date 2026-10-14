@@ -1,16 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Sprout } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Sprout, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNegotiation } from '../context/NegotiationContext';
 import { CartBadge } from './CartBadge';
+import { NotificationBell } from './NotificationBell';
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
   const { unreadCount } = useNegotiation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,6 +51,196 @@ export const Navbar = () => {
     if (r === 'admin') return '/admin/dashboard';
     return '/marketplace';
   };
+
+  // Dedicated Guest Header for unauthenticated visitors
+  if (!user) {
+    const guestNavLinks = [
+      { label: 'Home', path: '/' },
+      { label: 'About', path: '/about' },
+      { label: 'Help', path: '/help' },
+      { label: 'Contact', path: '/contact' }
+    ];
+
+    return (
+      <nav style={{
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid #E5E7EB',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+      }}>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '0.85rem 1.75rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          {/* Logo on Left */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none' }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              backgroundColor: '#1B4D3E',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 5px rgba(27,77,62,0.2)'
+            }}>
+              <Sprout size={20} color="#FFFFFF" strokeWidth={2.2} />
+            </div>
+            <div>
+              <span style={{
+                fontFamily: 'Playfair Display, Georgia, serif',
+                fontSize: '1.4rem',
+                fontWeight: 700,
+                color: '#1B4D3E',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                display: 'block'
+              }}>
+                FarmerBandh
+              </span>
+              <span style={{ display: 'block', fontSize: '0.72rem', color: '#6B7280', marginTop: '1px' }}>
+                Direct Local Produce
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Center Links */}
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '2.2rem' }}>
+            {guestNavLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  style={{
+                    textDecoration: 'none',
+                    fontSize: '0.94rem',
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? '#1B4D3E' : '#4B5563',
+                    position: 'relative',
+                    padding: '0.4rem 0',
+                    transition: 'color 0.15s ease'
+                  }}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '2.5px',
+                      backgroundColor: '#1B4D3E',
+                      borderRadius: '2px'
+                    }} />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Desktop Right: Sign in pill button */}
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '1rem' }}>
+            <Link
+              to="/auth"
+              style={{
+                backgroundColor: '#1B4D3E',
+                color: '#FFFFFF',
+                padding: '0.55rem 1.4rem',
+                borderRadius: '9999px',
+                textDecoration: 'none',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                boxShadow: '0 2px 4px rgba(27,77,62,0.18)',
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center'
+              }}
+            >
+              Sign in
+            </Link>
+          </div>
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            type="button"
+            className="flex md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '0.4rem',
+              color: '#1B4D3E',
+              cursor: 'pointer',
+              borderRadius: '6px'
+            }}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden" style={{
+            borderTop: '1px solid #E5E7EB',
+            backgroundColor: '#FFFFFF',
+            padding: '1rem 1.5rem 1.25rem',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {guestNavLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      textDecoration: 'none',
+                      fontSize: '0.98rem',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#1B4D3E' : '#374151',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '8px',
+                      backgroundColor: isActive ? '#E8F5E9' : 'transparent'
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+              <div style={{ paddingTop: '0.5rem', borderTop: '1px solid #F3F4F6' }}>
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    backgroundColor: '#1B4D3E',
+                    color: '#FFFFFF',
+                    padding: '0.65rem 1rem',
+                    borderRadius: '9999px',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.92rem'
+                  }}
+                >
+                  Sign in
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
+    );
+  }
 
   return (
     <nav style={{
@@ -163,9 +360,10 @@ export const Navbar = () => {
         )}
       </div>
 
-      {/* Right Controls: Cart & Profile (ALWAYS PINNED AND VISIBLE) */}
+      {/* Right Controls: Cart, Bell & Profile (ALWAYS PINNED AND VISIBLE) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', flexShrink: 0, marginLeft: '1rem' }}>
         <CartBadge />
+        {user && <NotificationBell />}
 
         {/* User Auth Section */}
         {!user ? (
@@ -284,6 +482,41 @@ export const Navbar = () => {
                     }}
                   >
                     Profile & Dashboard
+                  </Link>
+
+                  <Link
+                    to="/notifications"
+                    onClick={() => setDropdownOpen(false)}
+                    style={{
+                      textDecoration: 'none',
+                      color: '#374151',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '6px',
+                      fontSize: '0.88rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <span>Notifications</span>
+                    <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>All alerts</span>
+                  </Link>
+
+                  <Link
+                    to="/notifications/preferences"
+                    onClick={() => setDropdownOpen(false)}
+                    style={{
+                      textDecoration: 'none',
+                      color: '#374151',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '6px',
+                      fontSize: '0.88rem',
+                      fontWeight: 500,
+                      display: 'block'
+                    }}
+                  >
+                    Preferences
                   </Link>
 
                   <button
