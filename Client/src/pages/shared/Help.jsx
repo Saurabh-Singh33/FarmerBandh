@@ -24,9 +24,17 @@ import {
   ExternalLink,
   X,
   ChevronDown,
-  Layers
+  Layers,
+  RotateCcw
 } from 'lucide-react';
 import { SproutIcon } from '../../components/SocialIcons';
+
+const CATEGORIES_MAP = {
+  buyers: 'For Buyers',
+  farmers: 'For Farmers',
+  payments: 'Payouts & Escrow',
+  account: 'Account & Security'
+};
 
 const FAQ_DATA = [
   {
@@ -153,16 +161,16 @@ export const Help = () => {
         lineHeight: 1.6
       }}
     >
-      {/* 1. HERO & SEARCH SECTION (WIDE & BALANCED) */}
+      {/* 1. HERO & SEARCH SECTION (EXPANSIVE FULL-WIDTH) */}
       <section
         id="faq"
         style={{
           background: 'linear-gradient(180deg, #F4EFEA 0%, #FAF8F5 100%)',
           borderBottom: '1px solid #E7E0D3',
-          padding: '4.5rem 1.5rem 3.5rem'
+          padding: '4.5rem clamp(1.5rem, 3.5vw, 4rem) 3.5rem'
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1680px', width: '100%', margin: '0 auto' }}>
           {/* Top Badge & Header */}
           <div style={{ textAlign: 'center', maxWidth: '840px', margin: '0 auto 2.5rem' }}>
             <div
@@ -208,7 +216,7 @@ export const Help = () => {
           </div>
 
           {/* Wide Enhanced Search Bar */}
-          <div style={{ maxWidth: '720px', margin: '0 auto 2.5rem', position: 'relative' }}>
+          <div style={{ maxWidth: '920px', width: '100%', margin: '0 auto 2.5rem', position: 'relative' }}>
             <div
               style={{
                 position: 'relative',
@@ -418,19 +426,56 @@ export const Help = () => {
         </div>
       </section>
 
-      {/* 2. MAIN CONTENT: 2-COLUMN BALANCED KNOWLEDGE CENTER */}
-      <section style={{ maxWidth: '1240px', margin: '0 auto', padding: '4rem 1.5rem 5rem' }}>
+
+      {/* 2. MAIN CONTENT: 2-COLUMN EXPANSIVE KNOWLEDGE CENTER */}
+      <section
+        id="faq-content"
+        style={{
+          maxWidth: '1680px',
+          width: '100%',
+          margin: '0 auto',
+          padding: '3.5rem clamp(1.5rem, 3.5vw, 4rem) 5.5rem'
+        }}
+      >
+        <style>{`
+          @media (max-width: 960px) {
+            .help-layout-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+            .help-sidebar-sticky {
+              position: static !important;
+            }
+          }
+          .faq-card-interactive {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+          .faq-card-interactive:hover {
+            border-color: #10B981 !important;
+            box-shadow: 0 6px 20px rgba(27,77,62,0.06) !important;
+          }
+        `}</style>
+
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(280px, 320px) 1fr',
-            gap: '2.5rem',
+            gridTemplateColumns: 'minmax(290px, 340px) minmax(0, 1fr)',
+            gap: 'clamp(2rem, 3vw, 3.5rem)',
             alignItems: 'start'
           }}
           className="help-layout-grid"
         >
           {/* LEFT SIDEBAR: TOPICS & DIRECT CONTACT */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '90px' }}>
+          <div
+            className="help-sidebar-sticky"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              position: 'sticky',
+              top: '90px'
+            }}
+          >
             {/* Category Filter Menu Card */}
             <div
               style={{
@@ -438,35 +483,36 @@ export const Help = () => {
                 border: '1px solid #E2D9CB',
                 borderRadius: '16px',
                 padding: '1.25rem',
-                boxShadow: '0 4px 14px rgba(27,77,62,0.04)'
+                boxShadow: '0 4px 16px rgba(27,77,62,0.04)'
               }}
             >
               <div
                 style={{
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   fontWeight: 800,
                   color: '#1B4D3E',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  marginBottom: '0.85rem',
+                  letterSpacing: '0.07em',
+                  marginBottom: '1rem',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px'
+                  gap: '8px'
                 }}
               >
-                <Layers size={14} color="#059669" />
-                <span>विषय सूची · Topics</span>
+                <Layers size={15} color="#059669" />
+                <span>विषय सूची · Browse by Topic</span>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {[
-                  { id: 'all', label: 'All Questions', labelHindi: 'सभी प्रश्न', count: 12 },
-                  { id: 'buyers', label: 'For Buyers', labelHindi: 'खरीदारों के लिए', count: 4 },
-                  { id: 'farmers', label: 'For Farmers', labelHindi: 'किसानों के लिए', count: 2 },
-                  { id: 'payments', label: 'Payouts & Escrow', labelHindi: 'भुगतान व एस्क्रो', count: 2 },
-                  { id: 'account', label: 'Account & Security', labelHindi: 'खाता व सुरक्षा', count: 4 }
+                  { id: 'all', label: 'All Questions', labelHindi: 'सभी प्रश्न', count: FAQ_DATA.length, icon: BookOpen },
+                  { id: 'buyers', label: 'For Buyers', labelHindi: 'खरीदारों के लिए', count: FAQ_DATA.filter((f) => f.category === 'buyers').length, icon: Truck },
+                  { id: 'farmers', label: 'For Farmers', labelHindi: 'किसानों के लिए', count: FAQ_DATA.filter((f) => f.category === 'farmers').length, icon: Sprout },
+                  { id: 'payments', label: 'Payouts & Escrow', labelHindi: 'भुगतान व एस्क्रो', count: FAQ_DATA.filter((f) => f.category === 'payments').length, icon: Wallet },
+                  { id: 'account', label: 'Account & Security', labelHindi: 'खाता व सुरक्षा', count: FAQ_DATA.filter((f) => f.category === 'account').length, icon: ShieldCheck }
                 ].map((cat) => {
                   const isActive = selectedCategory === cat.id;
+                  const Icon = cat.icon;
                   return (
                     <button
                       key={cat.id}
@@ -475,33 +521,56 @@ export const Help = () => {
                       style={{
                         width: '100%',
                         textAlign: 'left',
-                        padding: '10px 12px',
+                        padding: '11px 12px',
                         borderRadius: '10px',
                         border: 'none',
                         backgroundColor: isActive ? '#1B4D3E' : 'transparent',
                         color: isActive ? '#FFFFFF' : '#374151',
                         fontWeight: isActive ? 700 : 500,
-                        fontSize: '0.88rem',
+                        fontSize: '0.9rem',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        transition: 'all 0.15s ease'
+                        gap: '10px',
+                        transition: 'all 0.15s ease',
+                        boxShadow: isActive ? '0 4px 12px rgba(27,77,62,0.18)' : 'none'
                       }}
                     >
-                      <div>
-                        <div>{cat.label}</div>
-                        <div style={{ fontSize: '0.72rem', opacity: isActive ? 0.85 : 0.6 }}>
-                          {cat.labelHindi}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                        <div
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '8px',
+                            backgroundColor: isActive ? 'rgba(255,255,255,0.18)' : '#F3F4F6',
+                            color: isActive ? '#FFFFFF' : '#059669',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}
+                        >
+                          <Icon size={14} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {cat.label}
+                          </div>
+                          <div style={{ fontSize: '0.72rem', opacity: isActive ? 0.9 : 0.65 }}>
+                            {cat.labelHindi}
+                          </div>
                         </div>
                       </div>
                       <span
                         style={{
                           fontSize: '0.72rem',
-                          padding: '2px 7px',
+                          fontWeight: 700,
+                          padding: '2px 8px',
                           borderRadius: '9999px',
-                          backgroundColor: isActive ? 'rgba(255,255,255,0.2)' : '#F3F4F6',
-                          color: isActive ? '#FFFFFF' : '#6B7280'
+                          backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#F3F4F6',
+                          color: isActive ? '#FFFFFF' : '#6B7280',
+                          flexShrink: 0
                         }}
                       >
                         {cat.count}
@@ -515,13 +584,14 @@ export const Help = () => {
             {/* Direct Kisan Helpline Card */}
             <div
               style={{
-                backgroundColor: '#1B4D3E',
+                background: 'linear-gradient(145deg, #1B4D3E 0%, #11382C 100%)',
                 color: '#FFFFFF',
                 borderRadius: '16px',
-                padding: '1.5rem',
-                boxShadow: '0 8px 24px rgba(27,77,62,0.18)',
+                padding: '1.6rem',
+                boxShadow: '0 10px 28px rgba(27,77,62,0.18)',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.12)'
               }}
             >
               <div
@@ -529,52 +599,56 @@ export const Help = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  backgroundColor: 'rgba(255,255,255,0.15)',
-                  padding: '3px 10px',
+                  backgroundColor: 'rgba(255,255,255,0.14)',
+                  padding: '4px 11px',
                   borderRadius: '9999px',
-                  fontSize: '0.74rem',
+                  fontSize: '0.75rem',
                   fontWeight: 700,
                   marginBottom: '1rem',
-                  color: '#A7F3D0'
+                  color: '#A7F3D0',
+                  border: '1px solid rgba(255,255,255,0.2)'
                 }}
               >
                 <span>📞</span>
-                <span>किसान व ग्राहक हेल्पलाइन</span>
+                <span>किसान व ग्राहक हेल्पलाइन · DIRECT DESK</span>
               </div>
 
               <h4
                 style={{
                   fontFamily: 'Playfair Display, Georgia, serif',
-                  fontSize: '1.25rem',
+                  fontSize: '1.3rem',
                   fontWeight: 700,
-                  margin: '0 0 0.5rem 0'
+                  margin: '0 0 0.5rem 0',
+                  color: '#FFFFFF'
                 }}
               >
                 Need to speak with us?
               </h4>
 
-              <p style={{ fontSize: '0.86rem', color: '#D1FAE5', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
+              <p style={{ fontSize: '0.86rem', color: '#D1FAE5', lineHeight: 1.55, margin: '0 0 1.25rem 0' }}>
                 Our agricultural desk is available Monday to Saturday, 9:00 AM – 6:00 PM IST.
               </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <a
                   href="tel:1800123456"
                   style={{
                     backgroundColor: '#FFFFFF',
                     color: '#1B4D3E',
-                    padding: '8px 14px',
-                    borderRadius: '8px',
-                    fontSize: '0.86rem',
+                    padding: '9px 14px',
+                    borderRadius: '9px',
+                    fontSize: '0.88rem',
                     fontWeight: 700,
                     textDecoration: 'none',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px'
+                    gap: '8px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  <Phone size={14} />
+                  <Phone size={15} />
                   <span>1800-123-456 (Toll-Free)</span>
                 </a>
 
@@ -584,20 +658,34 @@ export const Help = () => {
                     backgroundColor: 'rgba(255,255,255,0.12)',
                     color: '#FFFFFF',
                     border: '1px solid rgba(255,255,255,0.25)',
-                    padding: '8px 14px',
-                    borderRadius: '8px',
-                    fontSize: '0.86rem',
+                    padding: '9px 14px',
+                    borderRadius: '9px',
+                    fontSize: '0.88rem',
                     fontWeight: 600,
                     textDecoration: 'none',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px'
+                    gap: '8px',
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  <Mail size={14} />
+                  <Mail size={15} />
                   <span>support@farmerbandh.com</span>
                 </a>
+              </div>
+
+              <div
+                style={{
+                  marginTop: '1rem',
+                  paddingTop: '0.85rem',
+                  borderTop: '1px solid rgba(255,255,255,0.14)',
+                  fontSize: '0.74rem',
+                  color: '#A7F3D0',
+                  textAlign: 'center'
+                }}
+              >
+                Bilingual desk: हिंदी, ગુજરાતી, मराठी, English
               </div>
             </div>
 
@@ -606,31 +694,36 @@ export const Help = () => {
               style={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E2D9CB',
-                borderRadius: '12px',
-                padding: '1rem',
-                fontSize: '0.82rem'
+                borderRadius: '14px',
+                padding: '1.1rem 1.25rem',
+                fontSize: '0.82rem',
+                boxShadow: '0 2px 8px rgba(27,77,62,0.03)'
               }}
             >
               <div style={{ fontWeight: 700, color: '#1B4D3E', marginBottom: '0.4rem' }}>
                 मंडी स्थिति · Live Platform Status
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#059669', fontWeight: 600 }}>
                 <span
                   style={{
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
                     backgroundColor: '#16A34A',
-                    boxShadow: '0 0 6px #16A34A'
+                    boxShadow: '0 0 8px #16A34A',
+                    flexShrink: 0
                   }}
                 />
                 <span>All Mandi Systems Operational</span>
               </div>
+              <div style={{ fontSize: '0.74rem', color: '#6B7280', marginTop: '0.35rem' }}>
+                Escrow payouts & real-time negotiation engine 100% active.
+              </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: ACCORDION QUESTIONS LIST */}
-          <div>
+          {/* RIGHT COLUMN: ACCORDION QUESTIONS LIST (NEVER CLIPPED) */}
+          <div style={{ minWidth: 0, width: '100%' }}>
             {/* Results Filter Bar */}
             <div
               style={{
@@ -641,15 +734,30 @@ export const Help = () => {
                 borderBottom: '1.5px solid #E2D9CB',
                 marginBottom: '1.5rem',
                 flexWrap: 'wrap',
-                gap: '8px'
+                gap: '10px'
               }}
             >
-              <div>
-                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1B4D3E' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.94rem', fontWeight: 700, color: '#1B4D3E' }}>
                   Showing {filteredFaqs.length} verified answers
                 </span>
+                {selectedCategory !== 'all' && (
+                  <span
+                    style={{
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      backgroundColor: '#E8F5E9',
+                      color: '#065F46',
+                      padding: '2px 9px',
+                      borderRadius: '9999px',
+                      border: '1px solid #A7F3D0'
+                    }}
+                  >
+                    Topic: {CATEGORIES_MAP[selectedCategory] || selectedCategory}
+                  </span>
+                )}
                 {search && (
-                  <span style={{ fontSize: '0.84rem', color: '#6B7280', marginLeft: '6px' }}>
+                  <span style={{ fontSize: '0.84rem', color: '#6B7280' }}>
                     for "{search}"
                   </span>
                 )}
@@ -663,16 +771,22 @@ export const Help = () => {
                     setSelectedCategory('all');
                   }}
                   style={{
-                    backgroundColor: 'transparent',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #D1D5DB',
-                    borderRadius: '6px',
-                    padding: '4px 10px',
-                    fontSize: '0.78rem',
-                    color: '#6B7280',
-                    cursor: 'pointer'
+                    borderRadius: '8px',
+                    padding: '5px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: '#4B5563',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
                   }}
                 >
-                  Reset all filters
+                  <RotateCcw size={13} />
+                  <span>Reset filters</span>
                 </button>
               )}
             </div>
@@ -710,66 +824,92 @@ export const Help = () => {
                     setSelectedCategory('all');
                   }}
                   style={{
-                    padding: '0.6rem 1.5rem',
+                    padding: '0.65rem 1.6rem',
                     backgroundColor: '#1B4D3E',
                     color: '#FFF',
                     border: 'none',
                     borderRadius: '9999px',
                     cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    fontWeight: 600
+                    fontSize: '0.92rem',
+                    fontWeight: 600,
+                    boxShadow: '0 4px 14px rgba(27,77,62,0.2)'
                   }}
                 >
                   View All Questions
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem' }}>
                 {filteredFaqs.map((faq) => {
                   const isOpen = openAccordionIds.includes(faq.id);
                   const userFeedback = feedbackGiven[faq.id];
 
+                  // Distinct badge color schemes based on category
+                  const categoryBadgeStyles = {
+                    buyers: { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' },
+                    farmers: { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
+                    payments: { bg: '#EDE9FE', text: '#6D28D9', border: '#DDD6FE' },
+                    account: { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' }
+                  };
+                  const badgeStyle = categoryBadgeStyles[faq.category] || { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' };
+
                   return (
                     <div
                       key={faq.id}
+                      className="faq-card-interactive"
                       style={{
                         backgroundColor: '#FFFFFF',
                         border: isOpen ? '1.5px solid #10B981' : '1px solid #E2D9CB',
+                        borderLeft: isOpen ? '5px solid #10B981' : '5px solid transparent',
                         borderRadius: '14px',
                         overflow: 'hidden',
                         boxShadow: isOpen
-                          ? '0 6px 18px rgba(27,77,62,0.08)'
-                          : '0 2px 6px rgba(27,77,62,0.02)',
-                        transition: 'all 0.2s ease'
+                          ? '0 8px 24px rgba(27,77,62,0.08)'
+                          : '0 2px 6px rgba(27,77,62,0.02)'
                       }}
                     >
                       {/* Accordion Question Header */}
                       <button
                         type="button"
                         onClick={() => toggleAccordion(faq.id)}
+                        aria-expanded={isOpen}
                         style={{
                           width: '100%',
                           textAlign: 'left',
-                          padding: '1.25rem 1.5rem',
-                          backgroundColor: isOpen ? '#F4FAF6' : '#FFFFFF',
+                          padding: '1.3rem 1.6rem',
+                          backgroundColor: isOpen ? '#F7FAF8' : '#FFFFFF',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          gap: '1rem',
+                          gap: '1.25rem',
                           outline: 'none',
-                          transition: 'background-color 0.15s ease'
+                          transition: 'background-color 0.15s ease',
+                          boxSizing: 'border-box'
                         }}
                       >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div
+                          style={{
+                            flex: '1 1 auto',
+                            minWidth: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '5px'
+                          }}
+                        >
                           <span
                             style={{
                               fontSize: '0.72rem',
                               fontWeight: 700,
-                              color: '#B45309',
+                              color: badgeStyle.text,
+                              backgroundColor: badgeStyle.bg,
+                              border: `1px solid ${badgeStyle.border}`,
+                              padding: '2px 8px',
+                              borderRadius: '4px',
                               textTransform: 'uppercase',
-                              letterSpacing: '0.04em'
+                              letterSpacing: '0.04em',
+                              width: 'fit-content'
                             }}
                           >
                             {faq.categoryLabel}
@@ -777,32 +917,35 @@ export const Help = () => {
                           <span
                             style={{
                               fontFamily: 'Inter, sans-serif',
-                              fontSize: '1.02rem',
+                              fontSize: '1.05rem',
                               fontWeight: 600,
-                              color: isOpen ? '#1B4D3E' : '#1F2937',
-                              lineHeight: 1.35
+                              color: isOpen ? '#1B4D3E' : '#111827',
+                              lineHeight: 1.4
                             }}
                           >
                             {faq.title}
                           </span>
                         </div>
 
+                        {/* Chevron Icon Circle (Guaranteed Visible & Centered) */}
                         <span
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '32px',
-                            height: '32px',
+                            width: '36px',
+                            height: '36px',
                             borderRadius: '50%',
                             backgroundColor: isOpen ? '#1B4D3E' : '#F3F4F6',
-                            color: isOpen ? '#FFFFFF' : '#6B7280',
+                            color: isOpen ? '#FFFFFF' : '#4B5563',
                             flexShrink: 0,
+                            marginLeft: '12px',
                             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.22s ease',
+                            boxShadow: isOpen ? '0 2px 6px rgba(27,77,62,0.2)' : 'none'
                           }}
                         >
-                          <ChevronDown size={16} />
+                          <ChevronDown size={18} strokeWidth={2.4} />
                         </span>
                       </button>
 
@@ -810,11 +953,11 @@ export const Help = () => {
                       {isOpen && (
                         <div
                           style={{
-                            padding: '1.25rem 1.5rem 1.5rem',
+                            padding: '1.35rem 1.6rem 1.6rem',
                             borderTop: '1px solid #E7F0E9',
                             color: '#374151',
-                            fontSize: '0.96rem',
-                            lineHeight: 1.7,
+                            fontSize: '0.98rem',
+                            lineHeight: 1.75,
                             backgroundColor: '#FFFFFF'
                           }}
                         >
@@ -826,19 +969,20 @@ export const Help = () => {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
-                              paddingTop: '0.85rem',
+                              paddingTop: '0.95rem',
                               borderTop: '1px solid #F3F4F6',
-                              fontSize: '0.82rem',
+                              fontSize: '0.84rem',
                               color: '#6B7280',
                               flexWrap: 'wrap',
                               gap: '8px'
                             }}
                           >
-                            <span>Was this answer helpful?</span>
+                            <span style={{ fontWeight: 500 }}>Was this answer helpful?</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               {userFeedback ? (
-                                <span style={{ color: '#059669', fontWeight: 600 }}>
-                                  ✓ Thank you for your feedback!
+                                <span style={{ color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <CheckCircle2 size={14} color="#059669" />
+                                  <span>Thank you for your feedback!</span>
                                 </span>
                               ) : (
                                 <>
@@ -848,17 +992,18 @@ export const Help = () => {
                                     style={{
                                       display: 'inline-flex',
                                       alignItems: 'center',
-                                      gap: '4px',
-                                      padding: '4px 8px',
+                                      gap: '5px',
+                                      padding: '5px 10px',
                                       backgroundColor: '#F3F4F6',
                                       border: '1px solid #E5E7EB',
                                       borderRadius: '6px',
-                                      fontSize: '0.78rem',
+                                      fontSize: '0.8rem',
                                       color: '#374151',
-                                      cursor: 'pointer'
+                                      cursor: 'pointer',
+                                      transition: 'all 0.15s ease'
                                     }}
                                   >
-                                    <ThumbsUp size={12} />
+                                    <ThumbsUp size={13} />
                                     <span>Yes</span>
                                   </button>
                                   <button
@@ -867,17 +1012,18 @@ export const Help = () => {
                                     style={{
                                       display: 'inline-flex',
                                       alignItems: 'center',
-                                      gap: '4px',
-                                      padding: '4px 8px',
+                                      gap: '5px',
+                                      padding: '5px 10px',
                                       backgroundColor: '#F3F4F6',
                                       border: '1px solid #E5E7EB',
                                       borderRadius: '6px',
-                                      fontSize: '0.78rem',
+                                      fontSize: '0.8rem',
                                       color: '#374151',
-                                      cursor: 'pointer'
+                                      cursor: 'pointer',
+                                      transition: 'all 0.15s ease'
                                     }}
                                   >
-                                    <ThumbsDown size={12} />
+                                    <ThumbsDown size={13} />
                                     <span>No</span>
                                   </button>
                                 </>
@@ -895,16 +1041,16 @@ export const Help = () => {
         </div>
       </section>
 
-      {/* 3. LEGAL POLICY SECTION 1: TERMS OF SERVICE (WIDE & BALANCED) */}
+      {/* 3. LEGAL POLICY SECTION 1: TERMS OF SERVICE (EXPANSIVE) */}
       <section
         id="terms"
         style={{
           backgroundColor: '#FFFFFF',
           borderTop: '1px solid #E7E0D3',
-          padding: '5rem 1.5rem'
+          padding: '5rem clamp(1.5rem, 3.5vw, 4rem)'
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1680px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: '2.5rem' }}>
             <span
               style={{
@@ -1020,16 +1166,16 @@ export const Help = () => {
         </div>
       </section>
 
-      {/* 4. LEGAL POLICY SECTION 2: PRIVACY POLICY (WIDE & BALANCED) */}
+      {/* 4. LEGAL POLICY SECTION 2: PRIVACY POLICY (EXPANSIVE) */}
       <section
         id="privacy"
         style={{
           backgroundColor: '#FAF8F5',
           borderTop: '1px solid #E7E0D3',
-          padding: '5rem 1.5rem'
+          padding: '5rem clamp(1.5rem, 3.5vw, 4rem)'
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1680px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: '2.5rem' }}>
             <span
               style={{
@@ -1124,16 +1270,16 @@ export const Help = () => {
         </div>
       </section>
 
-      {/* 5. LEGAL POLICY SECTION 3: DATA SECURITY STANDARDS (WIDE & BALANCED) */}
+      {/* 5. LEGAL POLICY SECTION 3: DATA SECURITY STANDARDS (EXPANSIVE) */}
       <section
         id="security"
         style={{
           backgroundColor: '#FFFFFF',
           borderTop: '1px solid #E7E0D3',
-          padding: '5rem 1.5rem'
+          padding: '5rem clamp(1.5rem, 3.5vw, 4rem)'
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1680px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: '2.5rem' }}>
             <span
               style={{

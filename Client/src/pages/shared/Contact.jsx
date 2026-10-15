@@ -68,45 +68,45 @@ export const Contact = () => {
   return (
     <div
       style={{
-        backgroundColor: '#FAF8F5',
-        color: '#2C3E35',
+        backgroundColor: '#F9FBF8',
+        color: '#1F2937',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         lineHeight: 1.6
       }}
     >
-      {/* 1. HERO HEADER (WIDE & BALANCED) */}
+      {/* 1. HERO HEADER (MATCHING LANDING PAGE AESTHETICS) */}
       <section
         style={{
-          background: 'linear-gradient(180deg, #F4EFEA 0%, #FAF8F5 100%)',
-          borderBottom: '1px solid #E7E0D3',
-          padding: '4rem 1.5rem 3rem'
+          background: 'linear-gradient(180deg, #E8F5E9 0%, #F9FBF8 100%)',
+          borderBottom: '1px solid #E5E7EB',
+          padding: '4.5rem clamp(1.25rem, 3vw, 2.5rem) 3.5rem'
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', textAlign: 'center' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: '#EDE5D8',
-              border: '1px solid #D5C7B2',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #BBF7D0',
               padding: '6px 16px',
               borderRadius: '9999px',
               fontSize: '0.82rem',
-              fontWeight: 700,
+              fontWeight: 600,
               color: '#1B4D3E',
-              letterSpacing: '0.04em',
-              marginBottom: '1rem'
+              boxShadow: '0 2px 6px rgba(27,77,62,0.06)',
+              marginBottom: '1.25rem'
             }}
           >
-            <span>🌾</span>
+            <SproutIcon size={16} color="#16A34A" />
             <span>किसान व ग्राहक सेवा केंद्र · DIRECT SUPPORT & ENQUIRIES</span>
           </div>
 
           <h1
             style={{
               fontFamily: 'Playfair Display, Georgia, serif',
-              fontSize: 'clamp(2.3rem, 4.4vw, 3.4rem)',
+              fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
               fontWeight: 700,
               color: '#1B4D3E',
               lineHeight: 1.2,
@@ -115,7 +115,7 @@ export const Contact = () => {
           >
             संपर्क सूत्र — Get in touch with us.
             <br />
-            <span style={{ fontStyle: 'italic', color: '#B45309', fontSize: 'clamp(1.9rem, 3.6vw, 2.7rem)' }}>
+            <span style={{ fontStyle: 'italic', color: '#059669', fontSize: 'clamp(1.8rem, 3.4vw, 2.6rem)' }}>
               हम सदैव आपकी सेवा में उपस्थित हैं
             </span>
           </h1>
@@ -126,13 +126,31 @@ export const Contact = () => {
         </div>
       </section>
 
-      {/* 2. MAIN 2-COLUMN BALANCED CONTACT SECTION (NO EMPTY SIDES) */}
-      <section style={{ maxWidth: '1240px', margin: '0 auto', padding: '3.5rem 1.5rem 5rem' }}>
+      {/* 2. MAIN 2-COLUMN BALANCED CONTACT SECTION (1280px ALIGNED WITH NAVBAR) */}
+      <section style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '3.5rem clamp(1.25rem, 3vw, 2.5rem) 5rem' }}>
+        <style>{`
+          @media (max-width: 960px) {
+            .contact-layout-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+          }
+          .contact-input:focus {
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14) !important;
+          }
+          .contact-social-btn:hover {
+            background-color: #1B4D3E !important;
+            color: #FFFFFF !important;
+            transform: translateY(-2px);
+          }
+        `}</style>
+
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(320px, 420px) 1fr',
-            gap: '3rem',
+            gridTemplateColumns: 'minmax(320px, 420px) minmax(0, 1fr)',
+            gap: 'clamp(2rem, 3vw, 3rem)',
             alignItems: 'start'
           }}
           className="contact-layout-grid"
@@ -143,10 +161,10 @@ export const Contact = () => {
             <div
               style={{
                 backgroundColor: '#FFFFFF',
-                border: '1px solid #E2D9CB',
+                border: '1px solid #E5E7EB',
                 borderRadius: '16px',
                 padding: '1.75rem',
-                boxShadow: '0 4px 14px rgba(27,77,62,0.04)'
+                boxShadow: '0 4px 16px rgba(27,77,62,0.05)'
               }}
             >
               <h2
@@ -184,7 +202,7 @@ export const Contact = () => {
                     <Phone size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#B45309' }}>
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       TOLL-FREE KISAN HELPLINE
                     </div>
                     <a
@@ -224,7 +242,7 @@ export const Contact = () => {
                     <Mail size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#B45309' }}>
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       OFFICIAL SUPPORT EMAIL
                     </div>
                     <a
@@ -233,7 +251,7 @@ export const Contact = () => {
                         fontSize: '1rem',
                         fontWeight: 700,
                         color: '#1B4D3E',
-                        textDecoration: 'underline',
+                        textDecoration: 'none',
                         display: 'block',
                         margin: '2px 0'
                       }}
@@ -264,7 +282,7 @@ export const Contact = () => {
                     <MapPin size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#B45309' }}>
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       REGIONAL OPERATIONS CENTER
                     </div>
                     <div style={{ fontSize: '0.94rem', fontWeight: 600, color: '#1B4D3E', margin: '2px 0' }}>
@@ -282,7 +300,7 @@ export const Contact = () => {
                 style={{
                   marginTop: '1.5rem',
                   paddingTop: '1.25rem',
-                  borderTop: '1px solid #E7E0D3',
+                  borderTop: '1px solid #E5E7EB',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between'
@@ -297,14 +315,17 @@ export const Contact = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="FarmerBandh Instagram"
+                    className="contact-social-btn"
                     style={{
-                      padding: '8px',
-                      borderRadius: '8px',
-                      backgroundColor: '#F4EFEA',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: '#E8F5E9',
                       color: '#1B4D3E',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      textDecoration: 'none',
                       transition: 'all 0.15s ease'
                     }}
                     title="Instagram"
@@ -316,14 +337,17 @@ export const Contact = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="FarmerBandh Facebook"
+                    className="contact-social-btn"
                     style={{
-                      padding: '8px',
-                      borderRadius: '8px',
-                      backgroundColor: '#F4EFEA',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: '#E8F5E9',
                       color: '#1B4D3E',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      textDecoration: 'none',
                       transition: 'all 0.15s ease'
                     }}
                     title="Facebook"
@@ -335,14 +359,17 @@ export const Contact = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="FarmerBandh X"
+                    className="contact-social-btn"
                     style={{
-                      padding: '8px',
-                      borderRadius: '8px',
-                      backgroundColor: '#F4EFEA',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: '#E8F5E9',
                       color: '#1B4D3E',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      textDecoration: 'none',
                       transition: 'all 0.15s ease'
                     }}
                     title="Twitter / X"
@@ -357,10 +384,10 @@ export const Contact = () => {
             <div
               style={{
                 backgroundColor: '#FFFFFF',
-                border: '1.5px solid #D5C7B2',
+                border: '1px solid #E5E7EB',
                 borderRadius: '16px',
                 padding: '12px',
-                boxShadow: '0 8px 24px rgba(27,77,62,0.06)'
+                boxShadow: '0 4px 16px rgba(27,77,62,0.05)'
               }}
             >
               <div
@@ -408,13 +435,14 @@ export const Contact = () => {
             {/* Response SLA Guarantee Card */}
             <div
               style={{
-                backgroundColor: '#1B4D3E',
+                background: 'linear-gradient(135deg, #1B4D3E 0%, #12382C 100%)',
                 color: '#FFFFFF',
                 borderRadius: '14px',
                 padding: '1.25rem 1.5rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px'
+                gap: '12px',
+                border: '1px solid rgba(255,255,255,0.1)'
               }}
             >
               <ShieldCheck size={28} color="#A7F3D0" style={{ flexShrink: 0 }} />
@@ -429,30 +457,36 @@ export const Contact = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: RICH CLASSIC CONTACT FORM */}
+          {/* RIGHT COLUMN: RICH CLEAN CONTACT FORM */}
           <div
             style={{
               backgroundColor: '#FFFFFF',
-              border: '1.5px solid #D5C7B2',
-              borderRadius: '20px',
-              padding: '2.5rem',
-              boxShadow: '0 12px 32px rgba(27,77,62,0.08)',
+              border: '1px solid #E5E7EB',
+              borderRadius: '16px',
+              padding: '2.25rem',
+              boxShadow: '0 8px 24px rgba(27,77,62,0.06)',
               position: 'relative'
             }}
           >
             {/* Form Header */}
-            <div style={{ marginBottom: '2rem' }}>
+            <div style={{ marginBottom: '1.75rem' }}>
               <div
                 style={{
-                  fontSize: '0.78rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: '#E8F5E9',
+                  border: '1px solid #BBF7D0',
+                  padding: '4px 12px',
+                  borderRadius: '9999px',
+                  fontSize: '0.76rem',
                   fontWeight: 700,
-                  color: '#059669',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  marginBottom: '0.35rem'
+                  color: '#1B4D3E',
+                  marginBottom: '0.75rem'
                 }}
               >
-                संदेश भेजें · WRITE TO OUR DESK
+                <SproutIcon size={14} color="#16A34A" />
+                <span>संदेश भेजें · WRITE TO OUR DESK</span>
               </div>
               <h2
                 style={{
@@ -520,16 +554,17 @@ export const Contact = () => {
                         type="button"
                         onClick={() => setFormData({ ...formData, userType: role.id })}
                         style={{
-                          padding: '8px 12px',
-                          borderRadius: '8px',
-                          border: isSelected ? '2px solid #1B4D3E' : '1px solid #D1D5DB',
-                          backgroundColor: isSelected ? '#E8F5E9' : '#FFFFFF',
-                          color: isSelected ? '#1B4D3E' : '#4B5563',
+                          padding: '9px 12px',
+                          borderRadius: '10px',
+                          border: isSelected ? '1.5px solid #1B4D3E' : '1px solid #E5E7EB',
+                          backgroundColor: isSelected ? '#1B4D3E' : '#FFFFFF',
+                          color: isSelected ? '#FFFFFF' : '#374151',
                           fontWeight: isSelected ? 700 : 500,
-                          fontSize: '0.84rem',
+                          fontSize: '0.85rem',
                           cursor: 'pointer',
                           textAlign: 'center',
-                          transition: 'all 0.15s ease'
+                          transition: 'all 0.15s ease',
+                          boxShadow: isSelected ? '0 2px 8px rgba(27,77,62,0.2)' : 'none'
                         }}
                       >
                         {role.label}
@@ -560,6 +595,7 @@ export const Contact = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Ramesh Patel"
+                    className="contact-input"
                     style={{
                       width: '100%',
                       padding: '0.75rem 0.95rem',
@@ -568,7 +604,8 @@ export const Contact = () => {
                       fontSize: '0.95rem',
                       outline: 'none',
                       boxSizing: 'border-box',
-                      backgroundColor: '#FAF8F5'
+                      backgroundColor: '#FFFFFF',
+                      transition: 'all 0.15s ease'
                     }}
                   />
                   {errors.name && (
@@ -597,6 +634,7 @@ export const Contact = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="e.g. +91 98765 43210"
+                    className="contact-input"
                     style={{
                       width: '100%',
                       padding: '0.75rem 0.95rem',
@@ -605,7 +643,8 @@ export const Contact = () => {
                       fontSize: '0.95rem',
                       outline: 'none',
                       boxSizing: 'border-box',
-                      backgroundColor: '#FAF8F5'
+                      backgroundColor: '#FFFFFF',
+                      transition: 'all 0.15s ease'
                     }}
                   />
                 </div>
@@ -631,6 +670,7 @@ export const Contact = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="e.g. yourname@domain.com"
+                  className="contact-input"
                   style={{
                     width: '100%',
                     padding: '0.75rem 0.95rem',
@@ -639,7 +679,8 @@ export const Contact = () => {
                     fontSize: '0.95rem',
                     outline: 'none',
                     boxSizing: 'border-box',
-                    backgroundColor: '#FAF8F5'
+                    backgroundColor: '#FFFFFF',
+                    transition: 'all 0.15s ease'
                   }}
                 />
                 {errors.email && (
@@ -667,15 +708,18 @@ export const Contact = () => {
                   id="contact-subject"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="contact-input"
                   style={{
                     width: '100%',
                     padding: '0.75rem 0.95rem',
                     borderRadius: '10px',
                     border: '1px solid #D1D5DB',
                     fontSize: '0.95rem',
-                    backgroundColor: '#FAF8F5',
+                    backgroundColor: '#FFFFFF',
                     outline: 'none',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
                   }}
                 >
                   <option value="General">General Platform Information (सामान्य जानकारी)</option>
@@ -707,6 +751,7 @@ export const Contact = () => {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="How can our operations team assist you? Please describe in detail (min 10 characters)..."
+                  className="contact-input"
                   style={{
                     width: '100%',
                     padding: '0.75rem 0.95rem',
@@ -716,7 +761,8 @@ export const Contact = () => {
                     outline: 'none',
                     boxSizing: 'border-box',
                     fontFamily: 'Inter, sans-serif',
-                    backgroundColor: '#FAF8F5'
+                    backgroundColor: '#FFFFFF',
+                    transition: 'all 0.15s ease'
                   }}
                 />
                 {errors.message && (
@@ -726,48 +772,54 @@ export const Contact = () => {
                 )}
               </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                style={{
-                  backgroundColor: '#1B4D3E',
-                  color: '#FFFFFF',
-                  padding: '0.9rem 2.2rem',
-                  borderRadius: '9999px',
-                  border: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.98rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(27,77,62,0.25)',
-                  alignSelf: 'flex-start',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                <span>Submit Message (संदेश भेजें)</span>
-                <Send size={15} />
-              </button>
+              {/* Submit Button & Confidential Note */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <button
+                  type="submit"
+                  style={{
+                    backgroundColor: '#1B4D3E',
+                    color: '#FFFFFF',
+                    padding: '0.9rem 2.4rem',
+                    borderRadius: '9999px',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.98rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(27,77,62,0.25)',
+                    alignSelf: 'flex-start',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <span>Submit Message (संदेश भेजें)</span>
+                  <Send size={15} />
+                </button>
+
+                <div style={{ fontSize: '0.78rem', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ShieldCheck size={14} color="#059669" />
+                  <span>Your enquiry is logged securely under our Privacy Policy. Never shared with third parties.</span>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       </section>
 
-      {/* 3. SECTION: QUICK RESOLUTION SHORTCUTS (WIDE 3-CARD GRID) */}
+      {/* 3. SECTION: QUICK RESOLUTION SHORTCUTS (1280px ALIGNED WITH NAVBAR) */}
       <section
         style={{
           backgroundColor: '#FFFFFF',
-          borderTop: '1px solid #E7E0D3',
-          borderBottom: '1px solid #E7E0D3',
-          padding: '4.5rem 1.5rem'
+          borderTop: '1px solid #E5E7EB',
+          padding: '4.5rem clamp(1.25rem, 3vw, 2.5rem)'
         }}
       >
-        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <span
               style={{
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 color: '#059669',
                 textTransform: 'uppercase',
@@ -797,15 +849,15 @@ export const Contact = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
               gap: '1.75rem',
               marginBottom: '2.5rem'
             }}
           >
             <div
               style={{
-                backgroundColor: '#FAF8F5',
-                border: '1px solid #E2D9CB',
+                backgroundColor: '#F9FBF8',
+                border: '1px solid #E5E7EB',
                 borderRadius: '14px',
                 padding: '1.75rem',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
@@ -822,8 +874,8 @@ export const Contact = () => {
 
             <div
               style={{
-                backgroundColor: '#FAF8F5',
-                border: '1px solid #E2D9CB',
+                backgroundColor: '#F9FBF8',
+                border: '1px solid #E5E7EB',
                 borderRadius: '14px',
                 padding: '1.75rem',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
@@ -840,8 +892,8 @@ export const Contact = () => {
 
             <div
               style={{
-                backgroundColor: '#FAF8F5',
-                border: '1px solid #E2D9CB',
+                backgroundColor: '#F9FBF8',
+                border: '1px solid #E5E7EB',
                 borderRadius: '14px',
                 padding: '1.75rem',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
@@ -863,15 +915,15 @@ export const Contact = () => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
                 color: '#1B4D3E',
                 fontWeight: 700,
                 fontSize: '0.96rem',
                 textDecoration: 'none',
-                backgroundColor: '#EDE5D8',
-                padding: '8px 20px',
+                backgroundColor: '#E8F5E9',
+                padding: '10px 24px',
                 borderRadius: '9999px',
-                border: '1px solid #D5C7B2',
+                border: '1px solid #BBF7D0',
                 transition: 'all 0.15s ease'
               }}
             >

@@ -28,17 +28,18 @@ export const About = () => {
         lineHeight: 1.6
       }}
     >
-      {/* 1. CLASSIC HERO SECTION WITH INDIAN FARMER PORTRAIT */}
+      {/* 1. CLASSIC HERO SECTION WITH INDIAN FARMER PORTRAIT (EXPANSIVE) */}
       <section
         style={{
           borderBottom: '1px solid #E7E0D3',
           background: 'linear-gradient(180deg, #F4EFEA 0%, #FAF8F5 100%)',
-          padding: '4.5rem 1.5rem 4rem'
+          padding: '4.5rem clamp(1.5rem, 3.5vw, 4rem) 4rem'
         }}
       >
         <div
           style={{
-            maxWidth: '1160px',
+            maxWidth: '1680px',
+            width: '100%',
             margin: '0 auto',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -368,11 +369,12 @@ export const About = () => {
         {/* 4 Classic Agrarian Census Stats */}
         <div
           style={{
-            maxWidth: '1100px',
+            maxWidth: '1680px',
+            width: '100%',
             margin: '-36px auto 0',
             position: 'relative',
             zIndex: 10,
-            padding: '0 1.5rem'
+            padding: '0 clamp(1.5rem, 3.5vw, 4rem)'
           }}
         >
           <div
@@ -440,8 +442,8 @@ export const About = () => {
         </div>
       </section>
 
-      {/* 3. SECTION: WHAT FARMERBANDH DELIVERS — "खेत से दुकान तक" */}
-      <section style={{ maxWidth: '1160px', margin: '0 auto', padding: '5rem 1.5rem 4rem' }}>
+      {/* 3. SECTION: WHAT FARMERBANDH DELIVERS — "खेत से दुकान तक" (EXPANSIVE) */}
+      <section style={{ maxWidth: '1680px', width: '100%', margin: '0 auto', padding: '5rem clamp(1.5rem, 3.5vw, 4rem) 4rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div
             style={{
@@ -580,16 +582,16 @@ export const About = () => {
         </div>
       </section>
 
-      {/* 4. SECTION: COMMUNITY — "किसान, व्यापारी और देश का विश्वास" */}
+      {/* 4. SECTION: COMMUNITY — "किसान, व्यापारी और देश का विश्वास" (EXPANSIVE) */}
       <section
         style={{
           backgroundColor: '#FFFFFF',
           borderTop: '1px solid #E7E0D3',
           borderBottom: '1px solid #E7E0D3',
-          padding: '5rem 1.5rem'
+          padding: '5rem clamp(1.5rem, 3.5vw, 4rem)'
         }}
       >
-        <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1680px', width: '100%', margin: '0 auto' }}>
           <div
             style={{
               display: 'grid',
@@ -737,8 +739,8 @@ export const About = () => {
         </div>
       </section>
 
-      {/* 5. SECTION: OUR 4 PILLARS — "हमारे चार सिद्धांत" */}
-      <section style={{ maxWidth: '1160px', margin: '0 auto', padding: '5rem 1.5rem' }}>
+      {/* 5. SECTION: OUR 4 PILLARS — "हमारे चार सिद्धांत" (EXPANSIVE) */}
+      <section style={{ maxWidth: '1680px', width: '100%', margin: '0 auto', padding: '5rem clamp(1.5rem, 3.5vw, 4rem)' }}>
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div
             style={{
