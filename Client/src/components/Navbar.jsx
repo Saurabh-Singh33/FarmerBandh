@@ -1,10 +1,86 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Sprout, Menu, X } from 'lucide-react';
+import {
+  Sprout,
+  Menu,
+  X,
+  ShoppingBag,
+  Handshake,
+  Bookmark,
+  Store,
+  Package,
+  Wallet,
+  Tractor,
+  ShieldCheck,
+  ShieldAlert,
+  Bell,
+  Sliders,
+  LogOut,
+  ChevronDown
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNegotiation } from '../context/NegotiationContext';
 import { CartBadge } from './CartBadge';
 import { NotificationBell } from './NotificationBell';
+
+const DropdownItem = ({ to, onClick, icon: Icon, label, badge, badgeBg = '#F1F5F9', badgeColor = '#475569', isDanger = false, onSelect }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const content = (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0.55rem 0.75rem',
+        borderRadius: '8px',
+        fontSize: '0.84rem',
+        fontWeight: 500,
+        color: isDanger ? (hovered ? '#B91C1C' : '#DC2626') : (hovered ? '#0F172A' : '#334155'),
+        backgroundColor: isDanger ? (hovered ? '#FEF2F2' : 'transparent') : (hovered ? '#F1F5F9' : 'transparent'),
+        transition: 'all 0.15s ease',
+        cursor: 'pointer'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Icon
+          size={16}
+          color={isDanger ? '#DC2626' : (hovered ? '#1B4D3E' : '#64748B')}
+          strokeWidth={1.9}
+        />
+        <span>{label}</span>
+      </div>
+      {badge && (
+        <span style={{
+          fontSize: '0.68rem',
+          fontWeight: 600,
+          padding: '1px 7px',
+          borderRadius: '9999px',
+          backgroundColor: badgeBg,
+          color: badgeColor
+        }}>
+          {badge}
+        </span>
+      )}
+    </div>
+  );
+
+  if (to) {
+    return (
+      <Link to={to} onClick={onSelect} style={{ textDecoration: 'none', display: 'block' }}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div onClick={onClick} style={{ width: '100%' }}>
+      {content}
+    </div>
+  );
+};
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -389,156 +465,282 @@ export const Navbar = () => {
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#1B4D3E',
-                color: '#FFFFFF',
-                border: '2px solid #E8F5E9',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1rem',
-                fontWeight: 700,
+                gap: '6px',
+                padding: '3px 8px 3px 4px',
+                borderRadius: '9999px',
+                backgroundColor: dropdownOpen ? '#E8F5E9' : '#FFFFFF',
+                border: `1px solid ${dropdownOpen ? '#86EFAC' : '#E2E8F0'}`,
                 cursor: 'pointer',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                flexShrink: 0
+                transition: 'all 0.15s ease',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
               }}
               title={user.fullName}
+              aria-label="User profile menu"
             >
-              {getInitials(user.fullName)}
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#1B4D3E',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  flexShrink: 0
+                }}
+              >
+                {getInitials(user.fullName)}
+              </div>
+              <ChevronDown
+                size={14}
+                color="#475569"
+                style={{
+                  transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease'
+                }}
+              />
             </button>
 
-            {dropdownOpen && (
-              <div style={{
-                position: 'absolute',
-                right: 0,
-                top: '50px',
-                width: '240px',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E5E7EB',
-                borderRadius: '12px',
-                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05)',
-                padding: '1rem',
-                zIndex: 110
-              }}>
-                <div style={{ paddingBottom: '0.75rem', borderBottom: '1px solid #F3F4F6' }}>
-                  <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {user.fullName}
-                  </div>
-                  <div style={{ color: '#6B7280', fontSize: '0.82rem', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {user.email}
-                  </div>
-                  <div style={{
-                    marginTop: '0.5rem',
-                    display: 'inline-block',
-                    padding: '0.15rem 0.6rem',
-                    backgroundColor: '#E8F5E9',
-                    color: '#1B4D3E',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    borderRadius: '9999px',
-                    textTransform: 'capitalize'
-                  }}>
-                    {user.role}
-                  </div>
-                </div>
+            {dropdownOpen && (() => {
+              const role = (user?.role || '').toLowerCase();
+              const roleConfig = role === 'farmer'
+                ? { label: 'Farmer Partner', bg: '#FEF3C7', color: '#92400E', border: '#FDE68A', Icon: Tractor }
+                : role === 'admin'
+                ? { label: 'Platform Admin', bg: '#EFF6FF', color: '#1E40AF', border: '#BFDBFE', Icon: ShieldAlert }
+                : { label: 'Verified Buyer', bg: '#ECFDF5', color: '#065F46', border: '#A7F3D0', Icon: ShieldCheck };
+              const RoleIcon = roleConfig.Icon;
 
-                <div style={{ paddingTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  {(!user || user?.role?.toLowerCase() === 'buyer') && (
-                    <Link
-                      to="/cart"
-                      onClick={() => setDropdownOpen(false)}
-                      style={{
-                        textDecoration: 'none',
-                        color: '#15803D',
-                        padding: '0.5rem 0.75rem',
-                        borderRadius: '8px',
-                        fontSize: '0.88rem',
-                        fontWeight: 700,
-                        backgroundColor: '#ECFDF5',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        border: '1px solid #A7F3D0'
-                      }}
-                    >
-                      <span>🛒 View Shopping Cart</span>
-                      <span style={{ fontSize: '0.72rem', backgroundColor: '#15803D', color: '#fff', borderRadius: '9999px', padding: '1px 6px' }}>Go →</span>
-                    </Link>
-                  )}
-
-                  <Link
-                    to={getProfileLink()}
-                    onClick={() => setDropdownOpen(false)}
+              return (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '46px',
+                    width: '260px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '14px',
+                    boxShadow: '0 16px 36px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.05)',
+                    zIndex: 110,
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* User Identity Header Card */}
+                  <div
                     style={{
-                      textDecoration: 'none',
-                      color: '#374151',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '6px',
-                      fontSize: '0.88rem',
-                      fontWeight: 500,
-                      display: 'block'
-                    }}
-                  >
-                    Profile & Dashboard
-                  </Link>
-
-                  <Link
-                    to="/notifications"
-                    onClick={() => setDropdownOpen(false)}
-                    style={{
-                      textDecoration: 'none',
-                      color: '#374151',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '6px',
-                      fontSize: '0.88rem',
-                      fontWeight: 500,
+                      padding: '0.9rem 1rem',
+                      background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+                      borderBottom: '1px solid #E2E8F0',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between'
+                      gap: '0.75rem'
                     }}
                   >
-                    <span>Notifications</span>
-                    <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>All alerts</span>
-                  </Link>
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        backgroundColor: '#1B4D3E',
+                        color: '#FFFFFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.95rem',
+                        fontWeight: 700,
+                        flexShrink: 0,
+                        boxShadow: '0 2px 5px rgba(27,77,62,0.2)'
+                      }}
+                    >
+                      {getInitials(user.fullName)}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          color: '#0F172A',
+                          fontSize: '0.9rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {user.fullName}
+                      </div>
+                      <div
+                        style={{
+                          color: '#64748B',
+                          fontSize: '0.76rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {user.email}
+                      </div>
+                      <div style={{ marginTop: '3px' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            padding: '1px 7px',
+                            borderRadius: '9999px',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            backgroundColor: roleConfig.bg,
+                            color: roleConfig.color,
+                            border: `1px solid ${roleConfig.border}`
+                          }}
+                        >
+                          <RoleIcon size={11} strokeWidth={2.2} /> {roleConfig.label}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-                  <Link
-                    to="/notifications/preferences"
-                    onClick={() => setDropdownOpen(false)}
-                    style={{
-                      textDecoration: 'none',
-                      color: '#374151',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '6px',
-                      fontSize: '0.88rem',
-                      fontWeight: 500,
-                      display: 'block'
-                    }}
-                  >
-                    Preferences
-                  </Link>
+                  {/* Menu Items Container */}
+                  <div style={{ padding: '0.4rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    {/* Buyer Navigation */}
+                    {role === 'buyer' && (
+                      <>
+                        <DropdownItem
+                          to="/orders"
+                          icon={ShoppingBag}
+                          label="My Orders"
+                          badge="Track"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/negotiations"
+                          icon={Handshake}
+                          label="Price Negotiations"
+                          badge={unreadCount > 0 ? `${unreadCount} new` : null}
+                          badgeBg="#DCFCE7"
+                          badgeColor="#15803D"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/saved-farmers"
+                          icon={Bookmark}
+                          label="Saved Farmers"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/marketplace"
+                          icon={Store}
+                          label="Explore Marketplace"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                      </>
+                    )}
 
-                  <button
-                    onClick={handleLogout}
-                    style={{
-                      textAlign: 'left',
-                      width: '100%',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: '#DC2626',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '6px',
-                      fontSize: '0.88rem',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Logout
-                  </button>
+                    {/* Farmer Navigation */}
+                    {role === 'farmer' && (
+                      <>
+                        <DropdownItem
+                          to="/seller/dashboard"
+                          icon={Store}
+                          label="Seller Dashboard"
+                          badge="Hub"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/seller/listings"
+                          icon={Package}
+                          label="My Crop Listings"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/seller/orders"
+                          icon={ShoppingBag}
+                          label="Orders Received"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/seller/negotiations"
+                          icon={Handshake}
+                          label="Buyer Negotiations"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/seller/payouts"
+                          icon={Wallet}
+                          label="Earnings & Payouts"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                      </>
+                    )}
+
+                    {/* Admin Navigation */}
+                    {role === 'admin' && (
+                      <>
+                        <DropdownItem
+                          to="/admin/dashboard"
+                          icon={ShieldCheck}
+                          label="Admin Dashboard"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/admin/farmers"
+                          icon={Tractor}
+                          label="Farmer Directory"
+                          badge="Verify"
+                          badgeBg="#FEF3C7"
+                          badgeColor="#B45309"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/admin/listings"
+                          icon={Package}
+                          label="Manage Listings"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                        <DropdownItem
+                          to="/admin/orders"
+                          icon={ShoppingBag}
+                          label="Platform Orders"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
+                      </>
+                    )}
+
+                    {/* Divider */}
+                    <div style={{ height: '1px', backgroundColor: '#F1F5F9', margin: '4px 6px' }} />
+
+                    {/* Shared Utilities */}
+                    <DropdownItem
+                      to="/notifications"
+                      icon={Bell}
+                      label="Notifications"
+                      onSelect={() => setDropdownOpen(false)}
+                    />
+                    <DropdownItem
+                      to="/notifications/preferences"
+                      icon={Sliders}
+                      label="Preferences"
+                      onSelect={() => setDropdownOpen(false)}
+                    />
+
+                    {/* Divider */}
+                    <div style={{ height: '1px', backgroundColor: '#F1F5F9', margin: '4px 6px' }} />
+
+                    {/* Sign Out */}
+                    <DropdownItem
+                      onClick={handleLogout}
+                      icon={LogOut}
+                      label="Sign Out"
+                      isDanger={true}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         )}
       </div>

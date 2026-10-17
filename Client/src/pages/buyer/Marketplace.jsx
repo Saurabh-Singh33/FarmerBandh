@@ -18,6 +18,42 @@ import {
   Sparkles
 } from 'lucide-react';
 
+const INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Delhi',
+  'Jammu & Kashmir',
+  'Ladakh',
+  'Chandigarh',
+  'Puducherry'
+];
+
 export const Marketplace = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -36,8 +72,11 @@ export const Marketplace = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [minRating, setMinRating] = useState('');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [stateFilter, setStateFilter] = useState(user?.state || 'Gujarat');
-  const [districtFilter, setDistrictFilter] = useState(user?.district || 'Ahmedabad');
+  const [stateFilter, setStateFilter] = useState('');
+  const [districtFilter, setDistrictFilter] = useState('');
+  const [allIndia, setAllIndia] = useState(false);
+  const [appliedScope, setAppliedScope] = useState('country');
+  const [fallbackMessage, setFallbackMessage] = useState('');
   const [showMobileFilter, setShowMobileFilter] = useState(false);
 
   // Debounce search input (~300ms)
@@ -75,6 +114,7 @@ export const Marketplace = () => {
         verifiedOnly: verifiedOnly ? true : undefined,
         state: stateFilter || undefined,
         district: districtFilter || undefined,
+        allIndia: allIndia ? true : undefined,
         page: 1,
         pageSize: 12
       };
@@ -82,14 +122,18 @@ export const Marketplace = () => {
       const res = await productApi.list(params);
       setProducts(res.items || []);
       setTotal(res.total || 0);
+      setAppliedScope(res.appliedScope || 'country');
+      setFallbackMessage(res.fallbackMessage || '');
     } catch (err) {
       console.error('Failed to fetch products', err);
       setProducts([]);
       setTotal(0);
+      setAppliedScope('country');
+      setFallbackMessage('');
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, selectedCategory, sort, minPrice, maxPrice, minRating, verifiedOnly, stateFilter, districtFilter]);
+  }, [debouncedSearch, selectedCategory, sort, minPrice, maxPrice, minRating, verifiedOnly, stateFilter, districtFilter, allIndia]);
 
   useEffect(() => {
     fetchProducts();
@@ -104,9 +148,10 @@ export const Marketplace = () => {
     setMaxPrice('');
     setMinRating('');
     setVerifiedOnly(false);
-    setStateFilter(user?.state || '');
-    setDistrictFilter(user?.district || '');
-    notify.info('All filters have been reset to default.');
+    setStateFilter('');
+    setDistrictFilter('');
+    setAllIndia(true);
+    notify.info('All filters reset to All India.');
   };
 
   return (
@@ -114,19 +159,138 @@ export const Marketplace = () => {
       
       {/* Welcome Banner */}
       <div style={{ backgroundColor: '#E8F5E9', border: '1px solid #C8E6C9', padding: '1.25rem 1.5rem', borderRadius: '12px', marginBottom: '1.5rem', width: '100%', boxSizing: 'border-box' }}>
-        <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#1B4D3E', margin: 0, fontSize: '1.8rem' }}>
-          Welcome to Buyer Marketplace, {user?.fullName || 'Valued Buyer'}!
-        </h1>
-        <p style={{ color: '#2E7D32', marginTop: '0.5rem', marginBottom: 0, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <MapPin size={16} color="#2E7D32" /> Location Context: {districtFilter || 'All Districts'}, {stateFilter || 'All States'}
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#1B4D3E', margin: 0, fontSize: '1.8rem' }}>
+              Welcome to Buyer Marketplace, {user?.fullName || 'Valued Buyer'}!
+            </h1>
+            <p style={{ color: '#2E7D32', marginTop: '0.4rem', marginBottom: 0, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <MapPin size={16} color="#2E7D32" />
+              <span>Delivery Location: <strong>{user?.district && user?.state ? `${user.district}, ${user.state}` : user?.state || 'India'}</strong></span>
+              <span style={{ color: '#81C784' }}>&bull;</span>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                backgroundColor: appliedScope === 'district' ? '#C8E6C9' : appliedScope === 'state' ? '#FEF3C7' : '#DCFCE7',
+                color: appliedScope === 'district' ? '#1B4D3E' : appliedScope === 'state' ? '#92400E' : '#166534',
+                fontWeight: 600,
+                fontSize: '0.8rem'
+              }}>
+                {appliedScope === 'district'
+                  ? `📍 Near You (${districtFilter || user?.district})`
+                  : appliedScope === 'state'
+                  ? `📍 Statewide (${stateFilter || user?.state || 'State'})`
+                  : '🇮🇳 Nationwide (All India)'}
+              </span>
+            </p>
+          </div>
+
+          {/* Location Quick Switcher Buttons */}
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {user?.district && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (districtFilter === user.district) {
+                    setDistrictFilter('');
+                    setStateFilter('');
+                    setAllIndia(true);
+                  } else {
+                    setAllIndia(false);
+                    setDistrictFilter(user.district);
+                    setStateFilter(user.state || '');
+                  }
+                }}
+                style={{
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '20px',
+                  border: '1px solid #2E7D32',
+                  backgroundColor: districtFilter === user.district ? '#1B4D3E' : '#FFFFFF',
+                  color: districtFilter === user.district ? '#FFFFFF' : '#1B4D3E',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <MapPin size={13} />
+                Near Me ({user.district})
+              </button>
+            )}
+
+            {user?.state && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (stateFilter === user.state && !districtFilter) {
+                    setStateFilter('');
+                    setDistrictFilter('');
+                    setAllIndia(true);
+                  } else {
+                    setAllIndia(false);
+                    setDistrictFilter('');
+                    setStateFilter(user.state);
+                  }
+                }}
+                style={{
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '20px',
+                  border: '1px solid #2E7D32',
+                  backgroundColor: (stateFilter === user.state && !districtFilter) ? '#1B4D3E' : '#FFFFFF',
+                  color: (stateFilter === user.state && !districtFilter) ? '#FFFFFF' : '#1B4D3E',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <MapPin size={13} />
+                My State ({user.state})
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                setDistrictFilter('');
+                setStateFilter('');
+                setAllIndia(true);
+              }}
+              style={{
+                padding: '0.45rem 0.9rem',
+                borderRadius: '20px',
+                border: '1px solid #2E7D32',
+                backgroundColor: allIndia || (!stateFilter && !districtFilter) ? '#1B4D3E' : '#FFFFFF',
+                color: allIndia || (!stateFilter && !districtFilter) ? '#FFFFFF' : '#1B4D3E',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              All India
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Search & Main Controls Row */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', width: '100%' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', width: '100%' }}>
         
         {/* Search input with Lucide Search Icon */}
-        <div style={{ flex: '1 1 320px', position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div style={{ flex: '1 1 280px', position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={18} style={{ position: 'absolute', left: '16px', color: '#9CA3AF', pointerEvents: 'none' }} />
           <input
             type="text"
@@ -165,6 +329,65 @@ export const Marketplace = () => {
               title="Clear search"
             >
               <XCircle size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* State Selector Dropdown (Allows user to select a state to show products from) */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          backgroundColor: '#FFFFFF',
+          border: stateFilter ? '1.5px solid #2E7D32' : '1px solid #E5E7EB',
+          borderRadius: '24px',
+          padding: '0.45rem 0.85rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+          <MapPin size={16} color={stateFilter ? '#2E7D32' : '#6B7280'} />
+          <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>State:</span>
+          <select
+            id="market-state-select"
+            value={stateFilter}
+            onChange={(e) => {
+              const val = e.target.value;
+              setStateFilter(val);
+              setDistrictFilter(''); // selecting a state scopes to that entire state
+              if (val) {
+                setAllIndia(false);
+              } else {
+                setAllIndia(true);
+              }
+            }}
+            style={{
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
+              fontSize: '0.9rem',
+              color: stateFilter ? '#1B4D3E' : '#374151',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            <option value="">All States (All India)</option>
+            {INDIAN_STATES.map((st) => (
+              <option key={st} value={st}>
+                {st}
+              </option>
+            ))}
+          </select>
+          {stateFilter && (
+            <button
+              type="button"
+              onClick={() => {
+                setStateFilter('');
+                setDistrictFilter('');
+                setAllIndia(true);
+              }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: '0 2px', display: 'flex' }}
+              title="Reset to All States"
+            >
+              <XCircle size={15} />
             </button>
           )}
         </div>
@@ -330,28 +553,40 @@ export const Marketplace = () => {
               </label>
             </div>
 
-            {/* Location Scoping Override */}
+            {/* State Selection in Sidebar */}
             <div style={{ marginBottom: '1.25rem' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-                State Filter
+                Select State
               </label>
-              <input
-                type="text"
+              <select
                 value={stateFilter}
-                onChange={(e) => setStateFilter(e.target.value)}
-                placeholder="State (e.g. Gujarat)"
-                style={{ width: '100%', padding: '0.4rem 0.6rem', border: '1px solid #D1D5DB', borderRadius: '6px', fontSize: '0.85rem' }}
-              />
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setStateFilter(val);
+                  setDistrictFilter('');
+                  if (val) setAllIndia(false);
+                  else setAllIndia(true);
+                }}
+                style={{ width: '100%', padding: '0.5rem 0.6rem', border: '1px solid #D1D5DB', borderRadius: '6px', fontSize: '0.85rem', backgroundColor: '#FFFFFF' }}
+              >
+                <option value="">All States (All India)</option>
+                {INDIAN_STATES.map((st) => (
+                  <option key={st} value={st}>{st}</option>
+                ))}
+              </select>
             </div>
 
             <div style={{ marginBottom: '1.25rem' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-                District Filter
+                District Filter (Optional)
               </label>
               <input
                 type="text"
                 value={districtFilter}
-                onChange={(e) => setDistrictFilter(e.target.value)}
+                onChange={(e) => {
+                  setDistrictFilter(e.target.value);
+                  if (e.target.value) setAllIndia(false);
+                }}
                 placeholder="District (e.g. Ahmedabad)"
                 style={{ width: '100%', padding: '0.4rem 0.6rem', border: '1px solid #D1D5DB', borderRadius: '6px', fontSize: '0.85rem' }}
               />
@@ -361,9 +596,82 @@ export const Marketplace = () => {
 
         {/* Product Cards Container */}
         <div>
-          {/* Total Count */}
-          <div style={{ marginBottom: '1rem', color: '#6B7280', fontSize: '0.9rem', fontWeight: 500 }}>
-            {loading ? 'Searching catalog...' : `${total} listings found`}
+          {/* Fallback Notification Banner */}
+          {fallbackMessage && (
+            <div style={{
+              backgroundColor: '#FFFBEB',
+              border: '1px solid #FCD34D',
+              borderRadius: '12px',
+              padding: '0.85rem 1.25rem',
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              boxShadow: '0 2px 5px rgba(245, 158, 11, 0.08)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Sparkles size={18} color="#D97706" />
+                <div>
+                  <div style={{ fontWeight: 700, color: '#92400E', fontSize: '0.9rem' }}>
+                    {appliedScope === 'state' ? `Showing produce from ${stateFilter || user?.state || 'your state'}` : 'Showing produce across All India'}
+                  </div>
+                  <div style={{ margin: '2px 0 0 0', color: '#B45309', fontSize: '0.84rem' }}>
+                    {fallbackMessage}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStateFilter('');
+                    setDistrictFilter('');
+                    setAllIndia(true);
+                  }}
+                  style={{
+                    padding: '0.35rem 0.85rem',
+                    borderRadius: '16px',
+                    border: '1px solid #D97706',
+                    backgroundColor: '#FFFFFF',
+                    color: '#92400E',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  Browse All India
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Total Count & Current Location Scope Badge */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ color: '#6B7280', fontSize: '0.9rem', fontWeight: 500 }}>
+              {loading ? 'Searching catalog...' : `${total} listings found`}
+            </div>
+            {!loading && (
+              <span style={{
+                fontSize: '0.8rem',
+                color: '#1B4D3E',
+                backgroundColor: '#E8F5E9',
+                border: '1px solid #C8E6C9',
+                padding: '0.2rem 0.65rem',
+                borderRadius: '12px',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <MapPin size={12} />
+                {appliedScope === 'district' ? `District: ${districtFilter || user?.district}` : appliedScope === 'state' ? `State: ${stateFilter || user?.state}` : 'Region: All India'}
+              </span>
+            )}
           </div>
 
           {/* Skeleton Loader */}
@@ -386,24 +694,55 @@ export const Marketplace = () => {
                 <PackageSearch size={54} color="#1B4D3E" />
               </div>
               <h3 style={{ color: '#1B4D3E', marginTop: 0 }}>No products match your filters</h3>
-              <p style={{ color: '#6B7280', marginBottom: '1.5rem' }}>Try clearing search criteria or expanding your location scope.</p>
-              <button
-                onClick={handleClearFilters}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '24px',
-                  backgroundColor: '#1B4D3E',
-                  color: '#FFFFFF',
-                  fontWeight: 600,
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <RotateCcw size={16} /> Clear All Filters
-              </button>
+              <p style={{ color: '#6B7280', marginBottom: '1.5rem', maxWidth: '480px', margin: '0 auto 1.5rem auto', lineHeight: 1.5 }}>
+                {districtFilter
+                  ? `There are no active produce listings in "${districtFilter}" yet. Clear your location filter or browse statewide produce from verified farmers.`
+                  : stateFilter
+                  ? `There are no active produce listings in "${stateFilter}" matching your criteria yet. You can browse produce across all India or pick another state.`
+                  : 'Try clearing your search criteria or resetting filters to browse all fresh produce.'}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                {(districtFilter || stateFilter) && (
+                  <button
+                    onClick={() => {
+                      setDistrictFilter('');
+                      setStateFilter('');
+                      setAllIndia(true);
+                    }}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '24px',
+                      backgroundColor: '#1B4D3E',
+                      color: '#FFFFFF',
+                      fontWeight: 600,
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <RotateCcw size={16} /> Show All Regions (Browse All India)
+                  </button>
+                )}
+                <button
+                  onClick={handleClearFilters}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '24px',
+                    backgroundColor: (districtFilter || stateFilter) ? '#F3F4F6' : '#1B4D3E',
+                    color: (districtFilter || stateFilter) ? '#374151' : '#FFFFFF',
+                    fontWeight: 600,
+                    border: '1px solid #E5E7EB',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <RotateCcw size={16} /> Clear All Filters
+                </button>
+              </div>
             </div>
           )}
 

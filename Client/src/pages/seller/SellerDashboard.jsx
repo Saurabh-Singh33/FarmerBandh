@@ -111,12 +111,12 @@ export const SellerDashboard = () => {
         </div>
       </div>
 
-      {/* Verification Notice Banner if Unverified */}
-      {verificationStatus === 'Unverified' && (
+      {/* Verification Notice Banner */}
+      {String(verificationStatus).toLowerCase() !== 'verified' && String(verificationStatus) !== '2' && String(verificationStatus).toLowerCase() !== 'approved' && (
         <div
           style={{
-            backgroundColor: '#FFFBEB',
-            border: '1px solid #FDE68A',
+            backgroundColor: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#FEF2F2' : '#FFFBEB',
+            border: `1px solid ${String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#FECACA' : '#FDE68A'}`,
             borderRadius: '10px',
             padding: '1rem 1.25rem',
             marginBottom: '1.75rem',
@@ -128,13 +128,17 @@ export const SellerDashboard = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <AlertCircle size={20} color="#D97706" />
+            <AlertCircle size={20} color={String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#DC2626' : '#D97706'} />
             <div>
-              <div style={{ fontWeight: 700, color: '#92400E', fontSize: '0.92rem' }}>
-                Your seller profile is currently Unverified
+              <div style={{ fontWeight: 700, color: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#991B1B' : '#92400E', fontSize: '0.92rem' }}>
+                {String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0'
+                  ? 'Seller Access Restricted / Rejected'
+                  : 'Seller Account Pending Admin Approval'}
               </div>
-              <div style={{ color: '#B45309', fontSize: '0.82rem', marginTop: '2px' }}>
-                Verified farmers get 3.2x more buyer inquiries and instant payout approvals. Submit your Aadhaar & land details today.
+              <div style={{ color: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#B91C1C' : '#B45309', fontSize: '0.82rem', marginTop: '2px' }}>
+                {String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0'
+                  ? 'Your seller account has not been approved by the platform administrator. You can prepare listings, but they will not show to buyers on the marketplace.'
+                  : 'You can add and manage crop listings freely, but they will remain hidden from buyers on the marketplace until an Admin verifies and approves your seller profile.'}
               </div>
             </div>
           </div>
@@ -145,7 +149,7 @@ export const SellerDashboard = () => {
               alignItems: 'center',
               gap: '4px',
               padding: '0.45rem 0.9rem',
-              backgroundColor: '#D97706',
+              backgroundColor: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#DC2626' : '#D97706',
               color: '#FFFFFF',
               borderRadius: '6px',
               fontSize: '0.82rem',
@@ -154,7 +158,7 @@ export const SellerDashboard = () => {
               whiteSpace: 'nowrap'
             }}
           >
-            Get Verified Now <ArrowRight size={14} />
+            Check Verification Status <ArrowRight size={14} />
           </Link>
         </div>
       )}

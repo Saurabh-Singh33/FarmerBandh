@@ -9,7 +9,8 @@ export const ListingCard = ({
   onUnpublish,
   onMarkOutOfStock,
   onRestock,
-  onDelete
+  onDelete,
+  isApprovedSeller = true
 }) => {
   const imageUrl = getProductImageUrl(listing);
   const status = listing.productStatus || 'Active';
@@ -56,7 +57,7 @@ export const ListingCard = ({
         />
 
         {/* Status Badge */}
-        <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
           <span
             style={{
               fontSize: '0.75rem',
@@ -71,6 +72,21 @@ export const ListingCard = ({
           >
             {currentStatus.label}
           </span>
+          {isApprovedSeller === false && (
+            <span
+              style={{
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '2px 7px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(217, 119, 6, 0.95)',
+                color: '#FFFFFF',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+              }}
+            >
+              Hidden (Pending Approval)
+            </span>
+          )}
         </div>
 
         {/* Grade Pill */}

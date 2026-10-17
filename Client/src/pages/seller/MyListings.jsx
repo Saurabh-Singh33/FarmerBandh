@@ -7,7 +7,7 @@ import { notify } from '../../context/NotificationContext';
 import { useSeller } from '../../context/SellerContext';
 
 export const MyListings = () => {
-  const { refreshDashboard } = useSeller();
+  const { refreshDashboard, verificationStatus } = useSeller();
   const [listings, setListings] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -18,6 +18,11 @@ export const MyListings = () => {
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 12;
+
+  const isApprovedSeller =
+    String(verificationStatus).toLowerCase() === 'verified' ||
+    String(verificationStatus) === '2' ||
+    String(verificationStatus).toLowerCase() === 'approved';
 
   const fetchListings = useCallback(async () => {
     try {
@@ -154,6 +159,36 @@ export const MyListings = () => {
           <PlusCircle size={18} /> Add New Crop Produce
         </Link>
       </div>
+
+      {/* Notice Banner if seller not yet approved */}
+      {!isApprovedSeller && (
+        <div
+          style={{
+            backgroundColor: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#FEF2F2' : '#FFFBEB',
+            border: `1px solid ${String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#FECACA' : '#FDE68A'}`,
+            borderRadius: '12px',
+            padding: '1rem 1.25rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}
+        >
+          <AlertCircle size={22} color={String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#DC2626' : '#D97706'} style={{ flexShrink: 0 }} />
+          <div>
+            <div style={{ fontWeight: 700, color: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#991B1B' : '#92400E', fontSize: '0.92rem' }}>
+              {String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0'
+                ? 'Seller Privileges Restricted — Listings Hidden from Marketplace'
+                : 'Awaiting Admin Verification — Listings are Hidden from Marketplace'}
+            </div>
+            <div style={{ fontSize: '0.84rem', color: String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0' ? '#B91C1C' : '#B45309', marginTop: '3px', lineHeight: 1.4 }}>
+              {String(verificationStatus).toLowerCase() === 'rejected' || String(verificationStatus) === '0'
+                ? 'Your seller account has not been verified to sell on FarmerBandh. Your crop listings are saved here in your seller portal, but buyers cannot view or purchase them.'
+                : 'You are welcome to create, edit, and organize all your crop products right now. However, your active products will only show to buyers on the public marketplace once an Admin verifies and approves your seller account.'}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filter Tabs & Search Bar */}
       <div
@@ -325,6 +360,7 @@ export const MyListings = () => {
                 onMarkOutOfStock={handleMarkOutOfStock}
                 onRestock={handleRestock}
                 onDelete={handleDelete}
+                isApprovedSeller={isApprovedSeller}
               />
             ))}
           </div>

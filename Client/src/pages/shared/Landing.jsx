@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { SproutIcon } from '../../components/SocialIcons';
 import { FarmerBuyerScene } from '../../components/FarmerBuyerScene';
+import { TestimonialsSection } from '../../components/TestimonialsSection';
 
 export const Landing = () => {
   const { user } = useAuth();
@@ -480,6 +481,9 @@ export const Landing = () => {
           </div>
         </div>
       </section>
+
+      {/* SECTION: COMMUNITY REVIEWS & MEMBER TENURE STORIES */}
+      <TestimonialsSection />
 
       {/* SECTION 5: CALL TO ACTION */}
       <section

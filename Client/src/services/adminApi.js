@@ -37,6 +37,18 @@ export const adminUsersApi = {
   demoteUser: async (id, reason = '') => {
     const res = await apiClient.post(`/admin/users/${id}/demote`, { reason });
     return res.data;
+  },
+  approveSeller: async (farmerId) => {
+    const res = await apiClient.post(`/admin/users/farmers/${farmerId}/approve-seller`);
+    return res.data;
+  },
+  rejectSeller: async (farmerId, reason) => {
+    const res = await apiClient.post(`/admin/users/farmers/${farmerId}/reject-seller`, { reason });
+    return res.data;
+  },
+  revokeSeller: async (farmerId, reason) => {
+    const res = await apiClient.post(`/admin/users/farmers/${farmerId}/revoke-seller`, { reason });
+    return res.data;
   }
 };
 

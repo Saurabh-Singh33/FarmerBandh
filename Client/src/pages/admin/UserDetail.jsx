@@ -34,6 +34,9 @@ export const UserDetail = () => {
   const [suspendModalOpen, setSuspendModalOpen] = useState(false);
   const [reactivateModalOpen, setReactivateModalOpen] = useState(false);
   const [resetPwdModalOpen, setResetPwdModalOpen] = useState(false);
+  const [approveSellerModalOpen, setApproveSellerModalOpen] = useState(false);
+  const [rejectSellerModalOpen, setRejectSellerModalOpen] = useState(false);
+  const [revokeSellerModalOpen, setRevokeSellerModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUser = async () => {
@@ -88,6 +91,51 @@ export const UserDetail = () => {
       setResetPwdModalOpen(false);
     } catch (err) {
       notify.error(err.response?.data?.message || err.message || 'Failed to reset password.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleApproveSeller = async () => {
+    if (!user?.farmerProfile?.farmerId) return;
+    try {
+      setActionLoading(true);
+      await adminUsersApi.approveSeller(user.farmerProfile.farmerId);
+      notify.success('Farmer approved as seller! Their listings are now public.');
+      setApproveSellerModalOpen(false);
+      fetchUser();
+    } catch (err) {
+      notify.error(err.response?.data?.message || err.message || 'Failed to approve seller.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRejectSeller = async (reason) => {
+    if (!user?.farmerProfile?.farmerId) return;
+    try {
+      setActionLoading(true);
+      await adminUsersApi.rejectSeller(user.farmerProfile.farmerId, reason);
+      notify.info('Seller request rejected. Products remain hidden.');
+      setRejectSellerModalOpen(false);
+      fetchUser();
+    } catch (err) {
+      notify.error(err.response?.data?.message || err.message || 'Failed to reject seller.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRevokeSeller = async (reason) => {
+    if (!user?.farmerProfile?.farmerId) return;
+    try {
+      setActionLoading(true);
+      await adminUsersApi.revokeSeller(user.farmerProfile.farmerId, reason);
+      notify.warning('Seller privileges revoked. Listings hidden from store.');
+      setRevokeSellerModalOpen(false);
+      fetchUser();
+    } catch (err) {
+      notify.error(err.response?.data?.message || err.message || 'Failed to revoke seller.');
     } finally {
       setActionLoading(false);
     }
@@ -348,11 +396,69 @@ export const UserDetail = () => {
             boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-            <Tractor size={20} color="#059669" />
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>
-              Farmer & Operation Details
-            </h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Tractor size={20} color="#059669" />
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                Farmer & Operation Details
+              </h2>
+            </div>
+
+            {/* Quick Seller Actions in Farmer Card */}
+            {user.farmerProfile.farmerId && (
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {user.farmerProfile.verified !== 2 ? (
+                  <>
+                    <button
+                      onClick={() => setApproveSellerModalOpen(true)}
+                      style={{
+                        padding: '0.45rem 0.9rem',
+                        borderRadius: '6px',
+                        backgroundColor: '#059669',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Approve as Seller
+                    </button>
+                    <button
+                      onClick={() => setRejectSellerModalOpen(true)}
+                      style={{
+                        padding: '0.45rem 0.9rem',
+                        borderRadius: '6px',
+                        backgroundColor: '#FEF2F2',
+                        color: '#B91C1C',
+                        border: '1px solid #FCA5A5',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Reject Seller Account
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setRevokeSellerModalOpen(true)}
+                    style={{
+                      padding: '0.45rem 0.9rem',
+                      borderRadius: '6px',
+                      backgroundColor: '#FFFFFF',
+                      color: '#DC2626',
+                      border: '1px solid #FECACA',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Revoke Seller Privileges
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div
@@ -368,19 +474,28 @@ export const UserDetail = () => {
               <strong style={{ color: '#0F172A' }}>{user.farmerProfile.farmName || '—'}</strong>
             </div>
             <div>
-              <span style={{ color: '#64748B', display: 'block' }}>Verification Status</span>
+              <span style={{ color: '#64748B', display: 'block' }}>Seller Verification</span>
               <strong
                 style={{
                   color:
-                    user.farmerProfile.verified === 'Verified'
+                    user.farmerProfile.verified === 2 || user.farmerProfile.verificationStatus === 'Approved'
                       ? '#15803D'
-                      : user.farmerProfile.verified === 'Pending'
-                      ? '#0284C7'
-                      : '#D97706'
+                      : user.farmerProfile.verified === 1 || user.farmerProfile.verificationStatus === 'Pending'
+                      ? '#D97706'
+                      : '#DC2626'
                 }}
               >
-                {user.farmerProfile.verified}
+                {user.farmerProfile.verified === 2 || user.farmerProfile.verificationStatus === 'Approved'
+                  ? 'Approved Seller'
+                  : user.farmerProfile.verified === 1 || user.farmerProfile.verificationStatus === 'Pending'
+                  ? 'Pending Approval'
+                  : 'Rejected / Unverified'}
               </strong>
+              <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+                {user.farmerProfile.verified === 2
+                  ? 'Listings visible on store'
+                  : 'Listings hidden from buyer store'}
+              </div>
             </div>
             <div>
               <span style={{ color: '#64748B', display: 'block' }}>Farm Size</span>
@@ -438,6 +553,39 @@ export const UserDetail = () => {
         isLoading={actionLoading}
         onConfirm={handleResetPassword}
         onCancel={() => setResetPwdModalOpen(false)}
+      />
+
+      <ConfirmModal
+        isOpen={approveSellerModalOpen}
+        title="Approve Farmer as Verified Seller"
+        message={`Approve "${user.fullName}" (${user.farmerProfile?.farmName || 'Farm'}) as an authorized seller? Their products will immediately be visible to all buyers on the marketplace.`}
+        confirmText="Approve Seller"
+        type="success"
+        isLoading={actionLoading}
+        onConfirm={handleApproveSeller}
+        onCancel={() => setApproveSellerModalOpen(false)}
+      />
+
+      <ReasonModal
+        isOpen={rejectSellerModalOpen}
+        title="Reject Seller Account"
+        description={`Provide a reason for rejecting the seller privileges of "${user.fullName}". The farmer can still manage their dashboard, but their products will NOT show on the marketplace.`}
+        confirmText="Reject Seller"
+        type="danger"
+        isLoading={actionLoading}
+        onConfirm={handleRejectSeller}
+        onCancel={() => setRejectSellerModalOpen(false)}
+      />
+
+      <ReasonModal
+        isOpen={revokeSellerModalOpen}
+        title="Revoke Seller Privileges"
+        description={`Provide a reason for revoking seller approval for "${user.fullName}". Their listings will immediately become hidden from buyers on the marketplace.`}
+        confirmText="Revoke Seller"
+        type="danger"
+        isLoading={actionLoading}
+        onConfirm={handleRevokeSeller}
+        onCancel={() => setRevokeSellerModalOpen(false)}
       />
     </div>
   );

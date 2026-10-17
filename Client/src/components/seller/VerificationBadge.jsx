@@ -2,13 +2,14 @@ import React from 'react';
 import { ShieldCheck, Clock, AlertTriangle } from 'lucide-react';
 
 export const VerificationBadge = ({ status = 'Unverified', size = 'normal', showIcon = true }) => {
-  const norm = (status || '').toLowerCase();
-  const isVerified = norm === 'verified' || norm === '1';
-  const isPending = norm === 'pending' || norm === '2';
+  const norm = String(status || '').toLowerCase();
+  const isVerified = norm === 'verified' || norm === '2' || norm === 'approved';
+  const isPending = norm === 'pending' || norm === '1';
+  const isRejected = norm === 'rejected' || norm === '0';
 
   const config = isVerified
     ? {
-        label: 'Verified Farmer',
+        label: 'Approved Seller',
         bg: '#ECFDF5',
         color: '#065F46',
         border: '#A7F3D0',
@@ -16,17 +17,17 @@ export const VerificationBadge = ({ status = 'Unverified', size = 'normal', show
       }
     : isPending
     ? {
-        label: 'Verification Under Review',
-        bg: '#EFF6FF',
-        color: '#1E40AF',
-        border: '#BFDBFE',
+        label: 'Pending Admin Verification',
+        bg: '#FEF3C7',
+        color: '#92400E',
+        border: '#FDE68A',
         Icon: Clock
       }
     : {
-        label: 'Unverified Seller',
-        bg: '#FFFBEB',
-        color: '#92400E',
-        border: '#FDE68A',
+        label: isRejected ? 'Seller Unapproved / Rejected' : 'Unverified Seller',
+        bg: '#FEF2F2',
+        color: '#991B1B',
+        border: '#FECACA',
         Icon: AlertTriangle
       };
 

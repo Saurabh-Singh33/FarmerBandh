@@ -34,7 +34,7 @@ const POPULAR_CROP_SUGGESTIONS = [
 
 export const AddProduct = () => {
   const navigate = useNavigate();
-  const { refreshDashboard } = useSeller();
+  const { refreshDashboard, verificationStatus } = useSeller();
 
   const [categories, setCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -157,8 +157,19 @@ export const AddProduct = () => {
         saveAsDraft
       };
 
+      const isApproved =
+        String(verificationStatus).toLowerCase() === 'verified' ||
+        String(verificationStatus) === '2' ||
+        String(verificationStatus).toLowerCase() === 'approved';
+
       await sellerListingApi.createListing(payload);
-      notify.success(saveAsDraft ? 'Listing saved as draft.' : 'Produce listed live on Marketplace!');
+      notify.success(
+        saveAsDraft
+          ? 'Listing saved as draft.'
+          : isApproved
+          ? 'Produce listed live on Marketplace!'
+          : 'Produce listing saved! It will appear to buyers once Admin approves your seller account.'
+      );
       refreshDashboard();
       navigate('/seller/listings');
     } catch (err) {
