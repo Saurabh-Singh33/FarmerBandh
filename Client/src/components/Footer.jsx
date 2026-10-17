@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SproutIcon, InstagramIcon, FacebookIcon, TwitterIcon } from './SocialIcons';
+import { FooterLanguageSelector } from './FooterLanguageSelector';
 
 export const Footer = () => {
   return (
@@ -266,6 +267,11 @@ export const Footer = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Language Selection Option */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
+        <FooterLanguageSelector />
       </div>
 
       {/* Bottom Copyright */}

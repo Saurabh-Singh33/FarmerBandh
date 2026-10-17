@@ -6,6 +6,7 @@ import { NegotiationProvider } from './context/NegotiationContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ToastProvider } from './context/ToastContext';
 import { SellerProvider } from './context/SellerContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -58,21 +59,23 @@ function AppLayout() {
 function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <ToastProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <SellerProvider>
-                <NegotiationProvider>
-                  <CartProvider>
-                    <AppLayout />
-                  </CartProvider>
-                </NegotiationProvider>
-              </SellerProvider>
-            </NotificationProvider>
-          </AuthProvider>
-        </ToastProvider>
-      </BrowserRouter>
+      <LanguageProvider>
+        <BrowserRouter>
+          <ToastProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                <SellerProvider>
+                  <NegotiationProvider>
+                    <CartProvider>
+                      <AppLayout />
+                    </CartProvider>
+                  </NegotiationProvider>
+                </SellerProvider>
+              </NotificationProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </BrowserRouter>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }
