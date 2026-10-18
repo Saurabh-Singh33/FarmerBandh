@@ -7,12 +7,12 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        backgroundColor: '#143B2F',
+        backgroundColor: '#0D261E',
         color: '#E8F5E9',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
         paddingTop: '3.5rem',
-        paddingBottom: '2rem'
+        paddingBottom: '2.5rem'
       }}
     >
       <div
@@ -47,17 +47,17 @@ export const Footer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#143B2F',
+                color: '#0D261E',
                 boxShadow: '0 2px 8px rgba(34,197,94,0.3)'
               }}
             >
-              <SproutIcon size={22} color="#143B2F" />
+              <SproutIcon size={22} color="#0D261E" />
             </div>
             <div>
               <span
                 style={{
-                  fontFamily: 'Playfair Display, Georgia, serif',
-                  fontSize: '1.45rem',
+                  fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                  fontSize: '1.4rem',
                   fontWeight: 700,
                   color: '#FFFFFF',
                   letterSpacing: '-0.02em',
@@ -66,7 +66,7 @@ export const Footer = () => {
               >
                 FarmerBandh
               </span>
-              <span style={{ fontSize: '0.72rem', color: '#86EFAC', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: '0.72rem', color: '#A7F3D0', letterSpacing: '0.06em', fontWeight: 600 }}>
                 DIRECT LOCAL PRODUCE
               </span>
             </div>
@@ -74,16 +74,16 @@ export const Footer = () => {
 
           <p
             style={{
-              fontSize: '0.92rem',
+              fontSize: '0.9rem',
               color: '#A7F3D0',
               lineHeight: 1.6,
               margin: '0 0 1.25rem 0'
             }}
           >
-            Trade directly. Grow together. Connecting regional farmers and commercial buyers with transparent negotiation, verified profiles, and escrow-style protection.
+            Direct farm-to-buyer agricultural marketplace. Connecting verified regional growers with commercial buyers through transparent negotiation, fair pricing, and escrow protection.
           </p>
 
-          <div style={{ display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.06)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.78rem', color: '#BBF7D0' }}>
+          <div style={{ display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.78rem', color: '#BBF7D0' }}>
             Built for farmers across Gujarat & India
           </div>
         </div>
@@ -92,12 +92,12 @@ export const Footer = () => {
         <div>
           <h2
             style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '0.85rem',
-              fontWeight: 700,
+              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+              fontSize: '0.8rem',
+              fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#86EFAC',
+              color: '#94A3B8',
               marginBottom: '1.25rem'
             }}
           >
@@ -105,27 +105,27 @@ export const Footer = () => {
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li>
-              <Link to="/" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <Link to="/" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/marketplace" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <Link to="/marketplace" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Marketplace
               </Link>
             </li>
             <li>
-              <Link to="/about" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <Link to="/about" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 About FarmerBandh
               </Link>
             </li>
             <li>
-              <Link to="/help" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <Link to="/help" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Help & FAQs
               </Link>
             </li>
             <li>
-              <Link to="/contact" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <Link to="/contact" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Contact Support
               </Link>
             </li>
@@ -136,12 +136,12 @@ export const Footer = () => {
         <div>
           <h2
             style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '0.85rem',
-              fontWeight: 700,
+              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+              fontSize: '0.8rem',
+              fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#86EFAC',
+              color: '#94A3B8',
               marginBottom: '1.25rem'
             }}
           >
@@ -149,22 +149,22 @@ export const Footer = () => {
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li>
-              <a href="/help#terms" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <a href="/help#terms" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Terms of Service
               </a>
             </li>
             <li>
-              <a href="/help#privacy" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <a href="/help#privacy" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Privacy Policy
               </a>
             </li>
             <li>
-              <a href="/help#security" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <a href="/help#security" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Data Security Standards
               </a>
             </li>
             <li>
-              <a href="/help#faq" style={{ color: '#E8F5E9', textDecoration: 'none', fontSize: '0.92rem', transition: 'color 0.15s' }}>
+              <a href="/help#faq" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
                 Dispute & Return Policy
               </a>
             </li>
@@ -175,12 +175,12 @@ export const Footer = () => {
         <div>
           <h2
             style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '0.85rem',
-              fontWeight: 700,
+              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+              fontSize: '0.8rem',
+              fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#86EFAC',
+              color: '#94A3B8',
               marginBottom: '1.25rem'
             }}
           >
@@ -196,13 +196,14 @@ export const Footer = () => {
               style={{
                 width: '38px',
                 height: '38px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#FFFFFF',
-                transition: 'background-color 0.15s ease'
+                transition: 'all 0.15s ease'
               }}
             >
               <InstagramIcon size={19} color="#FFFFFF" />
@@ -216,13 +217,14 @@ export const Footer = () => {
               style={{
                 width: '38px',
                 height: '38px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#FFFFFF',
-                transition: 'background-color 0.15s ease'
+                transition: 'all 0.15s ease'
               }}
             >
               <FacebookIcon size={19} color="#FFFFFF" />
@@ -236,13 +238,14 @@ export const Footer = () => {
               style={{
                 width: '38px',
                 height: '38px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#FFFFFF',
-                transition: 'background-color 0.15s ease'
+                transition: 'all 0.15s ease'
               }}
             >
               <TwitterIcon size={19} color="#FFFFFF" />
@@ -250,19 +253,19 @@ export const Footer = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.88rem' }}>
-            <div style={{ color: '#BBF7D0' }}>
+            <div style={{ color: '#94A3B8' }}>
               Email:{' '}
-              <a href="mailto:support@farmerbandh.com" style={{ color: '#FFFFFF', textDecoration: 'underline' }}>
+              <a href="mailto:support@farmerbandh.com" style={{ color: '#F8FAFC', textDecoration: 'none', fontWeight: 500 }}>
                 support@farmerbandh.com
               </a>
             </div>
-            <div style={{ color: '#BBF7D0' }}>
+            <div style={{ color: '#94A3B8' }}>
               Toll-Free:{' '}
-              <a href="tel:1800123456" style={{ color: '#FFFFFF', textDecoration: 'none', fontWeight: 600 }}>
+              <a href="tel:1800123456" style={{ color: '#F8FAFC', textDecoration: 'none', fontWeight: 600 }}>
                 1800-123-456
               </a>
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#86EFAC', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.78rem', color: '#6EE7B7', marginTop: '2px' }}>
               Mon – Sat: 9:00 AM – 6:00 PM IST
             </div>
           </div>

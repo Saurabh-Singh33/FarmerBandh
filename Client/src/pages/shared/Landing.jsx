@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { SproutIcon } from '../../components/SocialIcons';
 import { FarmerBuyerScene } from '../../components/FarmerBuyerScene';
 import { TestimonialsSection } from '../../components/TestimonialsSection';
+import { Tractor, ShoppingBag, ShieldCheck, CheckCircle2, Zap, Sprout } from 'lucide-react';
 
 export const Landing = () => {
   const { user } = useAuth();
@@ -485,54 +486,271 @@ export const Landing = () => {
       {/* SECTION: COMMUNITY REVIEWS & MEMBER TENURE STORIES */}
       <TestimonialsSection />
 
-      {/* SECTION 5: CALL TO ACTION */}
+      {/* SECTION 5: CALL TO ACTION BANNER (CONTAINED FLOATING CARD) */}
       <section
         style={{
-          backgroundColor: '#1B4D3E',
-          color: '#FFFFFF',
-          padding: '5rem 1.5rem',
-          textAlign: 'center'
+          backgroundColor: '#F9FBF8',
+          padding: '3.5rem 1.5rem 5rem',
+          position: 'relative'
         }}
       >
-        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-          <h2
+        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+          <div
             style={{
-              fontFamily: 'Playfair Display, Georgia, serif',
-              fontSize: 'clamp(2rem, 4vw, 2.75rem)',
-              fontWeight: 700,
-              margin: '0 0 1rem 0'
+              background: 'linear-gradient(140deg, #12372A 0%, #16423C 55%, #0B251B 100%)',
+              borderRadius: '24px',
+              border: '1px solid rgba(52, 211, 153, 0.22)',
+              boxShadow: '0 24px 60px -15px rgba(18, 55, 42, 0.38)',
+              padding: '3.75rem 2.5rem',
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden'
             }}
           >
-            Ready to trade directly?
-          </h2>
+            {/* Subtle Top Ambient Light */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '60%',
+                height: '140px',
+                background: 'radial-gradient(ellipse at 50% 0%, rgba(34, 197, 94, 0.18) 0%, transparent 70%)',
+                pointerEvents: 'none'
+              }}
+            />
 
-          <p style={{ fontSize: '1.05rem', color: '#A7F3D0', lineHeight: 1.6, margin: '0 0 2rem 0' }}>
-            Join local farmers and buyers trading fresh, transparently priced produce today.
-          </p>
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: '780px', margin: '0 auto' }}>
+              {/* Badge */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.4rem 1rem',
+                  borderRadius: '9999px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
+                  color: '#A7F3D0',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  marginBottom: '1.25rem',
+                  letterSpacing: '0.02em'
+                }}
+              >
+                <Sprout size={15} color="#4ADE80" />
+                <span>Direct Farm-to-Buyer Marketplace · Zero Middlemen</span>
+              </div>
 
-          <Link
-            to="/auth"
-            style={{
-              display: 'inline-block',
-              backgroundColor: '#22C55E',
-              color: '#143B2F',
-              padding: '0.9rem 2.4rem',
-              borderRadius: '9999px',
-              fontSize: '1rem',
-              fontWeight: 700,
-              textDecoration: 'none',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
-              marginBottom: '1.25rem'
-            }}
-          >
-            Create an account
-          </Link>
+              {/* Title */}
+              <h2
+                style={{
+                  fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                  fontSize: 'clamp(2rem, 3.8vw, 2.85rem)',
+                  fontWeight: 800,
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.025em',
+                  lineHeight: 1.2,
+                  margin: '0 0 1rem 0'
+                }}
+              >
+                Ready to trade farm produce directly?
+              </h2>
 
-          <div style={{ fontSize: '0.88rem', color: '#86EFAC' }}>
-            Already have an account?{' '}
-            <Link to="/auth" style={{ color: '#FFFFFF', fontWeight: 600, textDecoration: 'underline' }}>
-              Sign in
-            </Link>
+              {/* Subtitle */}
+              <p
+                style={{
+                  fontSize: '1.05rem',
+                  color: '#D1FAE5',
+                  lineHeight: 1.6,
+                  margin: '0 auto 2.25rem',
+                  maxWidth: '640px'
+                }}
+              >
+                Join verified growers, APMC traders, and retail procurement teams trading seasonal harvests with transparent counter-offers and escrow safety.
+              </p>
+
+              {/* Dual Action Buttons: Farmer & Buyer */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '1rem',
+                  marginBottom: '1.75rem'
+                }}
+              >
+                <Link
+                  to="/auth"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.55rem',
+                    backgroundColor: '#22C55E',
+                    color: '#0B251B',
+                    padding: '0.85rem 1.85rem',
+                    borderRadius: '12px',
+                    fontSize: '0.98rem',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 14px rgba(34, 197, 94, 0.3)',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#16A34A';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#22C55E';
+                    e.currentTarget.style.color = '#0B251B';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <Tractor size={18} />
+                  <span>Start as a Farmer</span>
+                </Link>
+
+                <Link
+                  to="/marketplace"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.55rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    color: '#FFFFFF',
+                    padding: '0.85rem 1.85rem',
+                    borderRadius: '12px',
+                    fontSize: '0.98rem',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.18)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.22)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <ShoppingBag size={18} />
+                  <span>Explore Marketplace</span>
+                </Link>
+              </div>
+
+              {/* Already registered sign-in link */}
+              <div style={{ fontSize: '0.88rem', color: '#A7F3D0', marginBottom: '2.5rem' }}>
+                Already registered?{' '}
+                <Link
+                  to="/auth"
+                  style={{
+                    color: '#FFFFFF',
+                    fontWeight: 600,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px'
+                  }}
+                >
+                  Sign in here
+                </Link>
+              </div>
+
+              {/* Three Pillars Trust Strip */}
+              <div
+                style={{
+                  borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                  paddingTop: '1.75rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '1.25rem',
+                  textAlign: 'left'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#4ADE80',
+                      flexShrink: 0
+                    }}
+                  >
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '2px' }}>
+                      Escrow-Protected
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#A7F3D0', lineHeight: 1.4 }}>
+                      Funds released only after buyer inspection
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#4ADE80',
+                      flexShrink: 0
+                    }}
+                  >
+                    <CheckCircle2 size={18} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '2px' }}>
+                      Verified Profiles
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#A7F3D0', lineHeight: 1.4 }}>
+                      Identity and agrarian records verified
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#4ADE80',
+                      flexShrink: 0
+                    }}
+                  >
+                    <Zap size={18} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '2px' }}>
+                      Zero Hidden Markup
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#A7F3D0', lineHeight: 1.4 }}>
+                      Direct counter-offers with 48h locks
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

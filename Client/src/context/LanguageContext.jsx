@@ -71,6 +71,14 @@ export const LanguageProvider = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState(getStoredLanguage);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isGoogleReady, setIsGoogleReady] = useState(false);
+  const [showInitialModal, setShowInitialModal] = useState(() => {
+    try {
+      const chosen = localStorage.getItem('farmerbandh_lang_chosen');
+      return !chosen;
+    } catch {
+      return false;
+    }
+  });
 
   // Poll for Google Translate combo readiness
   useEffect(() => {
@@ -104,6 +112,7 @@ export const LanguageProvider = ({ children }) => {
 
     try {
       localStorage.setItem('farmerbandh_lang', langCode);
+      localStorage.setItem('farmerbandh_lang_chosen', 'true');
     } catch (e) {
       console.warn('Could not save language to localStorage', e);
     }
@@ -145,11 +154,38 @@ export const LanguageProvider = ({ children }) => {
     }
   };
 
+  const chooseInitialLanguage = (langCode) => {
+    try {
+      localStorage.setItem('farmerbandh_lang_chosen', 'true');
+      localStorage.setItem('farmerbandh_lang', langCode);
+    } catch (e) {
+      console.warn('Error storing initial language selection', e);
+    }
+
+    setShowInitialModal(false);
+
+    if (langCode === 'en' && currentLanguage === 'en') {
+      // Already English, no translation action needed
+      return;
+    }
+
+    changeLanguage(langCode);
+  };
+
+  const openInitialPrompt = () => {
+    setShowInitialModal(true);
+  };
+
   return (
     <LanguageContext.Provider
       value={{
         currentLanguage,
         changeLanguage,
+        showInitialModal,
+        setShowInitialModal,
+        chooseInitialLanguage,
+        openInitialPrompt,
+
         isTranslating,
         isGoogleReady,
         languages: LANGUAGES

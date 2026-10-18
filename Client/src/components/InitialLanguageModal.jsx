@@ -1,0 +1,490 @@
+import React, { useState } from 'react';
+import { Globe, ArrowRight, Check, X, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+
+const UkFlag = () => (
+  <svg
+    width="26"
+    height="18"
+    viewBox="0 0 60 30"
+    style={{
+      borderRadius: '4px',
+      border: '1px solid rgba(0,0,0,0.08)',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
+      flexShrink: 0
+    }}
+  >
+    <clipPath id="init-modal-uk-s">
+      <path d="M0,0 v30 h60 v-30 z" />
+    </clipPath>
+    <clipPath id="init-modal-uk-t">
+      <path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z" />
+    </clipPath>
+    <g clipPath="url(#init-modal-uk-s)">
+      <path d="M0,0 v30 h60 v-30 z" fill="#012169" />
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+      <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#init-modal-uk-t)" stroke="#C8102E" strokeWidth="4" />
+      <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+      <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6" />
+    </g>
+  </svg>
+);
+
+const IndiaFlag = () => (
+  <svg
+    width="26"
+    height="18"
+    viewBox="0 0 22 16"
+    style={{
+      borderRadius: '4px',
+      border: '1px solid rgba(0,0,0,0.08)',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
+      flexShrink: 0
+    }}
+  >
+    <rect width="22" height="5.33" fill="#FF9933" />
+    <rect y="5.33" width="22" height="5.33" fill="#FFFFFF" />
+    <rect y="10.66" width="22" height="5.34" fill="#138808" />
+    <circle cx="11" cy="8" r="2.2" fill="none" stroke="#000080" strokeWidth="0.6" />
+    <circle cx="11" cy="8" r="0.6" fill="#000080" />
+  </svg>
+);
+
+export const InitialLanguageModal = () => {
+  const { showInitialModal, chooseInitialLanguage, currentLanguage } = useLanguage();
+  const [selectedCode, setSelectedCode] = useState(currentLanguage || 'en');
+
+  if (!showInitialModal) return null;
+
+  const options = [
+    {
+      code: 'en',
+      title: 'English',
+      nativeLabel: 'English',
+      subtitle: 'Browse full marketplace in English',
+      badge: 'Default',
+      flag: <UkFlag />,
+      ctaLabel: 'Continue in English'
+    },
+    {
+      code: 'hi',
+      title: 'हिन्दी',
+      nativeLabel: 'Hindi',
+      subtitle: 'मंडी भाव और उत्पाद हिंदी में देखें',
+      badge: 'अनुशंसित',
+      flag: <IndiaFlag />,
+      ctaLabel: 'हिन्दी में जारी रखें'
+    },
+    {
+      code: 'gu',
+      title: 'ગુજરાતી',
+      nativeLabel: 'Gujarati',
+      subtitle: 'બજાર ભાવ અને ઉત્પાદનો ગુજરાતીમાં જુઓ',
+      badge: 'પ્રાદેશિક',
+      flag: <IndiaFlag />,
+      ctaLabel: 'ગુજરાતીમાં આગળ વધો'
+    }
+  ];
+
+  const currentOption = options.find((o) => o.code === selectedCode) || options[0];
+
+  const handleConfirm = (codeToApply) => {
+    const finalCode = codeToApply || selectedCode;
+    chooseInitialLanguage(finalCode);
+  };
+
+  const handleDismiss = () => {
+    // Default to current language or English
+    chooseInitialLanguage(currentLanguage || 'en');
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="language-modal-title"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1.25rem',
+        backgroundColor: 'rgba(15, 23, 42, 0.65)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        animation: 'fadeIn 0.2s ease-out'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleDismiss();
+        }
+      }}
+    >
+      <div
+        className="notranslate"
+        translate="no"
+        style={{
+          width: '100%',
+          maxWidth: '640px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '20px',
+          boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.06)',
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {/* Subtle Brand Accent Bar at the Top */}
+        <div
+          style={{
+            height: '4px',
+            width: '100%',
+            background: 'linear-gradient(90deg, #1B4D3E 0%, #2E7D32 50%, #E65100 100%)'
+          }}
+        />
+
+        <div style={{ padding: '2rem 2rem 1.75rem' }}>
+          {/* Top Bar: Sprout badge & Close Button */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '1.25rem'
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.35rem 0.85rem',
+                borderRadius: '9999px',
+                backgroundColor: '#ECFDF5',
+                border: '1px solid #A7F3D0',
+                color: '#065F46',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                letterSpacing: '0.02em'
+              }}
+            >
+              <Globe size={14} color="#059669" />
+              <span>Language Selection · भाषा चयन</span>
+            </div>
+
+            <button
+              type="button"
+              id="close-language-modal"
+              onClick={handleDismiss}
+              title="Close and continue with English"
+              aria-label="Close modal"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#64748B',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#E2E8F0';
+                e.currentTarget.style.color = '#0F172A';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#F8FAFC';
+                e.currentTarget.style.color = '#64748B';
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Heading & Subtitle */}
+          <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+            <h2
+              id="language-modal-title"
+              style={{
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                fontSize: '1.45rem',
+                fontWeight: 700,
+                color: '#0F172A',
+                letterSpacing: '-0.02em',
+                margin: '0 0 0.35rem 0',
+                lineHeight: 1.3
+              }}
+            >
+              Choose your preferred language
+            </h2>
+
+            <p
+              style={{
+                fontSize: '0.9rem',
+                color: '#475569',
+                margin: '0 0 0.25rem 0',
+                lineHeight: 1.5
+              }}
+            >
+              Select how you would like to view listings, mandi rates, and seller chats.
+            </p>
+
+            <p
+              style={{
+                fontSize: '0.82rem',
+                color: '#64748B',
+                margin: 0
+              }}
+            >
+              अपनी भाषा चुनें &nbsp;•&nbsp; તમારી પસંદગીની ભાષા પસંદ કરો
+            </p>
+          </div>
+
+          {/* 3 Modern Language Cards */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+              gap: '0.85rem',
+              marginBottom: '1.5rem'
+            }}
+          >
+            {options.map((opt) => {
+              const isSelected = selectedCode === opt.code;
+              return (
+                <div
+                  key={opt.code}
+                  id={`init-lang-${opt.code}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={isSelected}
+                  onClick={() => {
+                    setSelectedCode(opt.code);
+                  }}
+                  onDoubleClick={() => {
+                    handleConfirm(opt.code);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedCode(opt.code);
+                    }
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '1.15rem 1rem',
+                    borderRadius: '14px',
+                    backgroundColor: isSelected ? '#F0FDF4' : '#FFFFFF',
+                    border: isSelected ? '2px solid #16A34A' : '1.5px solid #E2E8F0',
+                    boxShadow: isSelected
+                      ? '0 4px 14px -1px rgba(22, 163, 74, 0.18)'
+                      : '0 1px 3px rgba(0,0,0,0.04)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    minHeight: '135px',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      e.currentTarget.style.borderColor = '#10B981';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 16px -2px rgba(16, 185, 129, 0.12)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.borderColor = '#E2E8F0';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+                    }
+                  }}
+                >
+                  {/* Top Row: Flag & Radio Indicator */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      marginBottom: '0.75rem'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      {opt.flag}
+                      {opt.badge && (
+                        <span
+                          style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 600,
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: isSelected ? '#DCFCE7' : '#F1F5F9',
+                            color: isSelected ? '#15803D' : '#64748B'
+                          }}
+                        >
+                          {opt.badge}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Radio Checkmark Circle */}
+                    <div
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: isSelected ? '#16A34A' : 'transparent',
+                        border: isSelected ? 'none' : '1.5px solid #CBD5E1',
+                        color: '#FFFFFF',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {isSelected && <Check size={12} strokeWidth={3} />}
+                    </div>
+                  </div>
+
+                  {/* Middle Content: Title and Subtitle */}
+                  <div>
+                    <div
+                      style={{
+                        fontSize: '1.2rem',
+                        fontWeight: 700,
+                        color: isSelected ? '#14532D' : '#0F172A',
+                        marginBottom: '0.2rem',
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: '0.35rem'
+                      }}
+                    >
+                      <span>{opt.title}</span>
+                      {opt.code !== 'en' && (
+                        <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 500 }}>
+                          ({opt.nativeLabel})
+                        </span>
+                      )}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '0.78rem',
+                        color: isSelected ? '#166534' : '#64748B',
+                        lineHeight: 1.4
+                      }}
+                    >
+                      {opt.subtitle}
+                    </div>
+                  </div>
+
+                  {/* Subtle Click Cue */}
+                  <div
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      color: isSelected ? '#15803D' : '#94A3B8',
+                      marginTop: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem'
+                    }}
+                  >
+                    <span>{isSelected ? 'Selected' : 'Click to select'}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Single Unified Primary CTA Button */}
+          <button
+            type="button"
+            id="confirm-initial-language"
+            onClick={() => handleConfirm(selectedCode)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.55rem',
+              padding: '0.85rem 1.5rem',
+              borderRadius: '12px',
+              backgroundColor: '#1B4D3E',
+              color: '#FFFFFF',
+              fontSize: '0.96rem',
+              fontWeight: 600,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(27, 77, 62, 0.22)',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#143B2F';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(27, 77, 62, 0.28)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#1B4D3E';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(27, 77, 62, 0.22)';
+            }}
+          >
+            <span>{currentOption.ctaLabel}</span>
+            <ArrowRight size={17} />
+          </button>
+        </div>
+
+        {/* Clean, Non-AI Footer Note */}
+        <div
+          style={{
+            padding: '0.85rem 2rem',
+            backgroundColor: '#F8FAFC',
+            borderTop: '1px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            fontSize: '0.78rem',
+            color: '#64748B'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <ShieldCheck size={14} color="#059669" />
+            <span>Saved on this browser · You can switch anytime in the footer</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDismiss}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#059669',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: 0,
+              textDecoration: 'underline'
+            }}
+          >
+            Skip for now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

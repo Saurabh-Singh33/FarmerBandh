@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Check, Loader2, Sparkles } from 'lucide-react';
+import { Globe, Check, Loader2, ShieldCheck } from 'lucide-react';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 
 const UkFlag = () => (
@@ -47,28 +47,13 @@ export const FooterLanguageSelector = () => {
     <div
       style={{
         backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        border: '1px solid rgba(134, 239, 172, 0.18)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '16px',
         padding: '1.5rem',
         marginBottom: '2.5rem',
-        backdropFilter: 'blur(8px)',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'relative'
       }}
     >
-      {/* Subtle background glow */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-10%',
-          width: '260px',
-          height: '260px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }}
-      />
 
       <div
         style={{
@@ -151,23 +136,23 @@ export const FooterLanguageSelector = () => {
                   padding: '0.65rem 1.15rem',
                   borderRadius: '12px',
                   border: isActive
-                    ? '2px solid #22C55E'
+                    ? '1.5px solid #4ADE80'
                     : '1px solid rgba(255, 255, 255, 0.16)',
                   backgroundColor: isActive
-                    ? 'rgba(34, 197, 94, 0.22)'
+                    ? 'rgba(74, 222, 128, 0.16)'
                     : 'rgba(255, 255, 255, 0.05)',
                   boxShadow: isActive
-                    ? '0 4px 16px rgba(34, 197, 94, 0.28), inset 0 0 12px rgba(34, 197, 94, 0.15)'
+                    ? '0 2px 8px rgba(0, 0, 0, 0.2)'
                     : 'none',
                   color: '#FFFFFF',
                   cursor: isActive ? 'default' : 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.15s ease',
                   position: 'relative'
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
-                    e.currentTarget.style.borderColor = 'rgba(134, 239, 172, 0.5)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }
                 }}
@@ -218,7 +203,7 @@ export const FooterLanguageSelector = () => {
                       justifyContent: 'center',
                       color: '#143B2F',
                       marginLeft: '0.25rem',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
                     }}
                   >
                     <Check size={12} strokeWidth={3} />
@@ -248,7 +233,7 @@ export const FooterLanguageSelector = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           {isTranslating ? (
             <>
-              <Loader2 size={13} className="spin-animate" color="#22C55E" />
+              <Loader2 size={13} className="spin-animate" color="#4ADE80" />
               <span style={{ color: '#BBF7D0', fontWeight: 500 }}>
                 Translating full website... કૃપા કરીને રાહ જુઓ... कृपया प्रतीक्षा करें...
               </span>
@@ -260,28 +245,27 @@ export const FooterLanguageSelector = () => {
                   width: '7px',
                   height: '7px',
                   borderRadius: '50%',
-                  backgroundColor: '#22C55E',
-                  display: 'inline-block',
-                  boxShadow: '0 0 6px #22C55E'
+                  backgroundColor: '#4ADE80',
+                  display: 'inline-block'
                 }}
               />
               <span>
-                Active Mode:{' '}
+                Active Language:{' '}
                 <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>
                   {currentLanguage === 'hi'
-                    ? 'हिन्दी (Hindi) — अनुवाद सक्रिय'
+                    ? 'हिन्दी (Hindi)'
                     : currentLanguage === 'gu'
-                    ? 'ગુજરાતી (Gujarati) — ભાષાંતર સક્રિય'
-                    : 'English (Original)'}
+                    ? 'ગુજરાતી (Gujarati)'
+                    : 'English'}
                 </strong>
               </span>
             </>
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#6EE7B7' }}>
-          <Sparkles size={12} />
-          <span>Full Real-Time Regional Translation Powered by FarmerBandh</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#A7F3D0' }}>
+          <ShieldCheck size={14} color="#4ADE80" />
+          <span>Regional Language Support for Gujarat & India</span>
         </div>
       </div>
     </div>

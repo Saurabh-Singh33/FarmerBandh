@@ -16,10 +16,12 @@ import {
   Bell,
   Sliders,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNegotiation } from '../context/NegotiationContext';
+import { useLanguage } from '../context/LanguageContext';
 import { CartBadge } from './CartBadge';
 import { NotificationBell } from './NotificationBell';
 
@@ -79,6 +81,46 @@ const DropdownItem = ({ to, onClick, icon: Icon, label, badge, badgeBg = '#F1F5F
     <div onClick={onClick} style={{ width: '100%' }}>
       {content}
     </div>
+  );
+};
+
+const LanguageNavButton = () => {
+  const { currentLanguage, openInitialPrompt } = useLanguage();
+  const label = currentLanguage === 'hi' ? 'हिन्दी' : currentLanguage === 'gu' ? 'ગુજરાતી' : 'English';
+  return (
+    <button
+      type="button"
+      onClick={openInitialPrompt}
+      title="Change language / भाषा बदलें"
+      className="notranslate"
+      translate="no"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '0.38rem 0.7rem',
+        borderRadius: '8px',
+        border: '1px solid #E2E8F0',
+        backgroundColor: '#FFFFFF',
+        color: '#334155',
+        fontSize: '0.82rem',
+        fontWeight: 600,
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#F8FAFC';
+        e.currentTarget.style.borderColor = '#10B981';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = '#FFFFFF';
+        e.currentTarget.style.borderColor = '#E2E8F0';
+      }}
+    >
+      <Globe size={14} color="#059669" />
+      <span>{label}</span>
+    </button>
   );
 };
 
@@ -221,8 +263,9 @@ export const Navbar = () => {
             })}
           </div>
 
-          {/* Desktop Right: Sign in pill button */}
-          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '1rem' }}>
+          {/* Desktop Right: Language switcher & Sign in pill button */}
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.75rem' }}>
+            <LanguageNavButton />
             <Link
               to="/auth"
               style={{
@@ -292,7 +335,10 @@ export const Navbar = () => {
                   </Link>
                 );
               })}
-              <div style={{ paddingTop: '0.5rem', borderTop: '1px solid #F3F4F6' }}>
+              <div style={{ paddingTop: '0.75rem', borderTop: '1px solid #F3F4F6', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <LanguageNavButton />
+                </div>
                 <Link
                   to="/auth"
                   onClick={() => setMobileMenuOpen(false)}
@@ -436,8 +482,9 @@ export const Navbar = () => {
         )}
       </div>
 
-      {/* Right Controls: Cart, Bell & Profile (ALWAYS PINNED AND VISIBLE) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', flexShrink: 0, marginLeft: '1rem' }}>
+      {/* Right Controls: Language, Cart, Bell & Profile (ALWAYS PINNED AND VISIBLE) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0, marginLeft: '1rem' }}>
+        <LanguageNavButton />
         <CartBadge />
         {user && <NotificationBell />}
 

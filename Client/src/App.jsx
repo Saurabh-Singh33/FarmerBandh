@@ -12,6 +12,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { FarmerSidebar } from './components/FarmerSidebar';
 import { AdminSidebar } from './components/admin/AdminSidebar';
+import { InitialLanguageModal } from './components/InitialLanguageModal';
 import { AppRoutes } from './routes/AppRoutes';
 
 function AppLayout() {
@@ -60,6 +61,7 @@ function App() {
   return (
     <ErrorBoundary>
       <LanguageProvider>
+        <InitialLanguageModal />
         <BrowserRouter>
           <ToastProvider>
             <AuthProvider>
