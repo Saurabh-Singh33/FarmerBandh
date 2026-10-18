@@ -22,7 +22,10 @@ public class ProductRepository : IProductRepository
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Farmer)
-            .Where(p => p.Status == ProductStatus.Active);
+                .ThenInclude(f => f.User)
+            .Where(p => p.Status == ProductStatus.Active 
+                     && p.Farmer.Verified == 2 
+                     && p.Farmer.User.Status == UserStatus.Active);
 
         // Search filter (Name or FarmName)
         if (!string.IsNullOrWhiteSpace(queryParams.Search))
@@ -110,7 +113,10 @@ public class ProductRepository : IProductRepository
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Farmer)
-            .FirstOrDefaultAsync(p => (isGuid && p.Id == id) || p.Slug.ToLower() == target);
+                .ThenInclude(f => f.User)
+            .FirstOrDefaultAsync(p => ((isGuid && p.Id == id) || p.Slug.ToLower() == target)
+                                      && p.Farmer.Verified == 2 
+                                      && p.Farmer.User.Status == UserStatus.Active);
     }
 
     public async Task<IEnumerable<Product>> GetSimilarProductsAsync(Guid currentProductId, Guid categoryId, int count = 8)
@@ -119,7 +125,12 @@ public class ProductRepository : IProductRepository
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Farmer)
-            .Where(p => p.CategoryId == categoryId && p.Id != currentProductId && p.Status == ProductStatus.Active)
+                .ThenInclude(f => f.User)
+            .Where(p => p.CategoryId == categoryId 
+                     && p.Id != currentProductId 
+                     && p.Status == ProductStatus.Active
+                     && p.Farmer.Verified == 2 
+                     && p.Farmer.User.Status == UserStatus.Active)
             .OrderByDescending(p => p.Rating)
             .ThenByDescending(p => p.CreatedAt)
             .Take(count)

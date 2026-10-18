@@ -31,24 +31,113 @@ public class ProductService : IProductService
 
     public async Task<PagedResultDto<ProductSummaryDto>> GetProductsAsync(ProductQueryParams queryParams, Guid? userId)
     {
-        // Location scoping for logged-in buyer
-        if (userId.HasValue && string.IsNullOrWhiteSpace(queryParams.State) && string.IsNullOrWhiteSpace(queryParams.District))
+        string? targetState = queryParams.State?.Trim();
+        string? targetDistrict = queryParams.District?.Trim();
+        bool isAllIndiaRequested = queryParams.AllIndia == true 
+            || string.Equals(targetState, "all", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(targetState, "all india", StringComparison.OrdinalIgnoreCase);
+
+        if (isAllIndiaRequested)
+        {
+            targetState = null;
+            targetDistrict = null;
+            queryParams.State = null;
+            queryParams.District = null;
+        }
+        else if (userId.HasValue && string.IsNullOrWhiteSpace(targetState) && string.IsNullOrWhiteSpace(targetDistrict))
         {
             var buyer = await _productRepository.GetBuyerByUserIdAsync(userId.Value);
             if (buyer != null)
             {
                 if (!string.IsNullOrWhiteSpace(buyer.PreferredState))
                 {
-                    queryParams.State = buyer.PreferredState;
+                    targetState = buyer.PreferredState.Trim();
                 }
                 if (!string.IsNullOrWhiteSpace(buyer.PreferredDistrict))
                 {
-                    queryParams.District = buyer.PreferredDistrict;
+                    targetDistrict = buyer.PreferredDistrict.Trim();
                 }
             }
         }
 
-        var (items, totalCount) = await _productRepository.GetProductsAsync(queryParams);
+        string appliedScope = "country";
+        string? fallbackMessage = null;
+        IEnumerable<Product> items = Enumerable.Empty<Product>();
+        int totalCount = 0;
+
+        var attemptParams = new ProductQueryParams
+        {
+            Search = queryParams.Search,
+            Category = queryParams.Category,
+            MinPrice = queryParams.MinPrice,
+            MaxPrice = queryParams.MaxPrice,
+            MinRating = queryParams.MinRating,
+            VerifiedOnly = queryParams.VerifiedOnly,
+            Sort = queryParams.Sort,
+            Page = queryParams.Page,
+            PageSize = queryParams.PageSize
+        };
+
+        // Level 1: Near Region (District)
+        if (!isAllIndiaRequested && !string.IsNullOrWhiteSpace(targetDistrict))
+        {
+            attemptParams.District = targetDistrict;
+            attemptParams.State = targetState;
+            var res = await _productRepository.GetProductsAsync(attemptParams);
+            if (res.TotalCount > 0 || queryParams.DisableFallback == true)
+            {
+                items = res.Items;
+                totalCount = res.TotalCount;
+                appliedScope = "district";
+            }
+        }
+
+        // Level 2: State Fallback (if district yielded 0 results or no district specified)
+        if (totalCount == 0 && !isAllIndiaRequested && !string.IsNullOrWhiteSpace(targetState) && queryParams.DisableFallback != true)
+        {
+            attemptParams.District = null;
+            attemptParams.State = targetState;
+            var res = await _productRepository.GetProductsAsync(attemptParams);
+            if (res.TotalCount > 0)
+            {
+                items = res.Items;
+                totalCount = res.TotalCount;
+                appliedScope = "state";
+                if (!string.IsNullOrWhiteSpace(targetDistrict))
+                {
+                    fallbackMessage = $"No produce found in {targetDistrict}. Showing produce available in {targetState}.";
+                }
+            }
+        }
+
+        // Level 3: Country / Whole India Fallback (if state yielded 0 results or All India requested or no location set)
+        if (totalCount == 0 && queryParams.DisableFallback != true)
+        {
+            attemptParams.District = null;
+            attemptParams.State = null;
+            var res = await _productRepository.GetProductsAsync(attemptParams);
+            items = res.Items;
+            totalCount = res.TotalCount;
+            appliedScope = "country";
+
+            if (!string.IsNullOrWhiteSpace(targetDistrict) && !string.IsNullOrWhiteSpace(targetState))
+            {
+                fallbackMessage = $"No produce found in {targetDistrict} or {targetState}. Showing produce from across India.";
+            }
+            else if (!string.IsNullOrWhiteSpace(targetState))
+            {
+                fallbackMessage = $"No produce found in {targetState}. Showing produce from across India.";
+            }
+            else if (!string.IsNullOrWhiteSpace(targetDistrict))
+            {
+                fallbackMessage = $"No produce found in {targetDistrict}. Showing produce from across India.";
+            }
+        }
+        else if (totalCount == 0 && queryParams.DisableFallback == true)
+        {
+            appliedScope = !string.IsNullOrWhiteSpace(targetDistrict) ? "district" : (!string.IsNullOrWhiteSpace(targetState) ? "state" : "country");
+        }
+
         var featuredIds = await _productRepository.GetFeaturedProductIdsAsync();
 
         var summaryList = items.Select(p =>
@@ -69,7 +158,11 @@ public class ProductService : IProductService
             Total = totalCount,
             Page = queryParams.Page < 1 ? 1 : queryParams.Page,
             PageSize = queryParams.PageSize < 1 ? 12 : Math.Min(queryParams.PageSize, 50),
-            Items = summaryList
+            Items = summaryList,
+            AppliedScope = appliedScope,
+            FallbackMessage = fallbackMessage,
+            TargetDistrict = targetDistrict,
+            TargetState = targetState
         };
     }
 
@@ -160,6 +253,7 @@ public class ProductService : IProductService
             BulkDiscountThresholdQuintal = request.BulkDiscountThresholdQuintal,
             HarvestDate = request.HarvestDate,
             Description = request.Description?.Trim(),
+            ImageUrl = request.ImageUrl?.Trim(),
             Verified = farmer.Verified == 1 ? ProductVerificationStatus.Verified : ProductVerificationStatus.Unverified,
             Status = request.SaveAsDraft ? ProductStatus.Draft : ProductStatus.Active,
             Rating = 0.00m,
@@ -223,6 +317,10 @@ public class ProductService : IProductService
         product.BulkDiscountThresholdQuintal = request.BulkDiscountThresholdQuintal;
         product.HarvestDate = request.HarvestDate;
         product.Description = request.Description?.Trim();
+        if (!string.IsNullOrWhiteSpace(request.ImageUrl))
+        {
+            product.ImageUrl = request.ImageUrl.Trim();
+        }
         product.Status = (ProductStatus)request.Status;
 
         await _productRepository.UpdateAsync(product);

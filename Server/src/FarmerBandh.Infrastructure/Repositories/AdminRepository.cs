@@ -231,6 +231,23 @@ public class AdminRepository : IAdminRepository
             }
         }
 
+        if (!string.IsNullOrWhiteSpace(query.VerificationStatus) && !query.VerificationStatus.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            var vs = query.VerificationStatus.Trim().ToLower();
+            if (vs == "approved" || vs == "verified")
+            {
+                q = q.Where(u => _context.Farmers.Any(f => f.UserId == u.Id && f.Verified == 2));
+            }
+            else if (vs == "pending")
+            {
+                q = q.Where(u => _context.Farmers.Any(f => f.UserId == u.Id && f.Verified == 1));
+            }
+            else if (vs == "rejected" || vs == "unverified")
+            {
+                q = q.Where(u => _context.Farmers.Any(f => f.UserId == u.Id && f.Verified == 0));
+            }
+        }
+
         var total = await q.CountAsync();
 
         var users = await q
@@ -262,10 +279,12 @@ public class AdminRepository : IAdminRepository
             }
         }
 
-        // Count listings for farmers
-        var farmerIds = await _context.Farmers
+        // Count listings and load profile for farmers
+        var farmers = await _context.Farmers.AsNoTracking()
             .Where(f => userIds.Contains(f.UserId))
-            .ToDictionaryAsync(f => f.UserId, f => f.Id);
+            .ToListAsync();
+        var farmerMap = farmers.ToDictionary(f => f.UserId, f => f);
+        var farmerIds = farmers.ToDictionary(f => f.UserId, f => f.Id);
 
         var farmerListingsCount = new Dictionary<Guid, int>();
         if (farmerIds.Count > 0)
@@ -283,19 +302,31 @@ public class AdminRepository : IAdminRepository
             }
         }
 
-        var dtos = users.Select(u => new AdminUserListItemDto
-        {
-            Id = u.Id,
-            FullName = u.FullName,
-            Email = u.Email,
-            Role = u.Role.ToString(),
-            Status = u.Status.ToString(),
-            State = u.State,
-            District = u.District,
-            JoinedAt = u.CreatedAt,
-            LastLoginAt = u.LastLoginAt,
-            OrderCount = buyerOrdersCount.TryGetValue(u.Id, out var oc) ? oc : 0,
-            ListingCount = farmerListingsCount.TryGetValue(u.Id, out var lc) ? lc : 0
+        var dtos = users.Select(u => {
+            farmerMap.TryGetValue(u.Id, out var farm);
+            return new AdminUserListItemDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                Email = u.Email,
+                Role = u.Role.ToString(),
+                Status = u.Status.ToString(),
+                State = u.State,
+                District = u.District,
+                JoinedAt = u.CreatedAt,
+                LastLoginAt = u.LastLoginAt,
+                OrderCount = buyerOrdersCount.TryGetValue(u.Id, out var oc) ? oc : 0,
+                ListingCount = farmerListingsCount.TryGetValue(u.Id, out var lc) ? lc : 0,
+                FarmerId = farm?.Id,
+                FarmName = farm?.FarmName,
+                FarmerVerified = farm?.Verified ?? 0,
+                FarmerVerifiedStatus = farm?.Verified switch
+                {
+                    2 => "Approved",
+                    1 => "Pending",
+                    _ => "Rejected"
+                }
+            };
         }).ToList();
 
         return (dtos, total);
@@ -370,6 +401,25 @@ public class AdminRepository : IAdminRepository
         var reviewsWritten = await _context.Reviews.CountAsync(r => r.Buyer != null && r.Buyer.UserId == id);
         var reviewsReceived = farmer != null ? await _context.Reviews.CountAsync(r => r.FarmerId == farmer.Id) : 0;
 
+        AdminUserFarmerDto? farmerProfile = null;
+        if (farmer != null)
+        {
+            farmerProfile = new AdminUserFarmerDto
+            {
+                FarmerId = farmer.Id,
+                FarmName = farmer.FarmName,
+                Verified = farmer.Verified,
+                VerificationStatus = farmer.Verified switch
+                {
+                    2 => "Approved",
+                    1 => "Pending",
+                    _ => "Rejected"
+                },
+                Rating = farmer.Rating,
+                Location = farmer.Location ?? $"{farmer.District}, {farmer.State}"
+            };
+        }
+
         return new AdminUserDetailDto
         {
             Id = user.Id,
@@ -388,7 +438,8 @@ public class AdminRepository : IAdminRepository
             ReviewsReceivedCount = reviewsReceived,
             Addresses = addresses,
             Listings = listings,
-            BankAccount = bankAccount
+            BankAccount = bankAccount,
+            FarmerProfile = farmerProfile
         };
     }
 
@@ -525,6 +576,13 @@ public class AdminRepository : IAdminRepository
     {
         _context.Farmers.Update(farmer);
         return Task.CompletedTask;
+    }
+
+    public async Task<VerificationRequest?> GetCurrentPendingVerificationRequestAsync(Guid farmerId)
+    {
+        return await _context.VerificationRequests
+            .OrderByDescending(v => v.SubmittedAt)
+            .FirstOrDefaultAsync(v => v.FarmerId == farmerId && v.Status == VerificationRequestStatus.Pending);
     }
     #endregion
 

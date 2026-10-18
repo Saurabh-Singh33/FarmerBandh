@@ -69,6 +69,10 @@ public class OrderService : IOrderService
             {
                 throw new InvalidOperationException($"Product '{item.Product?.Name ?? "Item"}' is no longer available.");
             }
+            if ((item.Farmer != null && item.Farmer.Verified != 2) || (item.Product.Farmer != null && item.Product.Farmer.Verified != 2))
+            {
+                throw new InvalidOperationException($"The seller for product '{item.Product.Name}' is awaiting admin verification and cannot be ordered yet.");
+            }
             if (item.QuantityQuintal > item.Product.AvailableQuantityQuintal)
             {
                 throw new InvalidOperationException($"Insufficient stock for '{item.Product.Name}'. Requested: {item.QuantityQuintal} Quintals, Available: {item.Product.AvailableQuantityQuintal} Quintals.");

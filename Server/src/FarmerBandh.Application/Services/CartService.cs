@@ -55,6 +55,11 @@ public class CartService : ICartService
             throw new KeyNotFoundException("Product is unavailable or out of stock.");
         }
 
+        if (product.Farmer != null && product.Farmer.Verified != 2)
+        {
+            throw new InvalidOperationException("This product's seller is awaiting admin verification and cannot accept orders yet.");
+        }
+
         if (request.QuantityQuintal < product.MinOrderQuantityQuintal)
         {
             throw new ArgumentException($"Minimum order quantity for '{product.Name}' is {product.MinOrderQuantityQuintal} Quintals.");

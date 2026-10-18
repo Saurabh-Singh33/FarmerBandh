@@ -106,6 +106,11 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(f => f.UserId == userId);
     }
 
+    public async Task AddVerificationRequestAsync(VerificationRequest request)
+    {
+        await _context.VerificationRequests.AddAsync(request);
+    }
+
     public async Task<bool> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync() > 0;

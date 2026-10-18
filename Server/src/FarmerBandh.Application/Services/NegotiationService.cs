@@ -54,6 +54,9 @@ public class NegotiationService : INegotiationService
                 if (prod.Farmer == null)
                     throw new InvalidOperationException($"Farmer details not found for product '{prod.Name}'.");
 
+                if (prod.Farmer.Verified != 2)
+                    throw new InvalidOperationException($"Seller for product '{prod.Name}' is not approved for trade yet.");
+
                 if (farmerId == null)
                 {
                     farmerId = prod.FarmerId;
@@ -159,6 +162,9 @@ public class NegotiationService : INegotiationService
 
         if (product.Farmer == null)
             throw new InvalidOperationException("Farmer details not found for this product.");
+
+        if (product.Farmer.Verified != 2)
+            throw new InvalidOperationException("This seller is not approved for trade yet.");
 
         if (buyer.UserId == product.Farmer.UserId)
             throw new InvalidOperationException("You cannot negotiate with your own listing.");

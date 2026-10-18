@@ -27,7 +27,13 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 36));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseMySql(connectionString, serverVersion);
+    options.UseMySql(connectionString, serverVersion, mySqlOptions =>
+    {
+        mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    });
 });
 
 // 2. Dependency Injection
@@ -217,6 +223,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+var wwwrootDir = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+if (!Directory.Exists(wwwrootDir))
+{
+    Directory.CreateDirectory(wwwrootDir);
+}
+var uploadsDir = Path.Combine(wwwrootDir, "uploads", "products");
+if (!Directory.Exists(uploadsDir))
+{
+    Directory.CreateDirectory(uploadsDir);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(wwwrootDir),
+    RequestPath = ""
+});
+
 app.UseCors("FarmerBandhClientPolicy");
 app.UseAuthentication();
 app.UseAuthorization();

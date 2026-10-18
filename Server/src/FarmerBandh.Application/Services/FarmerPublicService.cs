@@ -38,7 +38,7 @@ public class FarmerPublicService : IFarmerPublicService
             District = farmer.District,
             Rating = farmer.Rating,
             RatingCount = reviewCount,
-            Verified = farmer.Verified == 1,
+            Verified = farmer.Verified == 2,
             MemberSince = farmer.MemberSince,
             Bio = null, // Public bio placeholder without PII
             ActiveListingsCount = activeListings,
@@ -50,8 +50,8 @@ public class FarmerPublicService : IFarmerPublicService
     public async Task<PagedResultDto<ProductSummaryDto>> GetFarmerListingsAsync(Guid farmerId, int page = 1, int pageSize = 12)
     {
         var farmer = await _farmerRepository.GetByIdAsync(farmerId);
-        if (farmer == null)
-            throw new KeyNotFoundException("Farmer not found.");
+        if (farmer == null || farmer.Verified != 2)
+            throw new KeyNotFoundException("Verified farmer not found.");
 
         var products = await _farmerRepository.GetActiveProductsAsync(farmerId, page, pageSize);
         var total = await _farmerRepository.GetActiveProductsCountAsync(farmerId);

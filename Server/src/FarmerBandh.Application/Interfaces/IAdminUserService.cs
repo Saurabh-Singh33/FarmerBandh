@@ -12,4 +12,7 @@ public interface IAdminUserService
     Task<ResetPasswordResponse?> ResetPasswordAsync(Guid id, Guid currentAdminId, HttpContext? httpContext = null);
     Task<bool> PromoteUserAsync(Guid id, PromoteUserRequest request, Guid currentAdminId, HttpContext? httpContext = null);
     Task<bool> DemoteUserAsync(Guid id, DemoteUserRequest request, Guid currentAdminId, HttpContext? httpContext = null);
+    Task<bool> ApproveFarmerSellerAsync(Guid farmerId, Guid currentAdminId, HttpContext? httpContext = null);
+    Task<bool> RejectFarmerSellerAsync(Guid farmerId, string reason, Guid currentAdminId, HttpContext? httpContext = null);
+    Task<bool> RevokeFarmerSellerAsync(Guid farmerId, string reason, Guid currentAdminId, HttpContext? httpContext = null);
 }

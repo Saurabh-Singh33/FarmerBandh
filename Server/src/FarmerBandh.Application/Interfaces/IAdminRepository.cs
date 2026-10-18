@@ -22,6 +22,7 @@ public interface IAdminRepository
     Task UpdateVerificationRequestAsync(VerificationRequest request);
     Task<Farmer?> GetFarmerByIdAsync(Guid farmerId);
     Task UpdateFarmerAsync(Farmer farmer);
+    Task<VerificationRequest?> GetCurrentPendingVerificationRequestAsync(Guid farmerId);
 
     // Listings
     Task<(IEnumerable<AdminListingListItemDto> Items, int TotalCount)> GetListingsAsync(AdminListingQuery query);

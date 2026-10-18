@@ -103,4 +103,49 @@ public class AdminUsersController : AdminBaseController
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("farmers/{farmerId:guid}/approve-seller")]
+    public async Task<ActionResult> ApproveSeller(Guid farmerId)
+    {
+        try
+        {
+            var success = await _userService.ApproveFarmerSellerAsync(farmerId, GetAdminUserId(), HttpContext);
+            if (!success) return BadRequest(new { message = "Failed to approve farmer as seller." });
+            return Ok(new { message = "Farmer approved as seller successfully." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("farmers/{farmerId:guid}/reject-seller")]
+    public async Task<ActionResult> RejectSeller(Guid farmerId, [FromBody] RejectSellerRequest request)
+    {
+        try
+        {
+            var success = await _userService.RejectFarmerSellerAsync(farmerId, request.Reason, GetAdminUserId(), HttpContext);
+            if (!success) return BadRequest(new { message = "Failed to reject seller." });
+            return Ok(new { message = "Farmer seller request rejected." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("farmers/{farmerId:guid}/revoke-seller")]
+    public async Task<ActionResult> RevokeSeller(Guid farmerId, [FromBody] RejectSellerRequest request)
+    {
+        try
+        {
+            var success = await _userService.RevokeFarmerSellerAsync(farmerId, request.Reason, GetAdminUserId(), HttpContext);
+            if (!success) return BadRequest(new { message = "Failed to revoke seller privilege." });
+            return Ok(new { message = "Farmer seller privilege revoked." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

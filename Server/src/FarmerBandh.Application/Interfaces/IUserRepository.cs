@@ -15,5 +15,6 @@ public interface IUserRepository
     void UpdateRefreshToken(RefreshToken token);
     Task<Buyer?> GetBuyerByUserIdAsync(Guid userId);
     Task<Farmer?> GetFarmerByUserIdAsync(Guid userId);
+    Task AddVerificationRequestAsync(VerificationRequest request);
     Task<bool> SaveChangesAsync();
 }

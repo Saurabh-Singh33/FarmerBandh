@@ -12,5 +12,6 @@ public class CreateProductRequest
     public decimal? BulkDiscountThresholdQuintal { get; set; }
     public DateTime? HarvestDate { get; set; }
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
     public bool SaveAsDraft { get; set; } = false;
 }

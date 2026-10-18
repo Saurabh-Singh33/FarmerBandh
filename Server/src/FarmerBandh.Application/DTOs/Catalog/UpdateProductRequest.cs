@@ -12,5 +12,6 @@ public class UpdateProductRequest
     public decimal? BulkDiscountThresholdQuintal { get; set; }
     public DateTime? HarvestDate { get; set; }
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
     public int Status { get; set; } = 1; // 0=Draft, 1=Active, 2=OutOfStock
 }

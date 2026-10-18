@@ -149,7 +149,10 @@ public class VerificationService : IVerificationService
             SubmittedAt = vr.SubmittedAt,
             ReviewedAt = vr.ReviewedAt,
             RejectionReason = vr.RejectionReason,
-            Notes = vr.Notes
+            Notes = vr.Notes,
+            AadhaarNumber = vr.AadhaarNumber,
+            LandRecordUrl = vr.LandRecordUrl,
+            SelfieUrl = vr.SelfieUrl
         };
     }
 }

@@ -17,6 +17,9 @@ public class VerificationRequestSummaryDto
     public DateTime? ReviewedAt { get; set; }
     public string? RejectionReason { get; set; }
     public string? Notes { get; set; }
+    public string? AadhaarNumber { get; set; }
+    public string? LandRecordUrl { get; set; }
+    public string? SelfieUrl { get; set; }
 }
 
 public class SubmitVerificationRequest
