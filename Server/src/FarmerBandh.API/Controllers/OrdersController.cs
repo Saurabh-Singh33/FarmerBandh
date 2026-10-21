@@ -130,6 +130,30 @@ public class OrdersController : ControllerBase
         }
     }
 
+    [HttpPost("{id:guid}/pay")]
+    public async Task<ActionResult<OrderDetailDto>> PayOrder(Guid id, [FromBody] RecordPaymentRequest request)
+    {
+        var userId = GetUserId();
+        if (userId == Guid.Empty) return Unauthorized();
+
+        try
+        {
+            var result = await _orderService.RecordOrderPaymentAsync(userId, id, request);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 
     private Guid GetUserId()
     {

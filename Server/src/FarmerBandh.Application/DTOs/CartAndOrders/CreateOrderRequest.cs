@@ -7,4 +7,7 @@ public class CreateOrderRequest
     public string DeliverySlotWindow { get; set; } = string.Empty;
     public int PaymentMethod { get; set; } = 4;
     public string? CouponCode { get; set; }
+    public decimal? PaidAmount { get; set; }
+    public string? PaymentId { get; set; }
+    public string? PaymentLinkId { get; set; }
 }

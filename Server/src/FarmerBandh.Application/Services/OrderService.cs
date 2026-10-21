@@ -119,9 +119,13 @@ public class OrderService : IOrderService
             ? (PaymentMethod)request.PaymentMethod
             : PaymentMethod.COD;
 
-        PaymentStatus initialPaymentStatus = paymentMethod == PaymentMethod.COD
-            ? PaymentStatus.Pending
-            : PaymentStatus.Paid;
+        PaymentStatus initialPaymentStatus = paymentMethod switch
+        {
+            PaymentMethod.COD => PaymentStatus.Pending,
+            PaymentMethod.Razorpay when request.PaidAmount.HasValue && request.PaidAmount.Value < cartSubtotal && request.PaidAmount.Value > 0 => PaymentStatus.PartiallyPaid,
+            PaymentMethod.Razorpay when request.PaidAmount.HasValue && request.PaidAmount.Value <= 0 => PaymentStatus.Pending,
+            _ => PaymentStatus.Paid
+        };
 
         decimal grandTotal = 0m;
 
@@ -559,6 +563,112 @@ public class OrderService : IOrderService
                 order.Id
             );
         }
+        return MapToDetail(order);
+    }
+
+    public async Task<OrderDetailDto> RecordOrderPaymentAsync(Guid userId, Guid orderId, RecordPaymentRequest request)
+    {
+        var order = await _orderRepository.GetByIdAsync(orderId);
+        if (order == null)
+        {
+            throw new KeyNotFoundException("Order not found.");
+        }
+
+        var isBuyer = order.Buyer?.UserId == userId;
+        var isSeller = order.Seller?.UserId == userId;
+        if (!isBuyer && !isSeller)
+        {
+            var buyer = await _productRepository.GetBuyerByUserIdAsync(userId);
+            if (buyer != null && order.BuyerId == buyer.Id) isBuyer = true;
+            var farmer = await _productRepository.GetFarmerByUserIdAsync(userId);
+            if (farmer != null && order.SellerId == farmer.Id) isSeller = true;
+        }
+
+        if (!isBuyer && !isSeller)
+        {
+            throw new UnauthorizedAccessException("Not authorized to record payment for this order.");
+        }
+
+        if (request.PaymentMethod.HasValue && Enum.IsDefined(typeof(PaymentMethod), request.PaymentMethod.Value))
+        {
+            order.PaymentMethod = (PaymentMethod)request.PaymentMethod.Value;
+        }
+        else
+        {
+            order.PaymentMethod = PaymentMethod.Razorpay;
+        }
+
+        var paidAmount = request.Amount;
+        if (paidAmount >= order.TotalAmount)
+        {
+            order.PaymentStatus = PaymentStatus.Paid;
+        }
+        else if (paidAmount > 0)
+        {
+            order.PaymentStatus = PaymentStatus.PartiallyPaid;
+        }
+
+        await _orderRepository.UpdateOrderAsync(order);
+
+        var paymentRef = !string.IsNullOrWhiteSpace(request.PaymentId) ? request.PaymentId : request.PaymentLinkId ?? "plink_Tqe4bgUXaopgZ0";
+        var role = isBuyer ? UserRole.Buyer : UserRole.Farmer;
+        await _timelineService.LogStatusChangeAsync(
+            order.Id,
+            order.Status,
+            userId,
+            role,
+            $"Payment of ₹{paidAmount:N2} processed via Razorpay ({paymentRef}). Status: {order.PaymentStatus}."
+        );
+
+        if (isBuyer)
+        {
+            var sellerFarmer = await _productRepository.GetFarmerByIdAsync(order.SellerId);
+            if (sellerFarmer != null)
+            {
+                await _notificationService.CreateAsync(
+                    sellerFarmer.UserId,
+                    NotificationType.ORDER_PLACED,
+                    "Payment Received",
+                    $"Payment of ₹{paidAmount:N2} received via Razorpay for order #{order.OrderNumber}.",
+                    $"/seller/orders/{order.Id}",
+                    "Order",
+                    order.Id
+                );
+            }
+        }
+
+        return MapToDetail(order);
+    }
+
+    public async Task<OrderDetailDto> UpdateSellerOrderPaymentStatusAsync(Guid userId, Guid orderId, UpdatePaymentStatusRequest request)
+    {
+        var farmer = await _productRepository.GetFarmerByUserIdAsync(userId);
+        if (farmer == null)
+        {
+            throw new InvalidOperationException("Farmer profile not found.");
+        }
+
+        var order = await _orderRepository.GetByIdAsync(orderId);
+        if (order == null || order.SellerId != farmer.Id)
+        {
+            throw new KeyNotFoundException("Order not found.");
+        }
+
+        if (Enum.IsDefined(typeof(PaymentStatus), request.PaymentStatus))
+        {
+            order.PaymentStatus = (PaymentStatus)request.PaymentStatus;
+        }
+
+        await _orderRepository.UpdateOrderAsync(order);
+
+        await _timelineService.LogStatusChangeAsync(
+            order.Id,
+            order.Status,
+            userId,
+            UserRole.Farmer,
+            $"Farmer updated payment status to {order.PaymentStatus}. {request.Notes}"
+        );
+
         return MapToDetail(order);
     }
 

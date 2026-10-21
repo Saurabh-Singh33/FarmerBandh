@@ -84,6 +84,23 @@ public class SellerOrdersController : ControllerBase
         }
     }
 
+    [HttpPut("{id:guid}/payment-status")]
+    public async Task<ActionResult<OrderDetailDto>> UpdatePaymentStatus(Guid id, [FromBody] UpdatePaymentStatusRequest request)
+    {
+        var userId = GetUserId();
+        if (userId == Guid.Empty) return Unauthorized();
+
+        try
+        {
+            var updated = await _orderService.UpdateSellerOrderPaymentStatusAsync(userId, id, request);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
     private Guid GetUserId()
     {
         var subClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;

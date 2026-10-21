@@ -16,5 +16,7 @@ public interface IOrderService
     Task<OrderDetailDto> GetSellerOrderByIdAsync(Guid userId, Guid orderId);
     Task<OrderDetailDto> UpdateSellerOrderStatusAsync(Guid userId, Guid orderId, UpdateOrderStatusRequest request);
     Task<OrderDetailDto> RejectSellerOrderAsync(Guid userId, Guid orderId, RejectOrderRequest request);
+    Task<OrderDetailDto> RecordOrderPaymentAsync(Guid userId, Guid orderId, RecordPaymentRequest request);
+    Task<OrderDetailDto> UpdateSellerOrderPaymentStatusAsync(Guid userId, Guid orderId, UpdatePaymentStatusRequest request);
     Task<PublicSettingsDto> GetPublicSettingsAsync();
 }
