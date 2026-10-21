@@ -50,43 +50,76 @@ const IndiaFlag = () => (
   </svg>
 );
 
+const UI_STRINGS = {
+  en: {
+    badge: 'Language Selection',
+    title: 'Choose your preferred language',
+    subtitle: 'Select how you would like to view listings, mandi rates, and seller chats.',
+    subtagline: 'Choose your language • अपनी भाषा चुनें • તમારી પસંદગીની ભાષા પસંદ કરો',
+    continueBtn: 'Continue in English',
+    footerNote: 'Saved on this browser · You can switch anytime in the footer',
+    skipBtn: 'Skip for now',
+    closeTooltip: 'Close and continue with English'
+  },
+  hi: {
+    badge: 'भाषा चयन',
+    title: 'अपनी पसंदीदा भाषा चुनें',
+    subtitle: 'फसल लिस्टिंग, मंडी भाव और विक्रेता चैट देखने के लिए अपनी भाषा चुनें।',
+    subtagline: 'अपनी भाषा चुनें • તમારી પસંદગીની ભાષા પસંદ કરો • Choose your language',
+    continueBtn: 'हिन्दी में जारी रखें',
+    footerNote: 'इस ब्राउज़र पर सहेजा जाएगा · आप इसे कभी भी बदल सकते हैं',
+    skipBtn: 'अभी छोड़ें',
+    closeTooltip: 'बंद करें और आगे बढ़ें'
+  },
+  gu: {
+    badge: 'ભાષા પસંદગી',
+    title: 'તમારી પસંદગીની ભાષા પસંદ કરો',
+    subtitle: 'પાક લિસ્ટિંગ, બજાર ભાવ અને વેપારી ચેટ જોવા માટે ભાષા પસંદ કરો.',
+    subtagline: 'તમારી પસંદગીની ભાષા પસંદ કરો • अपनी भाषा चुनें • Choose your language',
+    continueBtn: 'ગુજરાતીમાં આગળ વધો',
+    footerNote: 'આ બ્રાઉઝર પર સાચવવામાં આવશે · તમે ફૂટરમાંથી ગમે ત્યારે બદલી શકો છો',
+    skipBtn: 'હમણાં માટે રહેવા દો',
+    closeTooltip: 'બંધ કરો અને આગળ વધો'
+  }
+};
+
 export const InitialLanguageModal = () => {
   const { showInitialModal, chooseInitialLanguage, currentLanguage } = useLanguage();
   const [selectedCode, setSelectedCode] = useState(currentLanguage || 'en');
 
   if (!showInitialModal) return null;
 
+  const currentStrings = UI_STRINGS[selectedCode] || UI_STRINGS.en;
+
   const options = [
     {
       code: 'en',
       title: 'English',
-      nativeLabel: 'English',
       subtitle: 'Browse full marketplace in English',
       badge: 'Default',
       flag: <UkFlag />,
-      ctaLabel: 'Continue in English'
+      selectedCue: 'Selected',
+      selectCue: 'Select'
     },
     {
       code: 'hi',
       title: 'हिन्दी',
-      nativeLabel: 'Hindi',
       subtitle: 'मंडी भाव और उत्पाद हिंदी में देखें',
       badge: 'अनुशंसित',
       flag: <IndiaFlag />,
-      ctaLabel: 'हिन्दी में जारी रखें'
+      selectedCue: 'चयनित',
+      selectCue: 'चुनें'
     },
     {
       code: 'gu',
       title: 'ગુજરાતી',
-      nativeLabel: 'Gujarati',
       subtitle: 'બજાર ભાવ અને ઉત્પાદનો ગુજરાતીમાં જુઓ',
       badge: 'પ્રાદેશિક',
       flag: <IndiaFlag />,
-      ctaLabel: 'ગુજરાતીમાં આગળ વધો'
+      selectedCue: 'પસંદ કરેલ',
+      selectCue: 'પસંદ કરો'
     }
   ];
-
-  const currentOption = options.find((o) => o.code === selectedCode) || options[0];
 
   const handleConfirm = (codeToApply) => {
     const finalCode = codeToApply || selectedCode;
@@ -94,7 +127,6 @@ export const InitialLanguageModal = () => {
   };
 
   const handleDismiss = () => {
-    // Default to current language or English
     chooseInitialLanguage(currentLanguage || 'en');
   };
 
@@ -168,18 +200,19 @@ export const InitialLanguageModal = () => {
                 color: '#065F46',
                 fontSize: '0.78rem',
                 fontWeight: 600,
-                letterSpacing: '0.02em'
+                letterSpacing: '0.02em',
+                transition: 'all 0.15s ease'
               }}
             >
               <Globe size={14} color="#059669" />
-              <span>Language Selection · भाषा चयन</span>
+              <span>{currentStrings.badge}</span>
             </div>
 
             <button
               type="button"
               id="close-language-modal"
               onClick={handleDismiss}
-              title="Close and continue with English"
+              title={currentStrings.closeTooltip}
               aria-label="Close modal"
               style={{
                 width: '32px',
@@ -207,7 +240,7 @@ export const InitialLanguageModal = () => {
             </button>
           </div>
 
-          {/* Heading & Subtitle */}
+          {/* Heading & Subtitle (Reacts to selected language) */}
           <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
             <h2
               id="language-modal-title"
@@ -221,7 +254,7 @@ export const InitialLanguageModal = () => {
                 lineHeight: 1.3
               }}
             >
-              Choose your preferred language
+              {currentStrings.title}
             </h2>
 
             <p
@@ -232,7 +265,7 @@ export const InitialLanguageModal = () => {
                 lineHeight: 1.5
               }}
             >
-              Select how you would like to view listings, mandi rates, and seller chats.
+              {currentStrings.subtitle}
             </p>
 
             <p
@@ -242,7 +275,7 @@ export const InitialLanguageModal = () => {
                 margin: 0
               }}
             >
-              अपनी भाषा चुनें &nbsp;•&nbsp; તમારી પસંદગીની ભાષા પસંદ કરો
+              {currentStrings.subtagline}
             </p>
           </div>
 
@@ -362,21 +395,13 @@ export const InitialLanguageModal = () => {
                   <div>
                     <div
                       style={{
-                        fontSize: '1.2rem',
+                        fontSize: '1.25rem',
                         fontWeight: 700,
                         color: isSelected ? '#14532D' : '#0F172A',
-                        marginBottom: '0.2rem',
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        gap: '0.35rem'
+                        marginBottom: '0.2rem'
                       }}
                     >
-                      <span>{opt.title}</span>
-                      {opt.code !== 'en' && (
-                        <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 500 }}>
-                          ({opt.nativeLabel})
-                        </span>
-                      )}
+                      {opt.title}
                     </div>
 
                     <div
@@ -390,10 +415,10 @@ export const InitialLanguageModal = () => {
                     </div>
                   </div>
 
-                  {/* Subtle Click Cue */}
+                  {/* Native Localized Status Cue (No English words on Hindi/Gujarati cards) */}
                   <div
                     style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.74rem',
                       fontWeight: 600,
                       color: isSelected ? '#15803D' : '#94A3B8',
                       marginTop: '0.75rem',
@@ -402,14 +427,14 @@ export const InitialLanguageModal = () => {
                       gap: '0.25rem'
                     }}
                   >
-                    <span>{isSelected ? 'Selected' : 'Click to select'}</span>
+                    <span>{isSelected ? opt.selectedCue : opt.selectCue}</span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Single Unified Primary CTA Button */}
+          {/* Single Unified Primary CTA Button (Dynamic) */}
           <button
             type="button"
             id="confirm-initial-language"
@@ -442,12 +467,12 @@ export const InitialLanguageModal = () => {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(27, 77, 62, 0.22)';
             }}
           >
-            <span>{currentOption.ctaLabel}</span>
+            <span>{currentStrings.continueBtn}</span>
             <ArrowRight size={17} />
           </button>
         </div>
 
-        {/* Clean, Non-AI Footer Note */}
+        {/* Clean, Fully Localized Footer Note */}
         <div
           style={{
             padding: '0.85rem 2rem',
@@ -464,7 +489,7 @@ export const InitialLanguageModal = () => {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
             <ShieldCheck size={14} color="#059669" />
-            <span>Saved on this browser · You can switch anytime in the footer</span>
+            <span>{currentStrings.footerNote}</span>
           </div>
 
           <button
@@ -481,7 +506,7 @@ export const InitialLanguageModal = () => {
               textDecoration: 'underline'
             }}
           >
-            Skip for now
+            {currentStrings.skipBtn}
           </button>
         </div>
       </div>

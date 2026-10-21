@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { SproutIcon } from '../../components/SocialIcons';
 import { FarmerBuyerScene } from '../../components/FarmerBuyerScene';
 import { TestimonialsSection } from '../../components/TestimonialsSection';
-import { Tractor, ShoppingBag, ShieldCheck, CheckCircle2, Zap, Sprout } from 'lucide-react';
+import { Tractor, ShoppingBag, ShieldCheck, CheckCircle2, Zap, Sprout, Check, ArrowRight } from 'lucide-react';
 
 export const Landing = () => {
   const { user } = useAuth();
@@ -486,270 +486,334 @@ export const Landing = () => {
       {/* SECTION: COMMUNITY REVIEWS & MEMBER TENURE STORIES */}
       <TestimonialsSection />
 
-      {/* SECTION 5: CALL TO ACTION BANNER (CONTAINED FLOATING CARD) */}
+      {/* SECTION 5: CALL TO ACTION GATEWAY (HUMAN-CRAFTED DUAL PERSONA) */}
       <section
         style={{
           backgroundColor: '#F9FBF8',
-          padding: '3.5rem 1.5rem 5rem',
+          padding: '4.5rem 1.5rem 5.5rem',
+          borderTop: '1px solid #E5E7EB',
           position: 'relative'
         }}
       >
         <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 3rem' }}>
+            <span
+              style={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#166534',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'block',
+                marginBottom: '0.5rem'
+              }}
+            >
+              Start Trading Today
+            </span>
+
+            <h2
+              style={{
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                fontSize: 'clamp(1.9rem, 3.2vw, 2.5rem)',
+                fontWeight: 800,
+                color: '#0F172A',
+                letterSpacing: '-0.025em',
+                lineHeight: 1.25,
+                margin: '0 0 0.85rem 0'
+              }}
+            >
+              Connect directly. Keep the full value.
+            </h2>
+
+            <p style={{ fontSize: '1.02rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+              Whether you are harvesting regional crops or sourcing bulk produce for commercial trade, FarmerBandh eliminates intermediate commission with verified trust and escrow protection.
+            </p>
+          </div>
+
+          {/* Dual Persona Gateway Cards */}
           <div
             style={{
-              background: 'linear-gradient(140deg, #12372A 0%, #16423C 55%, #0B251B 100%)',
-              borderRadius: '24px',
-              border: '1px solid rgba(52, 211, 153, 0.22)',
-              boxShadow: '0 24px 60px -15px rgba(18, 55, 42, 0.38)',
-              padding: '3.75rem 2.5rem',
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '2rem',
+              marginBottom: '2.5rem'
             }}
           >
-            {/* Subtle Top Ambient Light */}
+            {/* Card 1: For Farmers */}
             <div
               style={{
-                position: 'absolute',
-                top: 0,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '60%',
-                height: '140px',
-                background: 'radial-gradient(ellipse at 50% 0%, rgba(34, 197, 94, 0.18) 0%, transparent 70%)',
-                pointerEvents: 'none'
+                backgroundColor: '#FFFFFF',
+                borderRadius: '18px',
+                border: '1.5px solid #E2E8F0',
+                borderTop: '4px solid #1B4D3E',
+                padding: '2.25rem 2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 20px -2px rgba(27, 77, 62, 0.08)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
               }}
-            />
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 12px 28px -4px rgba(27, 77, 62, 0.14)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px -2px rgba(27, 77, 62, 0.08)';
+              }}
+            >
+              <div>
+                {/* Header with Icon */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '12px',
+                      backgroundColor: '#ECFDF5',
+                      border: '1px solid #A7F3D0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#15803D',
+                      flexShrink: 0
+                    }}
+                  >
+                    <Tractor size={22} />
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#15803D', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      For Growers & FPOs · किसान
+                    </span>
+                    <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                      I want to sell my harvest
+                    </h3>
+                  </div>
+                </div>
 
-            <div style={{ position: 'relative', zIndex: 1, maxWidth: '780px', margin: '0 auto' }}>
-              {/* Badge */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.16)',
-                  color: '#A7F3D0',
-                  fontSize: '0.82rem',
-                  fontWeight: 600,
-                  marginBottom: '1.25rem',
-                  letterSpacing: '0.02em'
-                }}
-              >
-                <Sprout size={15} color="#4ADE80" />
-                <span>Direct Farm-to-Buyer Marketplace · Zero Middlemen</span>
+                <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.55, marginBottom: '1.5rem' }}>
+                  List your seasonal produce directly, set your minimum expected price, negotiate bids transparently, and receive bank payouts upon delivery.
+                </p>
+
+                {/* Benefits List */}
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.88rem', color: '#334155', lineHeight: 1.45 }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <span><strong>100% Margin Retained:</strong> Zero mandi commission or arbitrary broker deductions</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.88rem', color: '#334155', lineHeight: 1.45 }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <span><strong>Guaranteed Escrow Payout:</strong> Buyer funds are locked before dispatch and released to your bank</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.88rem', color: '#334155', lineHeight: 1.45 }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <span><strong>Live Price Negotiations:</strong> Accept, decline, or counter commercial bulk offers in 48 hours</span>
+                  </li>
+                </ul>
               </div>
 
-              {/* Title */}
-              <h2
-                style={{
-                  fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                  fontSize: 'clamp(2rem, 3.8vw, 2.85rem)',
-                  fontWeight: 800,
-                  color: '#FFFFFF',
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1.2,
-                  margin: '0 0 1rem 0'
-                }}
-              >
-                Ready to trade farm produce directly?
-              </h2>
-
-              {/* Subtitle */}
-              <p
-                style={{
-                  fontSize: '1.05rem',
-                  color: '#D1FAE5',
-                  lineHeight: 1.6,
-                  margin: '0 auto 2.25rem',
-                  maxWidth: '640px'
-                }}
-              >
-                Join verified growers, APMC traders, and retail procurement teams trading seasonal harvests with transparent counter-offers and escrow safety.
-              </p>
-
-              {/* Dual Action Buttons: Farmer & Buyer */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '1rem',
-                  marginBottom: '1.75rem'
-                }}
-              >
+              <div>
                 <Link
                   to="/auth"
                   style={{
-                    display: 'inline-flex',
+                    width: '100%',
+                    display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '0.55rem',
-                    backgroundColor: '#22C55E',
-                    color: '#0B251B',
-                    padding: '0.85rem 1.85rem',
-                    borderRadius: '12px',
-                    fontSize: '0.98rem',
-                    fontWeight: 700,
+                    padding: '0.85rem 1.4rem',
+                    borderRadius: '10px',
+                    backgroundColor: '#1B4D3E',
+                    color: '#FFFFFF',
+                    fontSize: '0.94rem',
+                    fontWeight: 600,
                     textDecoration: 'none',
-                    boxShadow: '0 4px 14px rgba(34, 197, 94, 0.3)',
-                    transition: 'all 0.15s ease'
+                    boxShadow: '0 2px 8px rgba(27, 77, 62, 0.2)',
+                    transition: 'background-color 0.15s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#16A34A';
-                    e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.backgroundColor = '#143B2F';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#22C55E';
-                    e.currentTarget.style.color = '#0B251B';
-                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.backgroundColor = '#1B4D3E';
                   }}
                 >
-                  <Tractor size={18} />
-                  <span>Start as a Farmer</span>
+                  <span>Register as a Farmer</span>
+                  <ArrowRight size={16} />
                 </Link>
+                <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#64748B', marginTop: '0.65rem' }}>
+                  Free registration · Verification takes under 24 hours
+                </div>
+              </div>
+            </div>
 
+            {/* Card 2: For Commercial Buyers */}
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '18px',
+                border: '1.5px solid #E2E8F0',
+                borderTop: '4px solid #D97706',
+                padding: '2.25rem 2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 20px -2px rgba(217, 119, 6, 0.08)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 12px 28px -4px rgba(217, 119, 6, 0.14)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px -2px rgba(217, 119, 6, 0.08)';
+              }}
+            >
+              <div>
+                {/* Header with Icon */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '12px',
+                      backgroundColor: '#FEF3C7',
+                      border: '1px solid #FDE68A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#B45309',
+                      flexShrink: 0
+                    }}
+                  >
+                    <ShoppingBag size={22} />
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      For Traders & Businesses · व्यापारी
+                    </span>
+                    <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                      I want to procure fresh produce
+                    </h3>
+                  </div>
+                </div>
+
+                <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.55, marginBottom: '1.5rem' }}>
+                  Browse harvest-ready lots directly from verified regional farms. Review agrarian credentials, negotiate volume pricing, and inspect produce before releasing payment.
+                </p>
+
+                {/* Benefits List */}
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.88rem', color: '#334155', lineHeight: 1.45 }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <span><strong>Farm-Gate Sourcing:</strong> Direct procurement from verified farms across Gujarat & India</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.88rem', color: '#334155', lineHeight: 1.45 }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <span><strong>Inspect Before Releasing Funds:</strong> Payout remains held in escrow until produce passes grade check</span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.88rem', color: '#334155', lineHeight: 1.45 }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={11} strokeWidth={3} />
+                    </div>
+                    <span><strong>Admin Dispute Mediation:</strong> Structured returns and arbitration if shipment does not match specifications</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
                 <Link
                   to="/marketplace"
                   style={{
-                    display: 'inline-flex',
+                    width: '100%',
+                    display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '0.55rem',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    padding: '0.85rem 1.4rem',
+                    borderRadius: '10px',
+                    backgroundColor: '#0F172A',
                     color: '#FFFFFF',
-                    padding: '0.85rem 1.85rem',
-                    borderRadius: '12px',
-                    fontSize: '0.98rem',
+                    fontSize: '0.94rem',
                     fontWeight: 600,
                     textDecoration: 'none',
-                    transition: 'all 0.15s ease'
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.15)',
+                    transition: 'background-color 0.15s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.18)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.backgroundColor = '#1E293B';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.22)';
-                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.backgroundColor = '#0F172A';
                   }}
                 >
-                  <ShoppingBag size={18} />
-                  <span>Explore Marketplace</span>
+                  <span>Browse Live Marketplace</span>
+                  <ArrowRight size={16} />
                 </Link>
+                <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#64748B', marginTop: '0.65rem' }}>
+                  No account needed to browse live lots and mandi rates
+                </div>
               </div>
+            </div>
+          </div>
 
-              {/* Already registered sign-in link */}
-              <div style={{ fontSize: '0.88rem', color: '#A7F3D0', marginBottom: '2.5rem' }}>
-                Already registered?{' '}
-                <Link
-                  to="/auth"
-                  style={{
-                    color: '#FFFFFF',
-                    fontWeight: 600,
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '3px'
-                  }}
-                >
-                  Sign in here
-                </Link>
+          {/* Bottom Trust & Sign In Footer Bar */}
+          <div
+            style={{
+              padding: '1.25rem 1.5rem',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              fontSize: '0.85rem',
+              color: '#475569'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <ShieldCheck size={16} color="#059669" />
+                <span style={{ fontWeight: 500 }}>Bank Escrow Protected</span>
               </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <CheckCircle2 size={16} color="#059669" />
+                <span style={{ fontWeight: 500 }}>Verified Grower Profiles</span>
+              </div>
+            </div>
 
-              {/* Three Pillars Trust Strip */}
-              <div
+            <div>
+              <span>Already registered? </span>
+              <Link
+                to="/auth"
                 style={{
-                  borderTop: '1px solid rgba(255, 255, 255, 0.12)',
-                  paddingTop: '1.75rem',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '1.25rem',
-                  textAlign: 'left'
+                  color: '#15803D',
+                  fontWeight: 600,
+                  textDecoration: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.textDecoration = 'underline';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.textDecoration = 'none';
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#4ADE80',
-                      flexShrink: 0
-                    }}
-                  >
-                    <ShieldCheck size={18} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '2px' }}>
-                      Escrow-Protected
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: '#A7F3D0', lineHeight: 1.4 }}>
-                      Funds released only after buyer inspection
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#4ADE80',
-                      flexShrink: 0
-                    }}
-                  >
-                    <CheckCircle2 size={18} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '2px' }}>
-                      Verified Profiles
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: '#A7F3D0', lineHeight: 1.4 }}>
-                      Identity and agrarian records verified
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#4ADE80',
-                      flexShrink: 0
-                    }}
-                  >
-                    <Zap size={18} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '2px' }}>
-                      Zero Hidden Markup
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: '#A7F3D0', lineHeight: 1.4 }}>
-                      Direct counter-offers with 48h locks
-                    </div>
-                  </div>
-                </div>
-              </div>
+                Sign in to your account →
+              </Link>
             </div>
           </div>
         </div>
