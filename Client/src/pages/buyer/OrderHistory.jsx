@@ -31,6 +31,7 @@ import { notify } from '../../context/NotificationContext';
 import DisputeModal from '../../components/DisputeModal';
 import ReturnModal from '../../components/ReturnModal';
 import ReviewModal from '../../components/ReviewModal';
+import { RazorpayPaymentModal, RAZORPAY_PAYMENT_LINK_ID, RAZORPAY_PAYMENT_LINK_URL } from '../../components/RazorpayPaymentModal';
 
 
 export const OrderHistory = () => {
@@ -50,6 +51,7 @@ export const OrderHistory = () => {
   const [reviewingExisting, setReviewingExisting] = useState(null);
   const [deletingOrder, setDeletingOrder] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [razorpayOrder, setRazorpayOrder] = useState(null);
 
   useEffect(() => {
 
@@ -1049,6 +1051,30 @@ export const OrderHistory = () => {
                     </button>
                   )}
 
+                  {ord.paymentStatus?.toLowerCase() !== 'paid' && (
+                    <button
+                      type="button"
+                      onClick={() => setRazorpayOrder(ord)}
+                      style={{
+                        padding: '0.45rem 0.95rem',
+                        border: '1px solid #93C5FD',
+                        backgroundColor: '#EFF6FF',
+                        color: '#1D4ED8',
+                        borderRadius: '8px',
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        transition: 'background-color 0.15s ease'
+                      }}
+                      title="Pay via Razorpay Payment Link (supports flexible amounts)"
+                    >
+                      ⚡ Pay via Razorpay
+                    </button>
+                  )}
+
                   <button
                     onClick={() => handleReorder(ord.id)}
                     disabled={actionLoadingId === ord.id}
@@ -1226,6 +1252,32 @@ export const OrderHistory = () => {
           </div>
         </div>
       )}
+
+      {/* Razorpay Payment Modal */}
+      <RazorpayPaymentModal
+        isOpen={!!razorpayOrder}
+        onClose={() => setRazorpayOrder(null)}
+        orderTotal={razorpayOrder?.totalAmount || 100000}
+        orderNumber={razorpayOrder?.orderNumber}
+        customerPhone="+919508461241"
+        customerEmail="saurabhsinghdeveloper591@gmail.com"
+        onSuccess={async (res) => {
+          if (razorpayOrder?.id) {
+            try {
+              await orderApi.payOrder(razorpayOrder.id, {
+                amount: res.amount,
+                paymentId: res.paymentId,
+                paymentLinkId: res.paymentLinkId,
+                paymentLinkUrl: res.paymentLinkUrl
+              });
+              await loadOrders();
+              setRazorpayOrder(null);
+            } catch (err) {
+              console.error('Failed to sync order payment:', err);
+            }
+          }
+        }}
+      />
     </div>
   );
 };

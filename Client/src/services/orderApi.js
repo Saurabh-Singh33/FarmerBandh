@@ -47,6 +47,14 @@ export const orderApi = {
     const res = await apiClient.post(`/seller/orders/${id}/reject`, { reason });
     return res.data;
   },
+  payOrder: async (id, data) => {
+    const res = await apiClient.post(`/orders/${id}/pay`, data);
+    return res.data;
+  },
+  updateSellerPaymentStatus: async (id, data) => {
+    const res = await apiClient.put(`/seller/orders/${id}/payment-status`, data);
+    return res.data;
+  },
   getPublicSettings: async () => {
     const res = await apiClient.get('/settings/public');
     return res.data;

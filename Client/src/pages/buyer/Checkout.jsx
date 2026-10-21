@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext';
 import { addressApi } from '../../services/addressApi';
 import { orderApi } from '../../services/orderApi';
 import { notify } from '../../context/NotificationContext';
+import { RazorpayPaymentModal, RAZORPAY_PAYMENT_LINK_ID, RAZORPAY_PAYMENT_LINK_URL } from '../../components/RazorpayPaymentModal';
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -34,8 +35,10 @@ export const Checkout = () => {
   const [deliverySlotDate, setDeliverySlotDate] = useState(tomorrow.toISOString().split('T')[0]);
   const [deliverySlotWindow, setDeliverySlotWindow] = useState('Morning (8 AM - 12 PM)');
 
-  // Payment method state (1 = COD, 2 = UPI, 3 = NetBanking, 4 = Card)
-  const [paymentMethod, setPaymentMethod] = useState(4); // Card default
+  // Payment method state (1 = COD, 2 = UPI, 3 = NetBanking, 4 = Card, 5 = Razorpay Payment Link)
+  const [paymentMethod, setPaymentMethod] = useState(5); // Razorpay default
+  const [showRazorpayModal, setShowRazorpayModal] = useState(false);
+  const [razorpayPaidData, setRazorpayPaidData] = useState(null);
 
   // Order submission state
   const [submitting, setSubmitting] = useState(false);
@@ -95,6 +98,12 @@ export const Checkout = () => {
       return;
     }
 
+    // If Razorpay Payment Link option selected and not yet paid, open Razorpay UI modal
+    if (paymentMethod === 5 && !razorpayPaidData) {
+      setShowRazorpayModal(true);
+      return;
+    }
+
     setSubmitting(true);
     setErrorMsg('');
 
@@ -104,11 +113,50 @@ export const Checkout = () => {
         deliverySlotDate: new Date(deliverySlotDate).toISOString(),
         deliverySlotWindow,
         paymentMethod: Number(paymentMethod),
-        couponCode: cart?.couponCode || null
+        couponCode: cart?.couponCode || null,
+        paidAmount: razorpayPaidData?.amount || null,
+        paymentId: razorpayPaidData?.paymentId || null,
+        paymentLinkId: razorpayPaidData?.paymentLinkId || null
       });
 
       await fetchCart();
-      navigate('/order-confirmation', { state: { orderResult: result } });
+      navigate('/order-confirmation', { 
+        state: { 
+          orderResult: result,
+          razorpayPayment: razorpayPaidData 
+        } 
+      });
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || 'Order placement failed. Please try again.');
+      setSubmitting(false);
+    }
+  };
+
+  const handleRazorpaySuccess = async (res) => {
+    setRazorpayPaidData(res);
+    setShowRazorpayModal(false);
+    setSubmitting(true);
+    setErrorMsg('');
+
+    try {
+      const result = await orderApi.createOrder({
+        addressId: selectedAddressId,
+        deliverySlotDate: new Date(deliverySlotDate).toISOString(),
+        deliverySlotWindow,
+        paymentMethod: 5,
+        couponCode: cart?.couponCode || null,
+        paidAmount: res.amount,
+        paymentId: res.paymentId,
+        paymentLinkId: res.paymentLinkId
+      });
+
+      await fetchCart();
+      navigate('/order-confirmation', { 
+        state: { 
+          orderResult: result, 
+          razorpayPayment: res 
+        } 
+      });
     } catch (err) {
       setErrorMsg(err.response?.data?.message || 'Order placement failed. Please try again.');
       setSubmitting(false);
@@ -338,8 +386,15 @@ export const Checkout = () => {
 
               <div className="space-y-3">
                 {[
-                  { id: 4, name: 'Credit / Debit Card', desc: 'Pay via Visa, Mastercard, RuPay' },
+                  {
+                    id: 5,
+                    name: '⚡ Razorpay Instant Payment Link (UPI / Cards / NetBanking / QR)',
+                    desc: 'Official Razorpay gateway (plink_Tqe4bgUXaopgZ0) • Flexible custom amounts (less or more than ₹100,000)',
+                    badge: 'Recommended',
+                    isRazorpay: true
+                  },
                   { id: 2, name: 'UPI / BHIM / Google Pay', desc: 'Instant UPI payment confirmation' },
+                  { id: 4, name: 'Credit / Debit Card', desc: 'Pay via Visa, Mastercard, RuPay' },
                   { id: 3, name: 'Net Banking', desc: 'All major Indian banks supported' },
                   { id: 1, name: 'Cash on Delivery (COD)', desc: 'Pay cash directly to farmer/transporter on delivery' }
                 ].map((pm) => (
@@ -351,19 +406,62 @@ export const Checkout = () => {
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        checked={paymentMethod === pm.id}
-                        onChange={() => setPaymentMethod(pm.id)}
-                        className="text-emerald-600 focus:ring-emerald-500"
-                      />
-                      <div>
-                        <div className="font-bold text-slate-900 text-sm">{pm.name}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{pm.desc}</div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          checked={paymentMethod === pm.id}
+                          onChange={() => setPaymentMethod(pm.id)}
+                          className="text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900 text-sm">{pm.name}</span>
+                            {pm.badge && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                                {pm.badge}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-slate-500 mt-0.5">{pm.desc}</div>
+                        </div>
                       </div>
+
+                      {pm.isRazorpay && paymentMethod === pm.id && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowRazorpayModal(true);
+                          }}
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+                        >
+                          {razorpayPaidData ? '✓ Paid / Edit' : 'Open Razorpay UI'}
+                        </button>
+                      )}
                     </div>
+
+                    {pm.isRazorpay && paymentMethod === pm.id && (
+                      <div className="mt-3 pt-3 border-t border-emerald-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-slate-700">Link ID:</span>
+                          <span className="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-blue-700 font-bold">
+                            {RAZORPAY_PAYMENT_LINK_ID}
+                          </span>
+                        </div>
+                        {razorpayPaidData ? (
+                          <div className="text-emerald-700 font-bold flex items-center gap-1 bg-emerald-100 px-2 py-0.5 rounded">
+                            <Check className="w-3.5 h-3.5" /> ₹{razorpayPaidData.amount?.toLocaleString()} Paid via Razorpay ({razorpayPaidData.paymentId})
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-blue-800 font-medium">
+                            Click 'Review Order' to launch authentic Razorpay payment UI
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </label>
                 ))}
               </div>
@@ -459,9 +557,19 @@ export const Checkout = () => {
                   type="button"
                   onClick={handlePlaceOrder}
                   disabled={submitting}
-                  className="px-8 py-3.5 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-base rounded-full shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                  className={`px-8 py-3.5 text-white font-extrabold text-base rounded-full shadow-lg hover:shadow-xl transition-all disabled:opacity-50 ${
+                    paymentMethod === 5
+                      ? 'bg-blue-600 hover:bg-blue-700 ring-2 ring-blue-400'
+                      : 'bg-emerald-800 hover:bg-emerald-900'
+                  }`}
                 >
-                  {submitting ? 'Placing Order...' : `Confirm & Place Order (₹${cart.totalAmount?.toLocaleString()})`}
+                  {submitting
+                    ? 'Placing Order...'
+                    : (paymentMethod === 5
+                      ? (razorpayPaidData
+                        ? `Confirm & Place Order (Paid ₹${razorpayPaidData.amount?.toLocaleString()} via Razorpay)`
+                        : `Pay with Razorpay UI (₹${cart.totalAmount?.toLocaleString()})`)
+                      : `Confirm & Place Order (₹${cart.totalAmount?.toLocaleString()})`)}
                 </button>
               </div>
             </div>
@@ -635,6 +743,16 @@ export const Checkout = () => {
           </div>
         </div>
       )}
+
+      {/* Razorpay Payment Modal (Buyer Side) */}
+      <RazorpayPaymentModal
+        isOpen={showRazorpayModal}
+        onClose={() => setShowRazorpayModal(false)}
+        orderTotal={cart?.totalAmount || 100000}
+        customerPhone={addresses.find((a) => a.id === selectedAddressId)?.phone || '+919508461241'}
+        customerEmail="saurabhsinghdeveloper591@gmail.com"
+        onSuccess={handleRazorpaySuccess}
+      />
     </div>
   );
 };

@@ -36,6 +36,7 @@ import { generateOrderReceiptPdf } from '../../utils/receiptPdfGenerator';
 import DisputeModal from '../../components/DisputeModal';
 import ReturnModal from '../../components/ReturnModal';
 import ReviewModal from '../../components/ReviewModal';
+import { RazorpayPaymentModal, RAZORPAY_PAYMENT_LINK_ID, RAZORPAY_PAYMENT_LINK_URL } from '../../components/RazorpayPaymentModal';
 
 
 /**
@@ -96,6 +97,28 @@ export const OrderTracking = () => {
   // Delete Order states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeletingOrder, setIsDeletingOrder] = useState(false);
+
+  // Razorpay Payment Modal state
+  const [showRazorpayPayModal, setShowRazorpayPayModal] = useState(false);
+
+  const handleRazorpayPaymentSuccess = async (res) => {
+    if (!order?.id) return;
+    try {
+      await orderApi.payOrder(order.id, {
+        amount: res.amount,
+        paymentId: res.paymentId,
+        paymentLinkId: res.paymentLinkId,
+        paymentLinkUrl: res.paymentLinkUrl
+      });
+      const updated = await orderApi.getBuyerOrderById(order.id);
+      setOrder(updated);
+      setShowRazorpayPayModal(false);
+      notify.success(`Payment of ₹${res.amount?.toLocaleString()} recorded successfully via Razorpay!`, 'Payment Confirmed');
+    } catch (err) {
+      console.error('Failed to update payment:', err);
+      notify.error(err.response?.data?.message || 'Payment recorded on Razorpay, but server sync failed.');
+    }
+  };
 
   const handleConfirmDeleteOrder = async () => {
     if (!order?.id) return;
@@ -401,6 +424,19 @@ export const OrderTracking = () => {
                 {order.paymentStatus}
               </span>
             </span>
+
+            {order.paymentStatus?.toLowerCase() !== 'paid' && (
+              <>
+                <span className="text-slate-300">•</span>
+                <button
+                  type="button"
+                  onClick={() => setShowRazorpayPayModal(true)}
+                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors inline-flex items-center gap-1 active:scale-95"
+                >
+                  ⚡ Pay via Razorpay UI
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -415,6 +451,53 @@ export const OrderTracking = () => {
             })}
           </div>
           <div className="text-[11px] text-slate-400 mt-0.5">All taxes & platform fees included</div>
+        </div>
+      </div>
+
+      {/* Razorpay Payment Quick Action Banner */}
+      <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm flex-shrink-0">
+            ⚡
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-bold text-slate-900 text-sm">Razorpay Payment Integration</span>
+              <span className="font-mono text-xs bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded font-semibold border border-blue-200">
+                {RAZORPAY_PAYMENT_LINK_ID}
+              </span>
+              <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                order.paymentStatus?.toLowerCase() === 'paid'
+                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                  : 'bg-amber-100 text-amber-800 border border-amber-200'
+              }`}>
+                {order.paymentStatus?.toLowerCase() === 'paid' ? '✓ Paid' : 'Payment Due'}
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-2">
+              <span>Link: <a href={RAZORPAY_PAYMENT_LINK_URL} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline font-medium">{RAZORPAY_PAYMENT_LINK_URL}</a></span>
+              <span>•</span>
+              <span>Flexible payments allowed: Pay less or more than ₹100,000</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowRazorpayPayModal(true)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 active:scale-95"
+          >
+            {order.paymentStatus?.toLowerCase() === 'paid' ? 'View Razorpay UI' : '⚡ Pay via Razorpay UI'}
+          </button>
+          <a
+            href={RAZORPAY_PAYMENT_LINK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold rounded-xl shadow-xs transition-colors flex items-center gap-1"
+          >
+            Open Link
+          </a>
         </div>
       </div>
 
@@ -836,6 +919,17 @@ export const OrderTracking = () => {
           </div>
         </div>
       )}
+
+      {/* Razorpay Payment Modal */}
+      <RazorpayPaymentModal
+        isOpen={showRazorpayPayModal}
+        onClose={() => setShowRazorpayPayModal(false)}
+        orderTotal={order?.totalAmount || 100000}
+        orderNumber={order?.orderNumber}
+        customerPhone={order?.deliveryAddress?.phone || '+919508461241'}
+        customerEmail="saurabhsinghdeveloper591@gmail.com"
+        onSuccess={handleRazorpayPaymentSuccess}
+      />
     </div>
   );
 };

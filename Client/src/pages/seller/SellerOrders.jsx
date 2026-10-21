@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Clock, CheckCircle2, Truck, XCircle, AlertCircle, Search, RefreshCw, ChevronRight, Loader2, RotateCcw } from 'lucide-react';
+import { Package, Clock, CheckCircle2, Truck, XCircle, AlertCircle, Search, RefreshCw, ChevronRight, Loader2, RotateCcw, Copy, ExternalLink, Share2, Eye, ShieldCheck, CreditCard } from 'lucide-react';
 import { orderApi } from '../../services/orderApi';
 import { returnApi } from '../../services/returnApi';
 import { notify } from '../../context/NotificationContext';
+import { RazorpayPaymentModal, RAZORPAY_PAYMENT_LINK_ID, RAZORPAY_PAYMENT_LINK_URL } from '../../components/RazorpayPaymentModal';
 
 export const SellerOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -17,6 +18,7 @@ export const SellerOrders = () => {
   const [rejectModalOrder, setRejectModalOrder] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
   const [rejecting, setRejecting] = useState(false);
+  const [razorpayModalOrder, setRazorpayModalOrder] = useState(null);
 
   useEffect(() => {
     loadSellerOrders();
@@ -98,6 +100,33 @@ export const SellerOrders = () => {
       notify.error(err.response?.data?.message || err.message || 'Failed to reject order.');
     } finally {
       setRejecting(false);
+    }
+  };
+
+  const handleCopyPaymentLink = (e, orderNumber) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(RAZORPAY_PAYMENT_LINK_URL);
+    notify.success(`Razorpay Payment Link copied for Order #${orderNumber}!`);
+  };
+
+  const handleShareWhatsApp = (e, ord) => {
+    e.stopPropagation();
+    const text = encodeURIComponent(
+      `Hello ${ord.buyerName || 'Valued Customer'}! Here is your secure Razorpay Payment Link for FarmerBandh Order #${ord.orderNumber} (Total: ₹${ord.totalAmount?.toLocaleString()}): ${RAZORPAY_PAYMENT_LINK_URL}`
+    );
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  const handleVerifySellerPayment = async (orderId, newPaymentStatus = 2) => {
+    try {
+      await orderApi.updateSellerPaymentStatus(orderId, {
+        paymentStatus: newPaymentStatus,
+        notes: `Farmer verified Razorpay payment (${RAZORPAY_PAYMENT_LINK_ID})`
+      });
+      notify.success('Order payment status verified & updated to Paid.', 'Payment Verified');
+      await loadSellerOrders();
+    } catch (err) {
+      notify.error(err.response?.data?.message || err.message || 'Failed to update payment status.');
     }
   };
 
@@ -255,6 +284,92 @@ export const SellerOrders = () => {
                   </div>
                 </div>
 
+                {/* Razorpay Payment Link Bar (Farmer Side) */}
+                <div className="bg-gradient-to-r from-blue-50/70 to-indigo-50/50 border border-blue-200/80 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm flex-shrink-0">
+                      ⚡
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-slate-900">Razorpay Payment Link</span>
+                        <span className="font-mono text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold border border-blue-200">
+                          {RAZORPAY_PAYMENT_LINK_ID}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          ord.paymentStatus?.toLowerCase() === 'paid'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : (ord.paymentStatus?.toLowerCase() === 'partiallypaid'
+                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                              : 'bg-blue-100 text-blue-800 border border-blue-200')
+                        }`}>
+                          {ord.paymentStatus?.toLowerCase() === 'paid' ? '✓ Paid' : (ord.paymentStatus?.toLowerCase() === 'partiallypaid' ? 'Partially Paid' : 'Link Active')}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-2">
+                        <span>URL: <span className="text-blue-700 underline font-medium">{RAZORPAY_PAYMENT_LINK_URL}</span></span>
+                        <span>•</span>
+                        <span>Subtotal: <strong>₹{ord.totalAmount?.toLocaleString()}</strong> (or flexible amount)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopyPaymentLink(e, ord.orderNumber)}
+                      className="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg font-semibold flex items-center gap-1 text-[11px] shadow-xs transition-colors"
+                      title="Copy Razorpay Link"
+                    >
+                      <Copy className="w-3 h-3 text-slate-600" />
+                      Copy Link
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleShareWhatsApp(e, ord)}
+                      className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold flex items-center gap-1 text-[11px] shadow-xs transition-colors"
+                      title="Share link on WhatsApp with Buyer"
+                    >
+                      <Share2 className="w-3 h-3" />
+                      Share WhatsApp
+                    </button>
+
+                    <a
+                      href={RAZORPAY_PAYMENT_LINK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold flex items-center gap-1 text-[11px] shadow-xs transition-colors"
+                      title="Open Live Razorpay Link"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Open Link
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setRazorpayModalOrder(ord)}
+                      className="px-2.5 py-1.5 bg-white hover:bg-blue-50 text-blue-700 border border-blue-300 rounded-lg font-semibold flex items-center gap-1 text-[11px] shadow-xs transition-colors"
+                      title="Preview Razorpay UI modal as buyer sees it"
+                    >
+                      <Eye className="w-3 h-3 text-blue-600" />
+                      Preview UI
+                    </button>
+
+                    {ord.paymentStatus?.toLowerCase() !== 'paid' && (
+                      <button
+                        type="button"
+                        onClick={() => handleVerifySellerPayment(ord.id, 2)}
+                        className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg font-bold flex items-center gap-1 text-[11px] transition-colors"
+                        title="Mark payment as verified/received"
+                      >
+                        <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                        Mark Paid
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 {/* Status Action Buttons Bar */}
                 <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs">
                   <div className="text-slate-600 font-medium flex items-center gap-2">
@@ -383,6 +498,21 @@ export const SellerOrders = () => {
           </div>
         </div>
       )}
+
+      {/* Razorpay Payment Modal (Farmer Side Preview / Collect) */}
+      <RazorpayPaymentModal
+        isOpen={!!razorpayModalOrder}
+        onClose={() => setRazorpayModalOrder(null)}
+        orderTotal={razorpayModalOrder?.totalAmount || 100000}
+        orderNumber={razorpayModalOrder?.orderNumber}
+        customerPhone={razorpayModalOrder?.deliveryPhone || '+919508461241'}
+        customerEmail="saurabhsinghdeveloper591@gmail.com"
+        onSuccess={async (res) => {
+          if (razorpayModalOrder) {
+            await handleVerifySellerPayment(razorpayModalOrder.id, res.amount >= razorpayModalOrder.totalAmount ? 2 : 5);
+          }
+        }}
+      />
     </div>
   );
 };
