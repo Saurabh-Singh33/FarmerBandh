@@ -107,6 +107,10 @@ builder.Services.AddScoped<IAdminProfileService, AdminProfileService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Chatbot AI Companion (OpenRouter)
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
+
 // Hosted background service for expiring stale negotiations every 15 min
 builder.Services.AddHostedService<NegotiationExpiryService>();
 
