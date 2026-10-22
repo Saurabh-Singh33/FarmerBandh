@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sprout, ShoppingCart, Tractor, Check } from 'lucide-react';
+import { Sprout, ShoppingCart, Tractor, Check, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { notify } from '../../context/NotificationContext';
 
@@ -317,20 +317,28 @@ export const LoginRegister = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
                     style={{
                       position: 'absolute',
-                      right: '1rem',
+                      right: '0.85rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       border: 'none',
                       backgroundColor: 'transparent',
                       color: '#6B7280',
-                      fontSize: '0.82rem',
                       cursor: 'pointer',
-                      fontWeight: 600
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0.25rem',
+                      borderRadius: '6px',
+                      transition: 'color 0.15s ease'
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#1F2937')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
                   >
-                    {showPassword ? 'Hide' : 'Show'}
+                    {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                   </button>
                 </div>
               </div>
@@ -572,20 +580,28 @@ export const LoginRegister = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
                     style={{
                       position: 'absolute',
-                      right: '1rem',
+                      right: '0.85rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       border: 'none',
                       backgroundColor: 'transparent',
                       color: '#6B7280',
-                      fontSize: '0.82rem',
                       cursor: 'pointer',
-                      fontWeight: 600
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0.25rem',
+                      borderRadius: '6px',
+                      transition: 'color 0.15s ease'
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#1F2937')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
                   >
-                    {showPassword ? 'Hide' : 'Show'}
+                    {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                   </button>
                 </div>
                 {password.length >= 8 && (

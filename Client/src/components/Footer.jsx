@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Mail, Phone, Clock, ShieldCheck } from 'lucide-react';
 import { SproutIcon, InstagramIcon, FacebookIcon, TwitterIcon } from './SocialIcons';
 import { FooterLanguageSelector } from './FooterLanguageSelector';
 
@@ -7,11 +8,11 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        backgroundColor: '#0D261E',
-        color: '#E8F5E9',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'radial-gradient(ellipse 90% 60% at 50% 0%, #123528 0%, #081B14 100%)',
+        color: '#E2E8F0',
+        borderTop: '1px solid rgba(74, 222, 128, 0.15)',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        paddingTop: '3.5rem',
+        paddingTop: '3.75rem',
         paddingBottom: '2.5rem'
       }}
     >
@@ -43,30 +44,31 @@ export const Footer = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                backgroundColor: '#22C55E',
+                background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0D261E',
-                boxShadow: '0 2px 8px rgba(34,197,94,0.3)'
+                color: '#081B14',
+                boxShadow: '0 4px 14px rgba(34,197,94,0.35)'
               }}
             >
-              <SproutIcon size={22} color="#0D261E" />
+              <SproutIcon size={22} color="#081B14" />
             </div>
             <div>
               <span
                 style={{
                   fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                   fontSize: '1.4rem',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   color: '#FFFFFF',
-                  letterSpacing: '-0.02em',
-                  display: 'block'
+                  letterSpacing: '-0.025em',
+                  display: 'block',
+                  lineHeight: 1.15
                 }}
               >
                 FarmerBandh
               </span>
-              <span style={{ fontSize: '0.72rem', color: '#A7F3D0', letterSpacing: '0.06em', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.7rem', color: '#4ADE80', letterSpacing: '0.08em', fontWeight: 700 }}>
                 DIRECT LOCAL PRODUCE
               </span>
             </div>
@@ -74,16 +76,38 @@ export const Footer = () => {
 
           <p
             style={{
-              fontSize: '0.9rem',
-              color: '#A7F3D0',
-              lineHeight: 1.6,
+              fontSize: '0.88rem',
+              color: '#94A3B8',
+              lineHeight: 1.65,
               margin: '0 0 1.25rem 0'
             }}
           >
             Direct farm-to-buyer agricultural marketplace. Connecting verified regional growers with commercial buyers through transparent negotiation, fair pricing, and escrow protection.
           </p>
 
-          <div style={{ display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.78rem', color: '#BBF7D0' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: 'rgba(34, 197, 94, 0.08)',
+              border: '1px solid rgba(74, 222, 128, 0.22)',
+              padding: '5px 12px',
+              borderRadius: '9999px',
+              fontSize: '0.78rem',
+              fontWeight: 500,
+              color: '#86EFAC'
+            }}
+          >
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#22C55E',
+                boxShadow: '0 0 8px #22C55E'
+              }}
+            />
             Built for farmers across Gujarat & India
           </div>
         </div>
@@ -93,11 +117,11 @@ export const Footer = () => {
           <h2
             style={{
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: '0.8rem',
-              fontWeight: 600,
+              fontSize: '0.78rem',
+              fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#94A3B8',
+              letterSpacing: '0.1em',
+              color: '#F8FAFC',
               marginBottom: '1.25rem'
             }}
           >
@@ -105,27 +129,27 @@ export const Footer = () => {
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li>
-              <Link to="/" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <Link to="/" className="footer-link">
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/marketplace" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <Link to="/marketplace" className="footer-link">
                 Marketplace
               </Link>
             </li>
             <li>
-              <Link to="/about" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <Link to="/about" className="footer-link">
                 About FarmerBandh
               </Link>
             </li>
             <li>
-              <Link to="/help" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <Link to="/help" className="footer-link">
                 Help & FAQs
               </Link>
             </li>
             <li>
-              <Link to="/contact" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <Link to="/contact" className="footer-link">
                 Contact Support
               </Link>
             </li>
@@ -137,11 +161,11 @@ export const Footer = () => {
           <h2
             style={{
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: '0.8rem',
-              fontWeight: 600,
+              fontSize: '0.78rem',
+              fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#94A3B8',
+              letterSpacing: '0.1em',
+              color: '#F8FAFC',
               marginBottom: '1.25rem'
             }}
           >
@@ -149,22 +173,22 @@ export const Footer = () => {
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li>
-              <a href="/help#terms" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <a href="/help#terms" className="footer-link">
                 Terms of Service
               </a>
             </li>
             <li>
-              <a href="/help#privacy" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <a href="/help#privacy" className="footer-link">
                 Privacy Policy
               </a>
             </li>
             <li>
-              <a href="/help#security" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <a href="/help#security" className="footer-link">
                 Data Security Standards
               </a>
             </li>
             <li>
-              <a href="/help#faq" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.15s' }}>
+              <a href="/help#faq" className="footer-link">
                 Dispute & Return Policy
               </a>
             </li>
@@ -176,37 +200,26 @@ export const Footer = () => {
           <h2
             style={{
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: '0.8rem',
-              fontWeight: 600,
+              fontSize: '0.78rem',
+              fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#94A3B8',
+              letterSpacing: '0.1em',
+              color: '#F8FAFC',
               marginBottom: '1.25rem'
             }}
           >
             Connect
           </h2>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.35rem' }}>
             <a
               href="https://instagram.com/farmerbandh"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow FarmerBandh on Instagram"
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                transition: 'all 0.15s ease'
-              }}
+              className="footer-social-btn"
             >
-              <InstagramIcon size={19} color="#FFFFFF" />
+              <InstagramIcon size={18} />
             </a>
 
             <a
@@ -214,20 +227,9 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Connect with FarmerBandh on Facebook"
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                transition: 'all 0.15s ease'
-              }}
+              className="footer-social-btn"
             >
-              <FacebookIcon size={19} color="#FFFFFF" />
+              <FacebookIcon size={18} />
             </a>
 
             <a
@@ -235,38 +237,42 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow FarmerBandh on X"
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                transition: 'all 0.15s ease'
-              }}
+              className="footer-social-btn"
             >
-              <TwitterIcon size={19} color="#FFFFFF" />
+              <TwitterIcon size={18} />
             </a>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.88rem' }}>
-            <div style={{ color: '#94A3B8' }}>
-              Email:{' '}
-              <a href="mailto:support@farmerbandh.com" style={{ color: '#F8FAFC', textDecoration: 'none', fontWeight: 500 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.86rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8' }}>
+              <Mail size={15} color="#4ADE80" style={{ flexShrink: 0 }} />
+              <span>Email:</span>
+              <a
+                href="mailto:support@farmerbandh.com"
+                style={{ color: '#F1F5F9', textDecoration: 'none', fontWeight: 500, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#4ADE80')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#F1F5F9')}
+              >
                 support@farmerbandh.com
               </a>
             </div>
-            <div style={{ color: '#94A3B8' }}>
-              Toll-Free:{' '}
-              <a href="tel:1800123456" style={{ color: '#F8FAFC', textDecoration: 'none', fontWeight: 600 }}>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8' }}>
+              <Phone size={15} color="#4ADE80" style={{ flexShrink: 0 }} />
+              <span>Toll-Free:</span>
+              <a
+                href="tel:1800123456"
+                style={{ color: '#F1F5F9', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#4ADE80')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#F1F5F9')}
+              >
                 1800-123-456
               </a>
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#6EE7B7', marginTop: '2px' }}>
-              Mon – Sat: 9:00 AM – 6:00 PM IST
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#6EE7B7', marginTop: '2px' }}>
+              <Clock size={14} color="#4ADE80" style={{ flexShrink: 0 }} />
+              <span>Mon – Sat: 9:00 AM – 6:00 PM IST</span>
             </div>
           </div>
         </div>
@@ -277,19 +283,34 @@ export const Footer = () => {
         <FooterLanguageSelector />
       </div>
 
-      {/* Bottom Copyright */}
+      {/* Bottom Copyright & Trust Strip */}
       <div
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
           padding: '1.5rem 1.5rem 0',
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          textAlign: 'center',
-          fontSize: '0.82rem',
-          color: '#86EFAC'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          fontSize: '0.8rem',
+          color: '#64748B'
         }}
       >
-        © 2026 FarmerBandh · Made in India · All rights reserved.
+        <div>
+          © {new Date().getFullYear()} FarmerBandh · All rights reserved.
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#86EFAC', fontSize: '0.78rem' }}>
+          <ShieldCheck size={14} color="#4ADE80" />
+          <span>Direct Farm-to-Buyer Escrow Protection</span>
+        </div>
+
+        <div style={{ color: '#94A3B8', fontSize: '0.78rem' }}>
+          Proudly crafted for Indian Agriculture 🇮🇳
+        </div>
       </div>
     </footer>
   );

@@ -8,18 +8,29 @@ import {
   RefreshCw,
   Building,
   Bell,
-  Wallet
+  Wallet,
+  Eye,
+  EyeOff,
+  Smartphone,
+  Mail
 } from 'lucide-react';
 import { sellerProfileApi } from '../../services/sellerProfileApi';
 import { VerificationBadge } from '../../components/seller/VerificationBadge';
 import { notify } from '../../context/NotificationContext';
 import { useSeller } from '../../context/SellerContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const SellerProfile = () => {
   const { verificationStatus, refreshDashboard } = useSeller();
+  const { updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState('profile'); // profile | password | settings
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Password visibility states
+  const [showCurrentPwd, setShowCurrentPwd] = useState(false);
+  const [showNewPwd, setShowNewPwd] = useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false);
 
   // Tab 1: Profile form
   const [profileForm, setProfileForm] = useState({
@@ -61,13 +72,13 @@ export const SellerProfile = () => {
 
         if (prof) {
           setProfileForm({
-            fullName: prof.fullName || '',
+            fullName: prof.name || prof.fullName || '',
             email: prof.email || '',
             farmName: prof.farmName || '',
             location: prof.location || '',
             district: prof.district || '',
             state: prof.state || '',
-            phone: prof.phone || '',
+            phone: prof.phone || '+919508461241',
             bio: prof.bio || ''
           });
         }
@@ -98,21 +109,34 @@ export const SellerProfile = () => {
       notify.error('Farm name is required.');
       return;
     }
+    if (!profileForm.email.trim()) {
+      notify.error('Gmail / Email address is required.');
+      return;
+    }
+
     try {
       setSaving(true);
       await sellerProfileApi.updateProfile({
         farmName: profileForm.farmName.trim(),
+        fullName: profileForm.fullName.trim() || undefined,
+        email: profileForm.email.trim(),
+        phone: profileForm.phone.trim() || '+919508461241',
         location: profileForm.location.trim(),
         district: profileForm.district.trim(),
         state: profileForm.state.trim(),
-        phone: profileForm.phone.trim() || undefined,
         bio: profileForm.bio.trim() || undefined
       });
-      notify.success('Farm profile updated successfully.');
+
+      updateUser({
+        email: profileForm.email.trim(),
+        fullName: profileForm.fullName.trim()
+      });
+
+      notify.success('Farm profile, Gmail, and Razorpay phone saved successfully.');
       refreshDashboard();
     } catch (err) {
       console.error('Error updating profile:', err);
-      notify.error(err?.response?.data?.message || 'Failed to update profile');
+      notify.error(err?.response?.data?.message || err?.message || 'Failed to update profile');
     } finally {
       setSaving(false);
     }
@@ -262,44 +286,54 @@ export const SellerProfile = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   type="text"
-                  disabled
+                  required
+                  placeholder="e.g. Ramesh Patel"
                   value={profileForm.fullName}
+                  onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #E5E7EB',
+                    border: '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
-                    backgroundColor: '#F9FAFB',
-                    color: '#6B7280',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    outline: 'none'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Email Address
+                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Mail size={14} color="#059669" /> Gmail / Email Address *
+                  </span>
+                  <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, backgroundColor: '#ECFDF5', padding: '1px 6px', borderRadius: '4px' }}>
+                    Login & Receipts
+                  </span>
                 </label>
                 <input
                   type="email"
-                  disabled
+                  required
+                  placeholder="e.g. farmer@gmail.com"
                   value={profileForm.email}
+                  onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #E5E7EB',
+                    border: '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
-                    backgroundColor: '#F9FAFB',
-                    color: '#6B7280',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    outline: 'none'
                   }}
                 />
+                <span style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '4px', display: 'block' }}>
+                  Editable Gmail address for your Farmer account credentials & order summaries.
+                </span>
               </div>
             </div>
 
@@ -327,12 +361,18 @@ export const SellerProfile = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Contact Phone Number
+                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Smartphone size={14} color="#2563EB" /> Contact Phone Number *
+                  </span>
+                  <span style={{ fontSize: '0.72rem', color: '#1E40AF', fontWeight: 600, backgroundColor: '#EFF6FF', border: '1px solid #BFDBFE', padding: '1px 6px', borderRadius: '4px' }}>
+                    ⚡ Razorpay Linked
+                  </span>
                 </label>
                 <input
                   type="tel"
-                  placeholder="e.g. +91 98765 43210"
+                  required
+                  placeholder="+919508461241"
                   value={profileForm.phone}
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                   style={{
@@ -345,6 +385,29 @@ export const SellerProfile = () => {
                     outline: 'none'
                   }}
                 />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', flexWrap: 'wrap', gap: '4px' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>
+                    Integrated with Razorpay payment checkout & buyer coordination.
+                  </span>
+                  {profileForm.phone !== '+919508461241' && (
+                    <button
+                      type="button"
+                      onClick={() => setProfileForm({ ...profileForm, phone: '+919508461241' })}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        color: '#2563EB',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Use Razorpay (+919508461241)
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -484,65 +547,134 @@ export const SellerProfile = () => {
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
                 Current Password *
               </label>
-              <input
-                type="password"
-                required
-                value={pwdForm.currentPassword}
-                onChange={(e) => setPwdForm({ ...pwdForm, currentPassword: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.65rem 0.85rem',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  boxSizing: 'border-box',
-                  outline: 'none'
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showCurrentPwd ? 'text' : 'password'}
+                  required
+                  value={pwdForm.currentPassword}
+                  onChange={(e) => setPwdForm({ ...pwdForm, currentPassword: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.85rem',
+                    paddingRight: '2.5rem',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPwd(!showCurrentPwd)}
+                  aria-label={showCurrentPwd ? 'Hide current password' : 'Show current password'}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    color: '#6B7280',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0.2rem'
+                  }}
+                >
+                  {showCurrentPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
                 New Password (Min 6 Characters) *
               </label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={pwdForm.newPassword}
-                onChange={(e) => setPwdForm({ ...pwdForm, newPassword: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.65rem 0.85rem',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  boxSizing: 'border-box',
-                  outline: 'none'
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showNewPwd ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={pwdForm.newPassword}
+                  onChange={(e) => setPwdForm({ ...pwdForm, newPassword: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.85rem',
+                    paddingRight: '2.5rem',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPwd(!showNewPwd)}
+                  aria-label={showNewPwd ? 'Hide new password' : 'Show new password'}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    color: '#6B7280',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0.2rem'
+                  }}
+                >
+                  {showNewPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
                 Confirm New Password *
               </label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={pwdForm.confirmPassword}
-                onChange={(e) => setPwdForm({ ...pwdForm, confirmPassword: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '0.65rem 0.85rem',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  boxSizing: 'border-box',
-                  outline: 'none'
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showConfirmPwd ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={pwdForm.confirmPassword}
+                  onChange={(e) => setPwdForm({ ...pwdForm, confirmPassword: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.85rem',
+                    paddingRight: '2.5rem',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+                  aria-label={showConfirmPwd ? 'Hide confirm password' : 'Show confirm password'}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    color: '#6B7280',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0.2rem'
+                  }}
+                >
+                  {showConfirmPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <button

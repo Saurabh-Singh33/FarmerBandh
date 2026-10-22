@@ -83,6 +83,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (userData) => {
+    setUser((prev) => {
+      const updated = { ...prev, ...userData };
+      try {
+        localStorage.setItem('fb_user', JSON.stringify(updated));
+      } catch (err) {
+        console.error('Failed to save user in storage:', err);
+      }
+      return updated;
+    });
+  };
+
   const value = {
     user,
     accessToken,
@@ -92,6 +104,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     refresh,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

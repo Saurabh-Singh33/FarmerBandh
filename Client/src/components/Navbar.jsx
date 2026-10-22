@@ -17,7 +17,8 @@ import {
   Sliders,
   LogOut,
   ChevronDown,
-  Globe
+  Globe,
+  User
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNegotiation } from '../context/NegotiationContext';
@@ -473,6 +474,9 @@ export const Navbar = () => {
             <Link to="/seller/disputes" style={{ textDecoration: 'none', color: '#374151', fontSize: '0.92rem', fontWeight: 500, whiteSpace: 'nowrap' }}>
               Disputes
             </Link>
+            <Link to="/seller/profile" style={{ textDecoration: 'none', color: '#16A34A', fontSize: '0.92rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+              Profile
+            </Link>
           </>
         )}
         {user?.role?.toLowerCase() === 'admin' && (
@@ -690,6 +694,15 @@ export const Navbar = () => {
                     {/* Farmer Navigation */}
                     {role === 'farmer' && (
                       <>
+                        <DropdownItem
+                          to="/seller/profile"
+                          icon={User}
+                          label="My Farm Profile"
+                          badge="Edit Gmail & Phone"
+                          badgeBg="#DCFCE7"
+                          badgeColor="#15803D"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
                         <DropdownItem
                           to="/seller/dashboard"
                           icon={Store}
