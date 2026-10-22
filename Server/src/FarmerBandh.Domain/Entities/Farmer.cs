@@ -11,6 +11,7 @@ public class Farmer
     public int Verified { get; set; } = 1;
     public decimal Rating { get; set; } = 5.0m;
     public string? Bio { get; set; }
+    public string? Phone { get; set; }
     public DateTime MemberSince { get; set; } = DateTime.UtcNow;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

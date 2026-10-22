@@ -31,6 +31,9 @@ public class FarmerConfiguration : IEntityTypeConfiguration<Farmer>
         builder.Property(f => f.Bio)
             .HasMaxLength(1000);
 
+        builder.Property(f => f.Phone)
+            .HasMaxLength(20);
+
         builder.HasOne(f => f.User)
             .WithOne(u => u.Farmer)
             .HasForeignKey<Farmer>(f => f.UserId)

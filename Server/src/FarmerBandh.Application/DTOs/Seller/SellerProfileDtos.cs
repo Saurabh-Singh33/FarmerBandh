@@ -19,6 +19,8 @@ public class SellerProfileDto
 public class UpdateSellerProfileRequest
 {
     public string FarmName { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? FullName { get; set; }
     public string? Location { get; set; }
     public string? State { get; set; }
     public string? District { get; set; }

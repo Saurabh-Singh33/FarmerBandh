@@ -37,7 +37,7 @@ public class SellerProfileService : ISellerProfileService
         {
             Name = user?.FullName ?? string.Empty,
             Email = user?.Email ?? string.Empty,
-            Phone = null,
+            Phone = !string.IsNullOrWhiteSpace(farmer.Phone) ? farmer.Phone : "+919508461241",
             FarmName = farmer.FarmName,
             Location = farmer.Location,
             State = farmer.State,
@@ -55,11 +55,46 @@ public class SellerProfileService : ISellerProfileService
         var farmer = await _repository.GetFarmerByUserIdAsync(userId);
         if (farmer == null) throw new UnauthorizedAccessException("Farmer profile not found.");
 
+        var user = farmer.User ?? await _userRepository.GetByIdAsync(userId);
+        if (user != null)
+        {
+            bool userChanged = false;
+
+            if (!string.IsNullOrWhiteSpace(request.Email))
+            {
+                var trimmedEmail = request.Email.Trim().ToLowerInvariant();
+                if (!string.Equals(user.Email, trimmedEmail, StringComparison.OrdinalIgnoreCase))
+                {
+                    var existing = await _userRepository.GetByEmailAsync(trimmedEmail);
+                    if (existing != null && existing.Id != user.Id)
+                    {
+                        throw new ArgumentException("The specified email address is already in use by another account.");
+                    }
+                    user.Email = trimmedEmail;
+                    userChanged = true;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.FullName) && !string.Equals(user.FullName, request.FullName.Trim()))
+            {
+                user.FullName = request.FullName.Trim();
+                userChanged = true;
+            }
+
+            if (userChanged)
+            {
+                user.UpdatedAt = DateTime.UtcNow;
+                _userRepository.Update(user);
+                await _userRepository.SaveChangesAsync();
+            }
+        }
+
         farmer.FarmName = request.FarmName.Trim();
         farmer.Location = request.Location?.Trim();
         farmer.State = request.State?.Trim();
         farmer.District = request.District?.Trim();
         farmer.Bio = request.Bio?.Trim();
+        farmer.Phone = !string.IsNullOrWhiteSpace(request.Phone) ? request.Phone.Trim() : "+919508461241";
 
         await _repository.SaveChangesAsync();
         return await GetProfileAsync(userId);
