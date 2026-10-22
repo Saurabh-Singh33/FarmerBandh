@@ -13,6 +13,7 @@ import { Footer } from './components/Footer';
 import { FarmerSidebar } from './components/FarmerSidebar';
 import { AdminSidebar } from './components/admin/AdminSidebar';
 import { InitialLanguageModal } from './components/InitialLanguageModal';
+import { ChatbotWidget } from './components/ChatbotWidget';
 import { AppRoutes } from './routes/AppRoutes';
 
 function AppLayout() {
@@ -22,8 +23,10 @@ function AppLayout() {
   const isAdmin = role === 'admin' || location.pathname.startsWith('/admin');
   const isFarmer = role === 'farmer' && !location.pathname.startsWith('/admin');
 
+  let layoutContent;
+
   if (isAdmin && user?.role?.toLowerCase() === 'admin') {
-    return (
+    layoutContent = (
       <div style={{ minHeight: '100vh', display: 'flex', backgroundColor: '#F9FBF8', color: '#1F2937' }}>
         <AdminSidebar />
         <main style={{ flex: 1, minWidth: 0, width: '100%', overflowX: 'hidden', overflowY: 'auto', height: '100vh' }}>
@@ -31,10 +34,8 @@ function AppLayout() {
         </main>
       </div>
     );
-  }
-
-  if (isFarmer) {
-    return (
+  } else if (isFarmer) {
+    layoutContent = (
       <div style={{ minHeight: '100vh', display: 'flex', backgroundColor: '#F9FBF8', color: '#1F2937' }}>
         <FarmerSidebar />
         <main style={{ flex: 1, minWidth: 0, width: '100%', overflowX: 'hidden' }}>
@@ -42,18 +43,24 @@ function AppLayout() {
         </main>
       </div>
     );
+  } else {
+    const hideFooter = location.pathname === '/auth';
+    layoutContent = (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F9FBF8', color: '#1F2937' }}>
+        <Navbar />
+        <main style={{ flex: 1, minHeight: 0 }}>
+          <AppRoutes />
+        </main>
+        {!hideFooter && <Footer />}
+      </div>
+    );
   }
 
-  const hideFooter = location.pathname === '/auth';
-
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F9FBF8', color: '#1F2937' }}>
-      <Navbar />
-      <main style={{ flex: 1, minHeight: 0 }}>
-        <AppRoutes />
-      </main>
-      {!hideFooter && <Footer />}
-    </div>
+    <>
+      {layoutContent}
+      <ChatbotWidget />
+    </>
   );
 }
 
