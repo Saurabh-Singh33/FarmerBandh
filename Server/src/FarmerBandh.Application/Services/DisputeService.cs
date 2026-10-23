@@ -113,6 +113,16 @@ public class DisputeService : IDisputeService
             );
         }
 
+        // Notify Admins
+        await _notificationService.NotifyAdminsAsync(
+            NotificationType.DISPUTE_OPENED,
+            $"New Dispute on Order #{order.OrderNumber}",
+            $"Dispute filed on Order #{order.OrderNumber} by {user.FullName}. Subject: {request.Subject}",
+            $"/admin/disputes/{dispute.Id}",
+            "Dispute",
+            dispute.Id
+        );
+
         return MapToDetail(dispute);
     }
 

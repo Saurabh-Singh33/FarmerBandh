@@ -87,6 +87,16 @@ public class VerificationService : IVerificationService
             vr.Id
         );
 
+        // Notify Admins
+        await _notificationService.NotifyAdminsAsync(
+            NotificationType.VERIFICATION_SUBMITTED,
+            $"Farmer Verification #{vr.RequestNumber}",
+            $"Farmer submitted land and ID documents for verification review.",
+            "/admin/verifications",
+            "Verification",
+            vr.Id
+        );
+
         return MapToDto(vr);
     }
 

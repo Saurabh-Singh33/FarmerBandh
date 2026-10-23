@@ -6,6 +6,7 @@ public class AdminProfileDto
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
+    public string? ProfilePictureUrl { get; set; }
     public string Role { get; set; } = "Admin";
     public DateTime CreatedAt { get; set; }
     public DateTime? LastLoginAt { get; set; }
@@ -15,6 +16,7 @@ public class UpdateAdminProfileRequest
 {
     public string FullName { get; set; } = string.Empty;
     public string? Phone { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 }
 
 public class ChangeAdminPasswordRequest

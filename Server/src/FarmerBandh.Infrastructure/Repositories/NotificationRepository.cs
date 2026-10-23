@@ -166,4 +166,12 @@ public class NotificationRepository : INotificationRepository
         await _context.SaveChangesAsync();
         return existing;
     }
+
+    public async Task<List<Guid>> GetAdminUserIdsAsync()
+    {
+        return await _context.Users
+            .Where(u => u.Role == FarmerBandh.Domain.Enums.UserRole.Admin)
+            .Select(u => u.Id)
+            .ToListAsync();
+    }
 }

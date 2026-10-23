@@ -26,6 +26,7 @@ public class AdminProfileService : IAdminProfileService
             FullName = user.FullName,
             Email = user.Email,
             Phone = null,
+            ProfilePictureUrl = user.ProfilePictureUrl,
             Role = user.Role.ToString(),
             CreatedAt = user.CreatedAt,
             LastLoginAt = user.LastLoginAt
@@ -38,6 +39,10 @@ public class AdminProfileService : IAdminProfileService
         if (user == null) return false;
 
         user.FullName = request.FullName.Trim();
+        if (request.ProfilePictureUrl != null)
+        {
+            user.ProfilePictureUrl = string.IsNullOrWhiteSpace(request.ProfilePictureUrl) ? null : request.ProfilePictureUrl.Trim();
+        }
         user.UpdatedAt = DateTime.UtcNow;
         await _adminRepository.UpdateUserAsync(user);
         await _adminRepository.SaveChangesAsync();

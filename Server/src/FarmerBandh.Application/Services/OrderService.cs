@@ -238,6 +238,16 @@ public class OrderService : IOrderService
                 );
             }
 
+            // Notify Admins
+            await _notificationService.NotifyAdminsAsync(
+                NotificationType.ORDER_PLACED,
+                $"New Order Placed #{order.OrderNumber}",
+                $"Order #{order.OrderNumber} placed by {buyer.User?.FullName ?? "Buyer"} for ₹{order.TotalAmount:N2}.",
+                $"/admin/orders/{order.Id}",
+                "Order",
+                order.Id
+            );
+
             createdOrders.Add(order);
             grandTotal += orderTotal;
         }

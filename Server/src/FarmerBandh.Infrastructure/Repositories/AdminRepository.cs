@@ -1350,10 +1350,13 @@ public class AdminRepository : IAdminRepository
 
         var ordersList = await orderQ.ToListAsync();
         var delivered = ordersList.Where(o => o.Status == OrderStatus.Delivered).ToList();
+        var nonCancelled = ordersList.Where(o => o.Status != OrderStatus.Cancelled).ToList();
 
-        var totalRev = delivered.Sum(o => o.TotalAmount);
+        // Period GMV: Gross value of all valid orders traded on the platform in period
+        var totalGmv = nonCancelled.Sum(o => o.TotalAmount);
+        var deliveredRev = delivered.Sum(o => o.TotalAmount);
         var totalOrders = ordersList.Count;
-        var avgOrder = totalOrders > 0 ? Math.Round(totalRev / (delivered.Count > 0 ? delivered.Count : 1), 2) : 0;
+        var avgOrder = totalOrders > 0 ? Math.Round(totalGmv / totalOrders, 2) : 0;
 
         var newUsers = await userQ.CountAsync();
         var newFarmers = await userQ.CountAsync(u => u.Role == UserRole.Farmer);
@@ -1366,11 +1369,27 @@ public class AdminRepository : IAdminRepository
         var disputeRate = totalOrders > 0 ? Math.Round((decimal)disputesCount / totalOrders, 3) : 0;
 
         var activeListings = await _context.Products.CountAsync(p => p.Status == ProductStatus.Active);
-        var platformFees = delivered.Sum(o => o.PlatformFee);
+        
+        // Net Platform Revenue (2% commission or sum of platform fees)
+        var platformFees = nonCancelled.Sum(o => o.PlatformFee);
+        if (platformFees == 0 && totalGmv > 0)
+        {
+            platformFees = Math.Round(totalGmv * 0.02m, 2);
+        }
+
+        // Crops traded volume in quintals
+        var nonCancelledOrderIds = nonCancelled.Select(d => d.Id).ToList();
+        var orderItems = await _context.OrderItems
+            .Where(oi => nonCancelledOrderIds.Contains(oi.OrderId))
+            .ToListAsync();
+        var totalQuintals = orderItems.Sum(oi => oi.QuantityQuintal);
 
         return new AdminReportOverviewDto
         {
-            TotalRevenue = totalRev,
+            TotalRevenue = deliveredRev > 0 ? deliveredRev : totalGmv,
+            TotalGmv = totalGmv,
+            NetRevenue = platformFees,
+            UnitsSoldQuintals = totalQuintals,
             TotalOrders = totalOrders,
             AverageOrderValue = avgOrder,
             NewUsers = newUsers,
@@ -1389,7 +1408,7 @@ public class AdminRepository : IAdminRepository
         var end = to ?? DateTime.UtcNow;
 
         var orders = await _context.Orders
-            .Where(o => o.Status == OrderStatus.Delivered && (o.DeliveredAt ?? o.PlacedAt) >= start && (o.DeliveredAt ?? o.PlacedAt) <= end)
+            .Where(o => o.Status != OrderStatus.Cancelled && (o.DeliveredAt ?? o.PlacedAt) >= start && (o.DeliveredAt ?? o.PlacedAt) <= end)
             .ToListAsync();
 
         var result = new List<AdminRevenueSeriesPoint>();
@@ -1399,12 +1418,16 @@ public class AdminRepository : IAdminRepository
             var groups = orders.GroupBy(o => (o.DeliveredAt ?? o.PlacedAt).ToString("yyyy-MM-dd")).OrderBy(g => g.Key);
             foreach (var g in groups)
             {
+                var dayGmv = g.Sum(x => x.TotalAmount);
+                var fees = g.Sum(x => x.PlatformFee);
+                if (fees == 0 && dayGmv > 0) fees = Math.Round(dayGmv * 0.02m, 2);
+
                 result.Add(new AdminRevenueSeriesPoint
                 {
                     Period = g.Key,
-                    Revenue = g.Sum(x => x.TotalAmount),
+                    Revenue = dayGmv,
                     Orders = g.Count(),
-                    PlatformFees = g.Sum(x => x.PlatformFee)
+                    PlatformFees = fees
                 });
             }
         }

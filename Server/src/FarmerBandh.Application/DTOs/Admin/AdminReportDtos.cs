@@ -3,6 +3,9 @@ namespace FarmerBandh.Application.DTOs.Admin;
 public class AdminReportOverviewDto
 {
     public decimal TotalRevenue { get; set; }
+    public decimal TotalGmv { get; set; }
+    public decimal NetRevenue { get; set; }
+    public decimal UnitsSoldQuintals { get; set; }
     public int TotalOrders { get; set; }
     public decimal AverageOrderValue { get; set; }
     public int NewUsers { get; set; }

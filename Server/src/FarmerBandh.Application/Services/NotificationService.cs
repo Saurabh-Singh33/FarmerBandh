@@ -64,6 +64,28 @@ public class NotificationService : INotificationService
         }
     }
 
+    public async Task NotifyAdminsAsync(
+        NotificationType type,
+        string title,
+        string body,
+        string? link = null,
+        string? relatedEntityType = null,
+        Guid? relatedEntityId = null)
+    {
+        try
+        {
+            var adminIds = await _repo.GetAdminUserIdsAsync();
+            foreach (var adminId in adminIds)
+            {
+                await CreateAsync(adminId, type, title, body, link, relatedEntityType, relatedEntityId);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch notifications to admins (Type: {Type})", type);
+        }
+    }
+
     public async Task<PagedResultDto<NotificationDto>> GetUserNotificationsAsync(Guid userId, NotificationQueryParameters query)
     {
         var result = await _repo.GetUserNotificationsAsync(userId, query);

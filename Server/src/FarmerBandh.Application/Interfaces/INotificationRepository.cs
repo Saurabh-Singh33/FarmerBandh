@@ -16,4 +16,5 @@ public interface INotificationRepository
     Task<int> ClearAsync(Guid userId, bool onlyRead);
     Task<NotificationPreference?> GetPreferencesAsync(Guid userId);
     Task<NotificationPreference> UpsertPreferencesAsync(NotificationPreference preferences);
+    Task<List<Guid>> GetAdminUserIdsAsync();
 }

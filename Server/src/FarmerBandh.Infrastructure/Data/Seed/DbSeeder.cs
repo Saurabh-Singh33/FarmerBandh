@@ -1590,6 +1590,24 @@ public static class DbSeeder
                     "5-Star Review Received", "Anita Desai left a 5-star review on Tomato.", "/seller/dashboard", isRead: true, readAt: now.AddDays(-4));
             }
 
+            if (adminUser7 != null)
+            {
+                AddNotificationIfMissing(seedNotifs, context, adminUser7.Id, NotificationType.VERIFICATION_SUBMITTED, NotificationCategory.Verification,
+                    "Farmer Verification Pending", "Sunita Sharma submitted land records & Aadhaar for verification review.", "/admin/verifications", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, adminUser7.Id, NotificationType.DISPUTE_OPENED, NotificationCategory.ReturnDispute,
+                    "Dispute Raised: Order #FB-20261023-67EA68", "Buyer reported quantity mismatch on Wheat dispatch. Awaiting admin review.", "/admin/disputes", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, adminUser7.Id, NotificationType.ORDER_PLACED, NotificationCategory.Order,
+                    "New High-Value Order Placed", "Order #FB-20261023-67EA68 placed for ₹9,468.00 via Razorpay NetBanking.", "/admin/orders", isRead: false);
+
+                AddNotificationIfMissing(seedNotifs, context, adminUser7.Id, NotificationType.PAYOUT_PROCESSED, NotificationCategory.Payout,
+                    "Farmer Payout Batch Prepared", "Weekly payout batch of ₹22,000 for verified farmers ready for settlement.", "/admin/payouts", isRead: true, readAt: now.AddDays(-1));
+
+                AddNotificationIfMissing(seedNotifs, context, adminUser7.Id, NotificationType.SYSTEM_ANNOUNCEMENT, NotificationCategory.System,
+                    "FarmerBandh Control Center Active", "Platform operations dashboard initialized. Real-time telemetry and auditing active.", "/admin/dashboard", isRead: true, readAt: now.AddDays(-3));
+            }
+
             if (seedNotifs.Count > 0)
             {
                 await context.Notifications.AddRangeAsync(seedNotifs);

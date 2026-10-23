@@ -20,6 +20,15 @@ public interface INotificationService
         Guid? relatedEntityId = null
     );
 
+    Task NotifyAdminsAsync(
+        NotificationType type,
+        string title,
+        string body,
+        string? link = null,
+        string? relatedEntityType = null,
+        Guid? relatedEntityId = null
+    );
+
     Task<PagedResultDto<NotificationDto>> GetUserNotificationsAsync(Guid userId, NotificationQueryParameters query);
     Task<int> GetUnreadCountAsync(Guid userId);
     Task<NotificationDto?> GetAndMarkReadAsync(Guid userId, Guid notificationId);
