@@ -22,6 +22,7 @@ import Negotiations from '../pages/buyer/Negotiations';
 import NegotiationDetail from '../pages/buyer/NegotiationDetail';
 import SavedFarmers from '../pages/buyer/SavedFarmers';
 import FarmerPublicProfile from '../pages/buyer/FarmerPublicProfile';
+import { BuyerProfile } from '../pages/buyer/BuyerProfile';
 import { SellerDashboard } from '../pages/seller/SellerDashboard';
 import { MyListings } from '../pages/seller/MyListings';
 import { AddProduct } from '../pages/seller/AddProduct';
@@ -180,6 +181,18 @@ export const AppRoutes = () => {
             <SavedFarmers />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute role="buyer">
+            <BuyerProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/buyer/profile"
+        element={<Navigate to="/profile" replace />}
       />
 
       {/* Seller / Farmer Protected Routes */}

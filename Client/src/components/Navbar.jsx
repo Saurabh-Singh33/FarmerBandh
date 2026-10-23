@@ -18,7 +18,8 @@ import {
   LogOut,
   ChevronDown,
   Globe,
-  User
+  User,
+  UserCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNegotiation } from '../context/NegotiationContext';
@@ -565,6 +566,7 @@ export const Navbar = () => {
                 ? { label: 'Platform Admin', bg: '#EFF6FF', color: '#1E40AF', border: '#BFDBFE', Icon: ShieldAlert }
                 : { label: 'Verified Buyer', bg: '#ECFDF5', color: '#065F46', border: '#A7F3D0', Icon: ShieldCheck };
               const RoleIcon = roleConfig.Icon;
+              const profileLink = role === 'farmer' ? '/seller/profile' : role === 'admin' ? '/admin/profile' : '/profile';
 
               return (
                 <div
@@ -581,16 +583,23 @@ export const Navbar = () => {
                     overflow: 'hidden'
                   }}
                 >
-                  {/* User Identity Header Card */}
-                  <div
+                  {/* User Identity Header Card - Clickable to open Profile */}
+                  <Link
+                    to={profileLink}
+                    onClick={() => setDropdownOpen(false)}
                     style={{
                       padding: '0.9rem 1rem',
                       background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
                       borderBottom: '1px solid #E2E8F0',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.75rem'
+                      gap: '0.75rem',
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.15s ease'
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#EEF2F6')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
                   >
                     <div
                       style={{
@@ -634,7 +643,7 @@ export const Navbar = () => {
                       >
                         {user.email}
                       </div>
-                      <div style={{ marginTop: '3px' }}>
+                      <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span
                           style={{
                             display: 'inline-flex',
@@ -651,15 +660,24 @@ export const Navbar = () => {
                         >
                           <RoleIcon size={11} strokeWidth={2.2} /> {roleConfig.label}
                         </span>
+                        <span style={{ fontSize: '0.7rem', color: '#1B4D3E', fontWeight: 600 }}>
+                          View Profile →
+                        </span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Menu Items Container */}
                   <div style={{ padding: '0.4rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     {/* Buyer Navigation */}
                     {role === 'buyer' && (
                       <>
+                        <DropdownItem
+                          to="/profile"
+                          icon={User}
+                          label="Profile"
+                          onSelect={() => setDropdownOpen(false)}
+                        />
                         <DropdownItem
                           to="/orders"
                           icon={ShoppingBag}

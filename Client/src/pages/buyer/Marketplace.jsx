@@ -158,26 +158,26 @@ export const Marketplace = () => {
     <div style={{ width: '100%', maxWidth: '100%', padding: '1.25rem 0.85rem', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}>
       
       {/* Welcome Banner */}
-      <div style={{ backgroundColor: '#E8F5E9', border: '1px solid #C8E6C9', padding: '1.25rem 1.5rem', borderRadius: '12px', marginBottom: '1.5rem', width: '100%', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7', padding: '0.85rem 1.25rem', borderRadius: '12px', marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#1B4D3E', margin: 0, fontSize: '1.8rem' }}>
+            <h1 style={{ fontFamily: 'Inter, system-ui, sans-serif', color: '#1B4D3E', margin: 0, fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.01em' }}>
               Welcome to Buyer Marketplace, {user?.fullName || 'Valued Buyer'}!
             </h1>
-            <p style={{ color: '#2E7D32', marginTop: '0.4rem', marginBottom: 0, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-              <MapPin size={16} color="#2E7D32" />
+            <p style={{ color: '#15803D', marginTop: '0.25rem', marginBottom: 0, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <MapPin size={14} color="#16A34A" />
               <span>Delivery Location: <strong>{user?.district && user?.state ? `${user.district}, ${user.state}` : user?.state || 'India'}</strong></span>
-              <span style={{ color: '#81C784' }}>&bull;</span>
+              <span style={{ color: '#86EFAC' }}>&bull;</span>
               <span style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                backgroundColor: appliedScope === 'district' ? '#C8E6C9' : appliedScope === 'state' ? '#FEF3C7' : '#DCFCE7',
-                color: appliedScope === 'district' ? '#1B4D3E' : appliedScope === 'state' ? '#92400E' : '#166534',
+                padding: '1px 7px',
+                borderRadius: '10px',
+                backgroundColor: appliedScope === 'district' ? '#DCFCE7' : appliedScope === 'state' ? '#FEF3C7' : '#E0F2FE',
+                color: appliedScope === 'district' ? '#166534' : appliedScope === 'state' ? '#92400E' : '#0369A1',
                 fontWeight: 600,
-                fontSize: '0.8rem'
+                fontSize: '0.75rem'
               }}>
                 {appliedScope === 'district'
                   ? `📍 Near You (${districtFilter || user?.district})`
@@ -189,7 +189,7 @@ export const Marketplace = () => {
           </div>
 
           {/* Location Quick Switcher Buttons */}
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
             {user?.district && (
               <button
                 type="button"
@@ -205,21 +205,21 @@ export const Marketplace = () => {
                   }
                 }}
                 style={{
-                  padding: '0.45rem 0.9rem',
-                  borderRadius: '20px',
-                  border: '1px solid #2E7D32',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '16px',
+                  border: '1px solid #16A34A',
                   backgroundColor: districtFilter === user.district ? '#1B4D3E' : '#FFFFFF',
                   color: districtFilter === user.district ? '#FFFFFF' : '#1B4D3E',
-                  fontSize: '0.82rem',
+                  fontSize: '0.78rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px',
-                  transition: 'all 0.15s ease'
+                  gap: '4px',
+                  transition: 'background-color 0.15s ease'
                 }}
               >
-                <MapPin size={13} />
+                <MapPin size={12} />
                 Near Me ({user.district})
               </button>
             )}
@@ -239,21 +239,21 @@ export const Marketplace = () => {
                   }
                 }}
                 style={{
-                  padding: '0.45rem 0.9rem',
-                  borderRadius: '20px',
-                  border: '1px solid #2E7D32',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '16px',
+                  border: '1px solid #16A34A',
                   backgroundColor: (stateFilter === user.state && !districtFilter) ? '#1B4D3E' : '#FFFFFF',
                   color: (stateFilter === user.state && !districtFilter) ? '#FFFFFF' : '#1B4D3E',
-                  fontSize: '0.82rem',
+                  fontSize: '0.78rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px',
-                  transition: 'all 0.15s ease'
+                  gap: '4px',
+                  transition: 'background-color 0.15s ease'
                 }}
               >
-                <MapPin size={13} />
+                <MapPin size={12} />
                 My State ({user.state})
               </button>
             )}
@@ -266,18 +266,18 @@ export const Marketplace = () => {
                 setAllIndia(true);
               }}
               style={{
-                padding: '0.45rem 0.9rem',
-                borderRadius: '20px',
-                border: '1px solid #2E7D32',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '16px',
+                border: '1px solid #16A34A',
                 backgroundColor: allIndia || (!stateFilter && !districtFilter) ? '#1B4D3E' : '#FFFFFF',
                 color: allIndia || (!stateFilter && !districtFilter) ? '#FFFFFF' : '#1B4D3E',
-                fontSize: '0.82rem',
+                fontSize: '0.78rem',
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
-                transition: 'all 0.15s ease'
+                gap: '4px',
+                transition: 'background-color 0.15s ease'
               }}
             >
               All India
@@ -287,11 +287,11 @@ export const Marketplace = () => {
       </div>
 
       {/* Search & Main Controls Row */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', width: '100%' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', width: '100%' }}>
         
         {/* Search input with Lucide Search Icon */}
-        <div style={{ flex: '1 1 280px', position: 'relative', display: 'flex', alignItems: 'center' }}>
-          <Search size={18} style={{ position: 'absolute', left: '16px', color: '#9CA3AF', pointerEvents: 'none' }} />
+        <div style={{ flex: '1 1 260px', position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '14px', color: '#94A3B8', pointerEvents: 'none' }} />
           <input
             type="text"
             placeholder="Search crops, products, or farm names..."
@@ -299,12 +299,12 @@ export const Marketplace = () => {
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              padding: '0.75rem 2.4rem 0.75rem 2.75rem',
-              borderRadius: '24px',
-              border: '1px solid #E5E7EB',
-              fontSize: '0.95rem',
+              padding: '0.55rem 2.2rem 0.55rem 2.4rem',
+              borderRadius: '20px',
+              border: '1px solid #CBD5E1',
+              fontSize: '0.88rem',
               backgroundColor: '#FFFFFF',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
               outline: 'none',
               boxSizing: 'border-box'
             }}
@@ -315,20 +315,20 @@ export const Marketplace = () => {
               onClick={() => setSearch('')}
               style={{
                 position: 'absolute',
-                right: '14px',
+                right: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                color: '#9CA3AF',
+                color: '#94A3B8',
                 display: 'flex',
                 alignItems: 'center',
                 padding: '2px'
               }}
               title="Clear search"
             >
-              <XCircle size={16} />
+              <XCircle size={15} />
             </button>
           )}
         </div>
@@ -337,15 +337,15 @@ export const Marketplace = () => {
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '5px',
           backgroundColor: '#FFFFFF',
-          border: stateFilter ? '1.5px solid #2E7D32' : '1px solid #E5E7EB',
-          borderRadius: '24px',
-          padding: '0.45rem 0.85rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          border: stateFilter ? '1.5px solid #16A34A' : '1px solid #CBD5E1',
+          borderRadius: '20px',
+          padding: '0.4rem 0.75rem',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
         }}>
-          <MapPin size={16} color={stateFilter ? '#2E7D32' : '#6B7280'} />
-          <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: 500 }}>State:</span>
+          <MapPin size={14} color={stateFilter ? '#16A34A' : '#64748B'} />
+          <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 500 }}>State:</span>
           <select
             id="market-state-select"
             value={stateFilter}
@@ -363,8 +363,8 @@ export const Marketplace = () => {
               border: 'none',
               outline: 'none',
               backgroundColor: 'transparent',
-              fontSize: '0.9rem',
-              color: stateFilter ? '#1B4D3E' : '#374151',
+              fontSize: '0.84rem',
+              color: stateFilter ? '#1B4D3E' : '#334155',
               fontWeight: 600,
               cursor: 'pointer'
             }}
@@ -384,25 +384,25 @@ export const Marketplace = () => {
                 setDistrictFilter('');
                 setAllIndia(true);
               }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: '0 2px', display: 'flex' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: '0 2px', display: 'flex' }}
               title="Reset to All States"
             >
-              <XCircle size={15} />
+              <XCircle size={14} />
             </button>
           )}
         </div>
 
         {/* Sort dropdown & Filter toggle button */}
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
             style={{
-              padding: '0.75rem 1rem',
-              borderRadius: '24px',
-              border: '1px solid #E5E7EB',
+              padding: '0.45rem 0.85rem',
+              borderRadius: '20px',
+              border: '1px solid #CBD5E1',
               backgroundColor: '#FFFFFF',
-              fontSize: '0.9rem',
+              fontSize: '0.84rem',
               color: '#1B4D3E',
               fontWeight: 600,
               cursor: 'pointer'
@@ -417,36 +417,36 @@ export const Marketplace = () => {
           <button
             onClick={() => setShowMobileFilter(!showMobileFilter)}
             style={{
-              padding: '0.75rem 1.25rem',
-              borderRadius: '24px',
-              border: '1px solid #2E7D32',
-              backgroundColor: showMobileFilter ? '#2E7D32' : '#FFFFFF',
-              color: showMobileFilter ? '#FFFFFF' : '#2E7D32',
+              padding: '0.45rem 0.95rem',
+              borderRadius: '20px',
+              border: '1px solid #16A34A',
+              backgroundColor: showMobileFilter ? '#16A34A' : '#FFFFFF',
+              color: showMobileFilter ? '#FFFFFF' : '#16A34A',
               fontWeight: 600,
-              fontSize: '0.9rem',
+              fontSize: '0.84rem',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '6px'
             }}
           >
-            <SlidersHorizontal size={16} /> Filters
+            <SlidersHorizontal size={14} /> Filters
           </button>
         </div>
       </div>
 
       {/* Category Pills */}
-      <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.35rem', marginBottom: '1.25rem' }}>
         <button
           onClick={() => setSelectedCategory('')}
           style={{
-            padding: '0.5rem 1.25rem',
-            borderRadius: '20px',
-            border: '1px solid #E5E7EB',
+            padding: '0.35rem 0.95rem',
+            borderRadius: '16px',
+            border: '1px solid #E2E8F0',
             backgroundColor: selectedCategory === '' ? '#1B4D3E' : '#FFFFFF',
-            color: selectedCategory === '' ? '#FFFFFF' : '#374151',
+            color: selectedCategory === '' ? '#FFFFFF' : '#475569',
             fontWeight: 600,
-            fontSize: '0.88rem',
+            fontSize: '0.82rem',
             cursor: 'pointer',
             whiteSpace: 'nowrap'
           }}
@@ -458,13 +458,13 @@ export const Marketplace = () => {
             key={cat.id}
             onClick={() => setSelectedCategory(cat.slug)}
             style={{
-              padding: '0.5rem 1.25rem',
-              borderRadius: '20px',
-              border: '1px solid #E5E7EB',
+              padding: '0.35rem 0.95rem',
+              borderRadius: '16px',
+              border: '1px solid #E2E8F0',
               backgroundColor: selectedCategory === cat.slug ? '#1B4D3E' : '#FFFFFF',
-              color: selectedCategory === cat.slug ? '#FFFFFF' : '#374151',
+              color: selectedCategory === cat.slug ? '#FFFFFF' : '#475569',
               fontWeight: 600,
-              fontSize: '0.88rem',
+              fontSize: '0.82rem',
               cursor: 'pointer',
               whiteSpace: 'nowrap'
             }}
@@ -676,12 +676,13 @@ export const Marketplace = () => {
 
           {/* Skeleton Loader */}
           {loading && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', padding: '1.5rem', height: '220px', animate: 'pulse' }}>
-                  <div style={{ height: '24px', backgroundColor: '#F3F4F6', borderRadius: '4px', width: '70%', marginBottom: '1rem' }} />
-                  <div style={{ height: '16px', backgroundColor: '#F3F4F6', borderRadius: '4px', width: '40%', marginBottom: '1rem' }} />
-                  <div style={{ height: '20px', backgroundColor: '#F3F4F6', borderRadius: '4px', width: '30%', marginTop: '2rem' }} />
+                <div key={n} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '1rem', height: '240px' }}>
+                  <div style={{ height: '120px', backgroundColor: '#F1F5F9', borderRadius: '8px', marginBottom: '0.75rem' }} />
+                  <div style={{ height: '16px', backgroundColor: '#F1F5F9', borderRadius: '4px', width: '75%', marginBottom: '0.5rem' }} />
+                  <div style={{ height: '14px', backgroundColor: '#F1F5F9', borderRadius: '4px', width: '45%', marginBottom: '0.75rem' }} />
+                  <div style={{ height: '18px', backgroundColor: '#F1F5F9', borderRadius: '4px', width: '35%' }} />
                 </div>
               ))}
             </div>
@@ -689,19 +690,19 @@ export const Marketplace = () => {
 
           {/* Empty State */}
           {!loading && products.length === 0 && (
-            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', padding: '3rem', textAlign: 'center' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                <PackageSearch size={54} color="#1B4D3E" />
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '2.5rem 1.5rem', textAlign: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                <PackageSearch size={44} color="#1B4D3E" />
               </div>
-              <h3 style={{ color: '#1B4D3E', marginTop: 0 }}>No products match your filters</h3>
-              <p style={{ color: '#6B7280', marginBottom: '1.5rem', maxWidth: '480px', margin: '0 auto 1.5rem auto', lineHeight: 1.5 }}>
+              <h3 style={{ color: '#1B4D3E', marginTop: 0, fontSize: '1.15rem' }}>No products match your filters</h3>
+              <p style={{ color: '#64748B', marginBottom: '1.25rem', maxWidth: '460px', margin: '0 auto 1.25rem auto', lineHeight: 1.5, fontSize: '0.86rem' }}>
                 {districtFilter
                   ? `There are no active produce listings in "${districtFilter}" yet. Clear your location filter or browse statewide produce from verified farmers.`
                   : stateFilter
                   ? `There are no active produce listings in "${stateFilter}" matching your criteria yet. You can browse produce across all India or pick another state.`
                   : 'Try clearing your search criteria or resetting filters to browse all fresh produce.'}
               </p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
                 {(districtFilter || stateFilter) && (
                   <button
                     onClick={() => {
@@ -710,37 +711,39 @@ export const Marketplace = () => {
                       setAllIndia(true);
                     }}
                     style={{
-                      padding: '0.75rem 1.5rem',
-                      borderRadius: '24px',
+                      padding: '0.55rem 1.15rem',
+                      borderRadius: '20px',
                       backgroundColor: '#1B4D3E',
                       color: '#FFFFFF',
+                      fontSize: '0.84rem',
                       fontWeight: 600,
                       border: 'none',
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '6px'
                     }}
                   >
-                    <RotateCcw size={16} /> Show All Regions (Browse All India)
+                    <RotateCcw size={14} /> Show All Regions (Browse All India)
                   </button>
                 )}
                 <button
                   onClick={handleClearFilters}
                   style={{
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '24px',
-                    backgroundColor: (districtFilter || stateFilter) ? '#F3F4F6' : '#1B4D3E',
-                    color: (districtFilter || stateFilter) ? '#374151' : '#FFFFFF',
+                    padding: '0.55rem 1.15rem',
+                    borderRadius: '20px',
+                    backgroundColor: (districtFilter || stateFilter) ? '#F1F5F9' : '#1B4D3E',
+                    color: (districtFilter || stateFilter) ? '#334155' : '#FFFFFF',
+                    fontSize: '0.84rem',
                     fontWeight: 600,
-                    border: '1px solid #E5E7EB',
+                    border: '1px solid #CBD5E1',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '6px'
                   }}
                 >
-                  <RotateCcw size={16} /> Clear All Filters
+                  <RotateCcw size={14} /> Clear All Filters
                 </button>
               </div>
             </div>
@@ -748,38 +751,34 @@ export const Marketplace = () => {
 
           {/* Product Grid */}
           {!loading && products.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
               {products.map((prod) => (
                 <div
                   key={prod.id}
                   onClick={() => navigate(`/products/${prod.slug || prod.id}`)}
                   style={{
                     backgroundColor: '#FFFFFF',
-                    border: prod.isFeatured ? '2px solid #F59E0B' : '1px solid #E5E7EB',
-                    borderRadius: '16px',
+                    border: prod.isFeatured ? '1.5px solid #F59E0B' : '1px solid #E2E8F0',
+                    borderRadius: '12px',
                     overflow: 'hidden',
-                    boxShadow: prod.isFeatured ? '0 4px 12px rgba(245, 158, 11, 0.15)' : '0 2px 6px rgba(0,0,0,0.04)',
+                    boxShadow: prod.isFeatured ? '0 2px 6px rgba(245, 158, 11, 0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
                     cursor: 'pointer',
                     position: 'relative',
                     display: 'flex',
                     flexDirection: 'column',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
-                    const img = e.currentTarget.querySelector('.prod-card-img');
-                    if (img) img.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.borderColor = '#94A3B8';
+                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.06)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.04)';
-                    const img = e.currentTarget.querySelector('.prod-card-img');
-                    if (img) img.style.transform = 'scale(1)';
+                    e.currentTarget.style.borderColor = prod.isFeatured ? '#F59E0B' : '#E2E8F0';
+                    e.currentTarget.style.boxShadow = prod.isFeatured ? '0 2px 6px rgba(245, 158, 11, 0.12)' : '0 1px 3px rgba(0,0,0,0.04)';
                   }}
                 >
                   {/* Product Image Showcase Container */}
-                  <div style={{ position: 'relative', width: '100%', height: '175px', overflow: 'hidden', backgroundColor: '#F3F4F6' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '130px', overflow: 'hidden', backgroundColor: '#F8FAFC' }}>
                     <img
                       className="prod-card-img"
                       src={getProductImageUrl(prod)}
@@ -787,8 +786,7 @@ export const Marketplace = () => {
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
-                        transition: 'transform 0.35s ease'
+                        objectFit: 'cover'
                       }}
                       onError={(e) => {
                         e.target.onerror = null;
@@ -796,11 +794,11 @@ export const Marketplace = () => {
                       }}
                     />
 
-                    {/* Gradient Overlay */}
+                    {/* Subtle Gradient Overlay */}
                     <div style={{
                       position: 'absolute',
                       inset: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%)',
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.25) 0%, transparent 55%)',
                       pointerEvents: 'none'
                     }} />
 
@@ -808,16 +806,16 @@ export const Marketplace = () => {
                     {prod.bulkDiscountPercent > 0 && (
                       <div style={{
                         position: 'absolute',
-                        top: '12px',
-                        right: '12px',
+                        top: '8px',
+                        right: '8px',
                         backgroundColor: '#FFF3E0',
                         color: '#E65100',
-                        fontSize: '0.75rem',
+                        fontSize: '0.65rem',
                         fontWeight: 700,
-                        padding: '4px 10px',
-                        borderRadius: '20px',
+                        padding: '2px 7px',
+                        borderRadius: '12px',
                         border: '1px solid #FFE0B2',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                         zIndex: 2
                       }}>
                         {prod.bulkDiscountPercent}% BULK OFF
@@ -828,57 +826,70 @@ export const Marketplace = () => {
                     {prod.isFeatured && (
                       <div style={{
                         position: 'absolute',
-                        top: '12px',
-                        left: '12px',
+                        top: '8px',
+                        left: '8px',
                         background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
                         color: '#FFFFFF',
-                        fontSize: '0.72rem',
-                        fontWeight: 800,
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        padding: '2px 7px',
+                        borderRadius: '12px',
+                        boxShadow: '0 1px 4px rgba(245, 158, 11, 0.3)',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '4px',
-                        letterSpacing: '0.04em',
+                        gap: '3px',
+                        letterSpacing: '0.02em',
                         zIndex: 2
                       }}>
-                        <Sparkles size={12} fill="#FFFFFF" /> FEATURED
+                        <Sparkles size={11} fill="#FFFFFF" /> FEATURED
                       </div>
                     )}
 
                     {/* Category Overlay Tag */}
                     <div style={{
                       position: 'absolute',
-                      bottom: '10px',
-                      left: '12px',
+                      bottom: '8px',
+                      left: '8px',
                       backgroundColor: 'rgba(27, 77, 62, 0.88)',
-                      backdropFilter: 'blur(4px)',
+                      backdropFilter: 'blur(3px)',
                       color: '#FFFFFF',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      padding: '3px 8px',
-                      borderRadius: '12px',
-                      letterSpacing: '0.4px',
+                      fontSize: '0.68rem',
+                      fontWeight: 600,
+                      padding: '2px 6px',
+                      borderRadius: '6px',
+                      letterSpacing: '0.3px',
                       textTransform: 'uppercase',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '3px'
                     }}>
-                      <Sprout size={13} /> {prod.category}
+                      <Sprout size={11} /> {prod.category}
                     </div>
                   </div>
 
                   {/* Product Details Section */}
-                  <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+                  <div style={{ padding: '0.75rem 0.85rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
                     <div>
                       {/* Title */}
-                      <h3 style={{ color: '#1B4D3E', margin: '0 0 0.5rem 0', fontSize: '1.2rem', fontFamily: 'Playfair Display, serif', lineHeight: 1.3 }}>
+                      <h3
+                        title={prod.name}
+                        style={{
+                          color: '#1B4D3E',
+                          margin: '0 0 0.3rem 0',
+                          fontSize: '0.96rem',
+                          fontFamily: 'Inter, system-ui, sans-serif',
+                          fontWeight: 600,
+                          lineHeight: 1.3,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
                         {prod.name}
                       </h3>
 
                       {/* Seller & Verification */}
-                      <div style={{ color: '#4B5563', fontSize: '0.85rem', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 500 }}>
+                      <div style={{ color: '#475569', fontSize: '0.76rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 500 }}>
                         <span
                           onClick={(e) => {
                             e.stopPropagation();
@@ -887,59 +898,75 @@ export const Marketplace = () => {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '3px',
                             cursor: 'pointer',
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '120px'
                           }}
                           onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}
-                          title="View Farmer Profile & Store"
+                          title={`Farmer: ${prod.farmerName}`}
                         >
-                          <UserCheck size={14} color="#1B4D3E" /> {prod.farmerName}
+                          <UserCheck size={12} color="#1B4D3E" /> {prod.farmerName}
                         </span>
                         {prod.verified === 'Verified' && (
                           <span
                             title="Verified Farmer"
                             style={{
-                              color: '#2E7D32',
+                              color: '#16A34A',
                               fontWeight: 700,
-                              fontSize: '0.78rem',
-                              backgroundColor: '#E8F5E9',
-                              padding: '2px 6px',
-                              borderRadius: '8px',
+                              fontSize: '0.7rem',
+                              backgroundColor: '#DCFCE7',
+                              padding: '1px 5px',
+                              borderRadius: '6px',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '3px'
+                              gap: '2px',
+                              flexShrink: 0
                             }}
                           >
-                            <BadgeCheck size={13} color="#2E7D32" /> Verified
+                            <BadgeCheck size={11} color="#16A34A" /> Verified
                           </span>
                         )}
                       </div>
 
                       {/* Location & Rating */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#6B7280', fontSize: '0.8rem', marginBottom: '1rem' }}>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <MapPin size={13} color="#6B7280" /> {prod.farmerLocation}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748B', fontSize: '0.74rem', marginBottom: '0.55rem' }}>
+                        <span
+                          title={prod.farmerLocation}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '130px'
+                          }}
+                        >
+                          <MapPin size={11} color="#64748B" /> {prod.farmerLocation}
                         </span>
                         {prod.rating > 0 && (
-                          <span style={{ color: '#E65100', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                            <Star size={13} fill="#E65100" color="#E65100" /> {prod.rating}
+                          <span style={{ color: '#E65100', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+                            <Star size={11} fill="#E65100" color="#E65100" /> {prod.rating}
                           </span>
                         )}
                       </div>
                     </div>
 
                     {/* Price & Quantity Footer */}
-                    <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '0.55rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <div>
-                        <span style={{ fontWeight: 800, fontSize: '1.3rem', color: '#E65100' }}>
+                        <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#E65100' }}>
                           ₹{prod.pricePerQuintal.toLocaleString()}
                         </span>
-                        <span style={{ fontSize: '0.8rem', color: '#6B7280' }}> / quintal</span>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}> / qtl</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#374151', fontWeight: 600, backgroundColor: '#F3F4F6', padding: '3px 8px', borderRadius: '6px' }}>
-                        Avail: {prod.availableQuantityQuintal} Qtl
+                      <div style={{ fontSize: '0.72rem', color: '#334155', fontWeight: 600, backgroundColor: '#F1F5F9', padding: '2px 6px', borderRadius: '4px' }}>
+                        {prod.availableQuantityQuintal} Qtl
                       </div>
                     </div>
                   </div>
