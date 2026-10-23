@@ -543,10 +543,19 @@ export const Navbar = () => {
                   justifyContent: 'center',
                   fontSize: '0.85rem',
                   fontWeight: 700,
-                  flexShrink: 0
+                  flexShrink: 0,
+                  overflow: 'hidden'
                 }}
               >
-                {getInitials(user.fullName)}
+                {user.profilePictureUrl ? (
+                  <img
+                    src={user.profilePictureUrl}
+                    alt={user.fullName}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  getInitials(user.fullName)
+                )}
               </div>
               <ChevronDown
                 size={14}
@@ -614,10 +623,19 @@ export const Navbar = () => {
                         fontSize: '0.95rem',
                         fontWeight: 700,
                         flexShrink: 0,
-                        boxShadow: '0 2px 5px rgba(27,77,62,0.2)'
+                        boxShadow: '0 2px 5px rgba(27,77,62,0.2)',
+                        overflow: 'hidden'
                       }}
                     >
-                      {getInitials(user.fullName)}
+                      {user.profilePictureUrl ? (
+                        <img
+                          src={user.profilePictureUrl}
+                          alt={user.fullName}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        getInitials(user.fullName)
+                      )}
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div

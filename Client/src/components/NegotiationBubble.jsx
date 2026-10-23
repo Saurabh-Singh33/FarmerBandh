@@ -24,6 +24,8 @@ export default function NegotiationBubble({ msg, isMe }) {
     );
   };
 
+  const avatarUrl = msg.senderAvatarUrl || msg.avatarUrl;
+
   return (
     <div className={`flex w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}>
       <div
@@ -35,15 +37,23 @@ export default function NegotiationBubble({ msg, isMe }) {
       >
         {/* Header: Sender Name & Timestamp */}
         <div className="flex items-center justify-between gap-3 mb-2 text-xs">
-          <div className="flex items-center gap-1.5 font-bold truncate">
+          <div className="flex items-center gap-2 font-bold truncate">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={senderName}
+                className="w-5 h-5 rounded-full object-cover shrink-0 ring-1 ring-white/60 shadow-2xs"
+              />
+            ) : null}
             {isMe ? (
-              <span className="text-emerald-100 flex items-center gap-1">
-                <span>👤</span> You ({senderName})
+              <span className="text-emerald-100 flex items-center gap-1 truncate">
+                {!avatarUrl && <span>👤</span>} You ({senderName})
               </span>
             ) : (
-              <span className="text-gray-800 flex items-center gap-1">
-                <span>{isFarmerRole ? '🌾' : '👤'}</span> {senderName}{' '}
-                <span className="text-[10px] font-semibold text-gray-500 uppercase px-1.5 py-0.2 rounded-md bg-gray-100 border border-gray-200">
+              <span className="text-gray-800 flex items-center gap-1.5 truncate">
+                {!avatarUrl && <span>{isFarmerRole ? '🌾' : '👤'}</span>}
+                <span className="truncate">{senderName}</span>
+                <span className="text-[10px] font-semibold text-gray-500 uppercase px-1.5 py-0.2 rounded-md bg-gray-100 border border-gray-200 shrink-0">
                   {senderRole || 'Partner'}
                 </span>
               </span>

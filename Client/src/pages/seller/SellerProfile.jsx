@@ -17,9 +17,11 @@ import {
   Trash2,
   AlertTriangle,
   X,
-  ShieldAlert
+  ShieldAlert,
+  Camera
 } from 'lucide-react';
 import { sellerProfileApi } from '../../services/sellerProfileApi';
+import { uploadApi } from '../../services/uploadApi';
 import { VerificationBadge } from '../../components/seller/VerificationBadge';
 import { notify } from '../../context/NotificationContext';
 import { useSeller } from '../../context/SellerContext';
@@ -38,6 +40,9 @@ export const SellerProfile = () => {
   const [showNewPwd, setShowNewPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
 
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = React.useRef(null);
+
   // Tab 1: Profile form
   const [profileForm, setProfileForm] = useState({
     fullName: '',
@@ -47,7 +52,8 @@ export const SellerProfile = () => {
     district: '',
     state: '',
     phone: '',
-    bio: ''
+    bio: '',
+    profilePictureUrl: ''
   });
 
   // Tab 2: Password form
@@ -94,7 +100,8 @@ export const SellerProfile = () => {
             district: prof.district || '',
             state: prof.state || '',
             phone: prof.phone || '+919508461241',
-            bio: prof.bio || ''
+            bio: prof.bio || '',
+            profilePictureUrl: prof.profilePictureUrl || prof.avatarUrl || ''
           });
         }
 
@@ -118,6 +125,79 @@ export const SellerProfile = () => {
     loadAll();
   }, []);
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      notify.error('File size exceeds 5MB limit. Please choose a smaller image.');
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+      const res = await uploadApi.uploadImage(file);
+      const photoUrl = res.url || res.relativeUrl;
+      setProfileForm((prev) => ({ ...prev, profilePictureUrl: photoUrl }));
+
+      await sellerProfileApi.updateProfile({
+        farmName: profileForm.farmName.trim() || 'My Farm',
+        fullName: profileForm.fullName.trim() || undefined,
+        email: profileForm.email.trim(),
+        phone: profileForm.phone.trim() || '+919508461241',
+        location: profileForm.location.trim(),
+        district: profileForm.district.trim(),
+        state: profileForm.state.trim(),
+        bio: profileForm.bio.trim() || undefined,
+        profilePictureUrl: photoUrl
+      });
+
+      updateUser({
+        profilePictureUrl: photoUrl
+      });
+
+      notify.success('Seller profile picture updated successfully!');
+      refreshDashboard();
+    } catch (err) {
+      console.error('Photo upload failed:', err);
+      notify.error(err?.response?.data?.message || err?.message || 'Failed to upload seller picture.');
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      setUploadingPhoto(true);
+      setProfileForm((prev) => ({ ...prev, profilePictureUrl: '' }));
+
+      await sellerProfileApi.updateProfile({
+        farmName: profileForm.farmName.trim() || 'My Farm',
+        fullName: profileForm.fullName.trim() || undefined,
+        email: profileForm.email.trim(),
+        phone: profileForm.phone.trim() || '+919508461241',
+        location: profileForm.location.trim(),
+        district: profileForm.district.trim(),
+        state: profileForm.state.trim(),
+        bio: profileForm.bio.trim() || undefined,
+        profilePictureUrl: ''
+      });
+
+      updateUser({
+        profilePictureUrl: null
+      });
+
+      notify.success('Seller picture removed. Reverted to default.');
+      refreshDashboard();
+    } catch (err) {
+      console.error('Photo removal failed:', err);
+      notify.error(err?.response?.data?.message || err?.message || 'Failed to remove picture.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (!profileForm.farmName.trim()) {
@@ -139,12 +219,14 @@ export const SellerProfile = () => {
         location: profileForm.location.trim(),
         district: profileForm.district.trim(),
         state: profileForm.state.trim(),
-        bio: profileForm.bio.trim() || undefined
+        bio: profileForm.bio.trim() || undefined,
+        profilePictureUrl: profileForm.profilePictureUrl || undefined
       });
 
       updateUser({
         email: profileForm.email.trim(),
-        fullName: profileForm.fullName.trim()
+        fullName: profileForm.fullName.trim(),
+        profilePictureUrl: profileForm.profilePictureUrl || null
       });
 
       notify.success('Farm profile, Gmail, and Razorpay phone saved successfully.');
@@ -335,7 +417,136 @@ export const SellerProfile = () => {
             boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}
         >
-          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Seller / Farm Profile Picture Card */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1.25rem',
+                padding: '1.25rem',
+                backgroundColor: '#F9FAFB',
+                borderRadius: '10px',
+                border: '1px solid #E5E7EB'
+              }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handlePhotoUpload}
+                style={{ display: 'none' }}
+              />
+
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                {profileForm.profilePictureUrl ? (
+                  <img
+                    src={profileForm.profilePictureUrl}
+                    alt={profileForm.farmName || profileForm.fullName}
+                    style={{
+                      width: '72px',
+                      height: '72px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid #FFFFFF',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '72px',
+                      height: '72px',
+                      borderRadius: '50%',
+                      backgroundColor: '#1B4D3E',
+                      color: '#FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem',
+                      fontWeight: 800,
+                      border: '3px solid #FFFFFF',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {(profileForm.farmName || profileForm.fullName || 'F').charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 0,
+                    width: '26px',
+                    height: '26px',
+                    borderRadius: '50%',
+                    backgroundColor: '#1B4D3E',
+                    color: '#FFFFFF',
+                    border: '2px solid #FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                  }}
+                  title="Upload / Change Photo"
+                >
+                  {uploadingPhoto ? <RefreshCw size={12} className="spin-animate" /> : <Camera size={12} />}
+                </button>
+              </div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111827' }}>
+                  Farm & Seller Profile Photo
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#6B7280', marginTop: '2px', lineHeight: 1.4 }}>
+                  This picture appears in buyer negotiation chats, your product listing badges, and order details.
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                    style={{
+                      padding: '0.35rem 0.75rem',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      backgroundColor: '#1B4D3E',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {uploadingPhoto ? 'Uploading...' : (profileForm.profilePictureUrl ? 'Change Photo' : 'Upload Photo')}
+                  </button>
+                  {profileForm.profilePictureUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      disabled={uploadingPhoto}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        backgroundColor: '#FEF2F2',
+                        color: '#DC2626',
+                        border: '1px solid #FECACA',
+                        borderRadius: '6px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>

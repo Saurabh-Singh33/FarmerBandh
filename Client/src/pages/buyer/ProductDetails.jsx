@@ -668,10 +668,13 @@ export const ProductDetails = () => {
 
       {/* Negotiate Price Modal */}
       {showNegotiateModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
+        <div
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-200"
+          style={{ zIndex: 1000 }}
+        >
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] flex flex-col my-auto animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-emerald-50/80 via-teal-50/40 to-white">
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-emerald-50/80 via-teal-50/40 to-white shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#15803D] to-teal-700 text-white flex items-center justify-center text-xl font-bold shadow-md shadow-emerald-800/20 shrink-0">
                   🤝
@@ -701,7 +704,7 @@ export const ProductDetails = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmitNegotiation} className="p-5 sm:p-6 space-y-4">
+            <form onSubmit={handleSubmitNegotiation} className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
               {/* Quick Target Discount Chips */}
               <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 shadow-2xs">
                 <div className="flex items-center justify-between mb-2">
@@ -860,7 +863,7 @@ export const ProductDetails = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-2 border-t border-slate-100 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowNegotiateModal(false)}

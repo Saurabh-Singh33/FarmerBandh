@@ -345,10 +345,19 @@ export const FarmerSidebar = () => {
               justifyContent: 'center',
               fontWeight: 700,
               fontSize: '0.78rem',
-              flexShrink: 0
+              flexShrink: 0,
+              overflow: 'hidden'
             }}
           >
-            {getInitials(user?.fullName)}
+            {user?.profilePictureUrl ? (
+              <img
+                src={user.profilePictureUrl}
+                alt={user?.fullName || 'Seller'}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              getInitials(user?.fullName)
+            )}
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div

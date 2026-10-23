@@ -18,9 +18,11 @@ import {
   Edit3,
   X,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Camera
 } from 'lucide-react';
 import { buyerProfileApi } from '../../services/buyerProfileApi';
+import { uploadApi } from '../../services/uploadApi';
 import { notify } from '../../context/NotificationContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -34,6 +36,8 @@ export const BuyerProfile = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [initialProfile, setInitialProfile] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -64,6 +68,7 @@ export const BuyerProfile = () => {
     pincode: '',
     preferredState: '',
     preferredDistrict: '',
+    profilePictureUrl: '',
     memberSince: null,
     totalOrders: 0
   });
@@ -103,6 +108,7 @@ export const BuyerProfile = () => {
           pincode: data.pincode || '',
           preferredState: data.preferredState || '',
           preferredDistrict: data.preferredDistrict || '',
+          profilePictureUrl: data.profilePictureUrl || authUser?.profilePictureUrl || '',
           memberSince: data.memberSince,
           totalOrders: data.totalOrders || 0
         };
@@ -148,6 +154,81 @@ export const BuyerProfile = () => {
     setPasswordForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      notify.error('File size exceeds 5MB limit. Please choose a smaller image.');
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+      const res = await uploadApi.uploadImage(file);
+      const photoUrl = res.url || res.relativeUrl;
+      setProfile((prev) => ({ ...prev, profilePictureUrl: photoUrl }));
+
+      await buyerProfileApi.updateProfile({
+        fullName: profile.fullName || authUser?.fullName || 'Buyer',
+        email: profile.email || authUser?.email || '',
+        phone: profile.phone || '',
+        defaultAddressLine: profile.defaultAddressLine || '',
+        city: profile.city || '',
+        state: profile.state || '',
+        district: profile.district || '',
+        pincode: profile.pincode || '',
+        preferredState: profile.preferredState || '',
+        preferredDistrict: profile.preferredDistrict || '',
+        profilePictureUrl: photoUrl
+      });
+
+      if (updateUser) {
+        updateUser({ profilePictureUrl: photoUrl });
+      }
+
+      notify.success('Profile picture updated successfully!');
+    } catch (err) {
+      console.error('Photo upload failed:', err);
+      notify.error(err.response?.data?.message || err.message || 'Failed to upload profile picture.');
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      setUploadingPhoto(true);
+      setProfile((prev) => ({ ...prev, profilePictureUrl: '' }));
+
+      await buyerProfileApi.updateProfile({
+        fullName: profile.fullName || authUser?.fullName || 'Buyer',
+        email: profile.email || authUser?.email || '',
+        phone: profile.phone || '',
+        defaultAddressLine: profile.defaultAddressLine || '',
+        city: profile.city || '',
+        state: profile.state || '',
+        district: profile.district || '',
+        pincode: profile.pincode || '',
+        preferredState: profile.preferredState || '',
+        preferredDistrict: profile.preferredDistrict || '',
+        profilePictureUrl: ''
+      });
+
+      if (updateUser) {
+        updateUser({ profilePictureUrl: null });
+      }
+
+      notify.success('Profile picture removed. Reverted to initials.');
+    } catch (err) {
+      console.error('Photo remove failed:', err);
+      notify.error(err.response?.data?.message || err.message || 'Failed to remove picture.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleSaveProfile = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!profile.fullName.trim()) {
@@ -171,7 +252,8 @@ export const BuyerProfile = () => {
         district: profile.district.trim(),
         pincode: profile.pincode.trim(),
         preferredState: profile.preferredState.trim(),
-        preferredDistrict: profile.preferredDistrict.trim()
+        preferredDistrict: profile.preferredDistrict.trim(),
+        profilePictureUrl: profile.profilePictureUrl || undefined
       });
 
       // Synchronize frontend auth user context immediately so Navbar updates
@@ -181,7 +263,8 @@ export const BuyerProfile = () => {
           email: updated.email,
           state: updated.state,
           district: updated.district,
-          city: updated.city
+          city: updated.city,
+          profilePictureUrl: updated.profilePictureUrl ?? profile.profilePictureUrl
         });
       }
 
@@ -327,9 +410,37 @@ export const BuyerProfile = () => {
         {/* User Identity Overview Card */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[#1B4D3E] text-white flex items-center justify-center text-xl font-bold shrink-0 shadow-sm ring-4 ring-emerald-50">
-              {getInitials(profile.fullName || authUser?.fullName)}
+            <div className="relative group shrink-0">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              {profile.profilePictureUrl ? (
+                <img
+                  src={profile.profilePictureUrl}
+                  alt={profile.fullName}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-sm ring-4 ring-emerald-50 border border-slate-200"
+                />
+              ) : (
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#1B4D3E] text-white flex items-center justify-center text-xl sm:text-2xl font-bold shrink-0 shadow-sm ring-4 ring-emerald-50">
+                  {getInitials(profile.fullName || authUser?.fullName)}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#1B4D3E] text-white shadow-md hover:bg-[#143B2F] transition-all ring-2 ring-white cursor-pointer disabled:opacity-50"
+                title="Upload or change profile picture"
+              >
+                {uploadingPhoto ? <RefreshCw size={13} className="spin-animate" /> : <Camera size={13} />}
+              </button>
             </div>
+
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <span className="text-lg sm:text-xl font-bold text-slate-900 font-sans">
@@ -338,6 +449,31 @@ export const BuyerProfile = () => {
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]">
                   <ShieldCheck size={13} strokeWidth={2.5} /> Verified Buyer
                 </span>
+              </div>
+
+              {/* Photo Actions Link */}
+              <div className="flex items-center gap-2 mt-1 mb-1">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                  className="text-xs font-semibold text-[#1B4D3E] hover:underline cursor-pointer"
+                >
+                  {profile.profilePictureUrl ? 'Change Photo' : 'Upload Profile Photo'}
+                </button>
+                {profile.profilePictureUrl && (
+                  <>
+                    <span className="text-slate-300 text-xs">·</span>
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      disabled={uploadingPhoto}
+                      className="text-xs font-medium text-rose-600 hover:underline cursor-pointer"
+                    >
+                      Remove Photo
+                    </button>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-3 sm:gap-4 mt-1 text-xs sm:text-sm text-slate-500 flex-wrap">
                 <span className="inline-flex items-center gap-1.5">
