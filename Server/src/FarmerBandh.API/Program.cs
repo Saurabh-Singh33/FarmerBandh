@@ -55,6 +55,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBuyerProfileService, BuyerProfileService>();
 
 // Phase 4 Repositories & Services
 builder.Services.AddScoped<ITimelineRepository, TimelineRepository>();
