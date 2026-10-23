@@ -425,7 +425,7 @@ export const OrderTracking = () => {
               </span>
             </span>
 
-            {order.paymentStatus?.toLowerCase() !== 'paid' && (
+            {order.paymentStatus?.toLowerCase() !== 'paid' && order.paymentMethod?.toLowerCase() !== 'cod' && order.paymentMethod !== '4' && (
               <>
                 <span className="text-slate-300">•</span>
                 <button
@@ -433,7 +433,7 @@ export const OrderTracking = () => {
                   onClick={() => setShowRazorpayPayModal(true)}
                   className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors inline-flex items-center gap-1 active:scale-95"
                 >
-                  ⚡ Pay via Razorpay UI
+                  ⚡ Pay via Razorpay
                 </button>
               </>
             )}
@@ -454,52 +454,73 @@ export const OrderTracking = () => {
         </div>
       </div>
 
-      {/* Razorpay Payment Quick Action Banner */}
-      <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm flex-shrink-0">
-            ⚡
-          </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-bold text-slate-900 text-sm">Razorpay Payment Integration</span>
-              <span className="font-mono text-xs bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded font-semibold border border-blue-200">
-                {RAZORPAY_PAYMENT_LINK_ID}
-              </span>
-              <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                order.paymentStatus?.toLowerCase() === 'paid'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                  : 'bg-amber-100 text-amber-800 border border-amber-200'
-              }`}>
-                {order.paymentStatus?.toLowerCase() === 'paid' ? '✓ Paid' : 'Payment Due'}
-              </span>
+      {/* Payment Information Status Banner */}
+      {order.paymentStatus?.toLowerCase() === 'paid' ? (
+        <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shadow-sm flex-shrink-0">
+              ✓
             </div>
-            <div className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-2">
-              <span>Link: <a href={RAZORPAY_PAYMENT_LINK_URL} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline font-medium">{RAZORPAY_PAYMENT_LINK_URL}</a></span>
-              <span>•</span>
-              <span>Flexible payments allowed: Pay less or more than ₹100,000</span>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-bold text-slate-900 text-sm">Payment Completed</span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  ✓ Paid in Full
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                ₹{Number(order.totalAmount).toLocaleString('en-IN')} paid securely via {order.paymentMethod || 'Razorpay'}. No balance due.
+              </div>
             </div>
           </div>
         </div>
+      ) : (order.paymentMethod?.toLowerCase() === 'cod' || order.paymentMethod === '4') ? (
+        <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold text-base shadow-sm flex-shrink-0">
+              💵
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-bold text-slate-900 text-sm">Cash on Delivery (COD)</span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  Pay on Delivery
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-600 mt-0.5">
+                Please keep exact cash of ₹{Number(order.totalAmount).toLocaleString('en-IN')} ready upon produce delivery.
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm flex-shrink-0">
+              ⚡
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-bold text-slate-900 text-sm">Razorpay Payment Pending</span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  Payment Due
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Complete payment of ₹{Number(order.totalAmount).toLocaleString('en-IN')} securely via Razorpay.
+              </div>
+            </div>
+          </div>
 
-        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowRazorpayPayModal(true)}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 active:scale-95"
           >
-            {order.paymentStatus?.toLowerCase() === 'paid' ? 'View Razorpay UI' : '⚡ Pay via Razorpay UI'}
+            ⚡ Pay via Razorpay
           </button>
-          <a
-            href={RAZORPAY_PAYMENT_LINK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold rounded-xl shadow-xs transition-colors flex items-center gap-1"
-          >
-            Open Link
-          </a>
         </div>
-      </div>
+      )}
 
       {/* Cancellation Banner if Cancelled */}
       {isCancelled && (

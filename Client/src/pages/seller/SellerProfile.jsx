@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   User,
   Lock,
@@ -18,7 +18,8 @@ import {
   AlertTriangle,
   X,
   ShieldAlert,
-  Camera
+  Camera,
+  Edit3
 } from 'lucide-react';
 import { sellerProfileApi } from '../../services/sellerProfileApi';
 import { uploadApi } from '../../services/uploadApi';
@@ -29,11 +30,14 @@ import { useAuth } from '../../context/AuthContext';
 
 export const SellerProfile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { verificationStatus, refreshDashboard } = useSeller();
   const { updateUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('profile'); // profile | password | settings
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [initialProfileForm, setInitialProfileForm] = useState(null);
 
   // Password visibility states
   const [showCurrentPwd, setShowCurrentPwd] = useState(false);
@@ -83,6 +87,14 @@ export const SellerProfile = () => {
   const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('edit') === 'true') {
+      setActiveTab('profile');
+      setIsEditing(true);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
     const loadAll = async () => {
       try {
         setLoading(true);
@@ -92,7 +104,7 @@ export const SellerProfile = () => {
         ]);
 
         if (prof) {
-          setProfileForm({
+          const loaded = {
             fullName: prof.name || prof.fullName || '',
             email: prof.email || '',
             farmName: prof.farmName || '',
@@ -102,7 +114,9 @@ export const SellerProfile = () => {
             phone: prof.phone || '+919508461241',
             bio: prof.bio || '',
             profilePictureUrl: prof.profilePictureUrl || prof.avatarUrl || ''
-          });
+          };
+          setProfileForm(loaded);
+          setInitialProfileForm(loaded);
         }
 
         if (setts) {
@@ -125,6 +139,22 @@ export const SellerProfile = () => {
     loadAll();
   }, []);
 
+  const handleStartEdit = () => {
+    setIsEditing(true);
+    setTimeout(() => {
+      const input = document.querySelector('input[name="fullName"]');
+      if (input) input.focus();
+    }, 50);
+  };
+
+  const handleCancelEdit = () => {
+    if (initialProfileForm) {
+      setProfileForm({ ...initialProfileForm });
+    }
+    setIsEditing(false);
+    notify.info('Edits cancelled. Reverted to saved farm profile.');
+  };
+
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -139,6 +169,7 @@ export const SellerProfile = () => {
       const res = await uploadApi.uploadImage(file);
       const photoUrl = res.url || res.relativeUrl;
       setProfileForm((prev) => ({ ...prev, profilePictureUrl: photoUrl }));
+      setInitialProfileForm((prev) => (prev ? { ...prev, profilePictureUrl: photoUrl } : prev));
 
       await sellerProfileApi.updateProfile({
         farmName: profileForm.farmName.trim() || 'My Farm',
@@ -171,6 +202,7 @@ export const SellerProfile = () => {
     try {
       setUploadingPhoto(true);
       setProfileForm((prev) => ({ ...prev, profilePictureUrl: '' }));
+      setInitialProfileForm((prev) => (prev ? { ...prev, profilePictureUrl: '' } : prev));
 
       await sellerProfileApi.updateProfile({
         farmName: profileForm.farmName.trim() || 'My Farm',
@@ -199,7 +231,7 @@ export const SellerProfile = () => {
   };
 
   const handleSaveProfile = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (!profileForm.farmName.trim()) {
       notify.error('Farm name is required.');
       return;
@@ -229,7 +261,9 @@ export const SellerProfile = () => {
         profilePictureUrl: profileForm.profilePictureUrl || null
       });
 
-      notify.success('Farm profile, Gmail, and Razorpay phone saved successfully.');
+      setInitialProfileForm({ ...profileForm });
+      setIsEditing(false);
+      notify.success('Farm profile saved in database successfully.');
       refreshDashboard();
     } catch (err) {
       console.error('Error updating profile:', err);
@@ -418,6 +452,137 @@ export const SellerProfile = () => {
           }}
         >
           <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Form Header: Status Badge & Quick Action Controls */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+                paddingBottom: '0.75rem',
+                borderBottom: '1px solid #F3F4F6'
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', margin: 0 }}>
+                  Farm & Seller Information
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: '2px 0 0 0' }}>
+                  {isEditing
+                    ? 'Editing mode active — make your updates and click "Save in DB".'
+                    : 'Viewing saved information from the database. Click "Edit Profile" to modify.'}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {isEditing ? (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '4px 10px',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      backgroundColor: '#FEF3C7',
+                      color: '#92400E',
+                      border: '1px solid #FDE68A'
+                    }}
+                  >
+                    <Edit3 size={12} /> Editing Mode Active
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '4px 10px',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      backgroundColor: '#ECFDF5',
+                      color: '#065F46',
+                      border: '1px solid #A7F3D0'
+                    }}
+                  >
+                    <CheckCircle2 size={12} /> Saved in Database
+                  </span>
+                )}
+
+                {!isEditing ? (
+                  <button
+                    type="button"
+                    onClick={handleStartEdit}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '0.45rem 0.95rem',
+                      borderRadius: '8px',
+                      backgroundColor: '#FFFFFF',
+                      color: '#1B4D3E',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      border: '1.5px solid #1B4D3E',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    title="Click to edit farm information"
+                  >
+                    <Edit3 size={14} /> Edit
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    disabled={saving}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '8px',
+                      backgroundColor: '#F3F4F6',
+                      color: '#4B5563',
+                      fontWeight: 600,
+                      fontSize: '0.82rem',
+                      border: '1px solid #D1D5DB',
+                      cursor: saving ? 'not-allowed' : 'pointer'
+                    }}
+                    title="Discard changes"
+                  >
+                    <X size={14} /> Cancel
+                  </button>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={saving || !isEditing}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '0.45rem 1rem',
+                    borderRadius: '8px',
+                    backgroundColor: isEditing ? '#1B4D3E' : '#E5E7EB',
+                    color: isEditing ? '#FFFFFF' : '#9CA3AF',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    border: 'none',
+                    cursor: saving || !isEditing ? 'not-allowed' : 'pointer',
+                    boxShadow: isEditing ? '0 2px 4px rgba(27,77,62,0.2)' : 'none',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title={isEditing ? 'Save changes to database' : 'Profile is already saved in database'}
+                >
+                  <Save size={14} /> {saving ? 'Saving...' : 'Save in DB'}
+                </button>
+              </div>
+            </div>
+
             {/* Seller / Farm Profile Picture Card */}
             <div
               style={{
@@ -554,18 +719,24 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="text"
+                  name="fullName"
                   required
+                  disabled={!isEditing}
                   placeholder="e.g. Ramesh Patel"
                   value={profileForm.fullName}
                   onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
               </div>
@@ -581,18 +752,24 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
+                  disabled={!isEditing}
                   placeholder="e.g. farmer@gmail.com"
                   value={profileForm.email}
                   onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
                 <span style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '4px', display: 'block' }}>
@@ -608,18 +785,24 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="text"
+                  name="farmName"
                   required
+                  disabled={!isEditing}
                   placeholder="e.g. Ramesh Farms, Patel Agro Lands"
                   value={profileForm.farmName}
                   onChange={(e) => setProfileForm({ ...profileForm, farmName: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
               </div>
@@ -635,25 +818,31 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="tel"
+                  name="phone"
                   required
+                  disabled={!isEditing}
                   placeholder="+919508461241"
                   value={profileForm.phone}
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', flexWrap: 'wrap', gap: '4px' }}>
                   <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>
                     Integrated with Razorpay payment checkout & buyer coordination.
                   </span>
-                  {profileForm.phone !== '+919508461241' && (
+                  {isEditing && profileForm.phone !== '+919508461241' && (
                     <button
                       type="button"
                       onClick={() => setProfileForm({ ...profileForm, phone: '+919508461241' })}
@@ -682,18 +871,24 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="text"
+                  name="location"
                   required
+                  disabled={!isEditing}
                   placeholder="e.g. Sanand, Bavla"
                   value={profileForm.location}
                   onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
               </div>
@@ -704,18 +899,24 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="text"
+                  name="district"
                   required
+                  disabled={!isEditing}
                   placeholder="e.g. Ahmedabad"
                   value={profileForm.district}
                   onChange={(e) => setProfileForm({ ...profileForm, district: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
               </div>
@@ -726,18 +927,24 @@ export const SellerProfile = () => {
                 </label>
                 <input
                   type="text"
+                  name="state"
                   required
+                  disabled={!isEditing}
                   placeholder="e.g. Gujarat"
                   value={profileForm.state}
                   onChange={(e) => setProfileForm({ ...profileForm, state: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    border: '1px solid #D1D5DB',
+                    border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '0.9rem',
                     boxSizing: 'border-box',
-                    outline: 'none'
+                    outline: 'none',
+                    backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                    color: isEditing ? '#111827' : '#4B5563',
+                    cursor: isEditing ? 'text' : 'not-allowed',
+                    transition: 'all 0.15s ease'
                   }}
                 />
               </div>
@@ -749,19 +956,25 @@ export const SellerProfile = () => {
               </label>
               <textarea
                 rows={4}
+                name="bio"
                 maxLength={1000}
+                disabled={!isEditing}
                 placeholder="Share your farming journey, organic cultivation methods, soil health practices, family legacy..."
                 value={profileForm.bio}
                 onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.85rem',
-                  border: '1px solid #D1D5DB',
+                  border: isEditing ? '1.5px solid #10B981' : '1px solid #D1D5DB',
                   borderRadius: '8px',
                   fontSize: '0.9rem',
                   boxSizing: 'border-box',
                   outline: 'none',
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
+                  backgroundColor: isEditing ? '#FFFFFF' : '#F9FAFB',
+                  color: isEditing ? '#111827' : '#4B5563',
+                  cursor: isEditing ? 'text' : 'not-allowed',
+                  transition: 'all 0.15s ease'
                 }}
               />
               <div style={{ textAlign: 'right', fontSize: '0.75rem', color: '#9CA3AF', marginTop: '4px' }}>
@@ -769,27 +982,130 @@ export const SellerProfile = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={saving}
+            {/* Bottom Action Bar: Edit, Cancel, Save in DB & Status */}
+            <div
               style={{
-                alignSelf: 'flex-start',
-                display: 'inline-flex',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '0.75rem 1.6rem',
-                borderRadius: '8px',
-                backgroundColor: '#1B4D3E',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                border: 'none',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                boxShadow: '0 2px 4px rgba(27,77,62,0.2)'
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                paddingTop: '1.25rem',
+                borderTop: '1px solid #E5E7EB'
               }}
             >
-              <Save size={16} /> {saving ? 'Saving...' : 'Update Farm Profile'}
-            </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                {!isEditing ? (
+                  <button
+                    type="button"
+                    onClick={handleStartEdit}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '0.75rem 1.6rem',
+                      borderRadius: '8px',
+                      backgroundColor: '#FFFFFF',
+                      color: '#1B4D3E',
+                      fontWeight: 700,
+                      fontSize: '0.92rem',
+                      border: '1.5px solid #1B4D3E',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                      transition: 'all 0.15s ease'
+                    }}
+                    title="Click to edit farm information"
+                  >
+                    <Edit3 size={16} /> Edit Profile
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    disabled={saving}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '0.75rem 1.4rem',
+                      borderRadius: '8px',
+                      backgroundColor: '#F3F4F6',
+                      color: '#4B5563',
+                      fontWeight: 600,
+                      fontSize: '0.92rem',
+                      border: '1px solid #D1D5DB',
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    title="Discard changes and revert to saved data"
+                  >
+                    <X size={16} /> Discard & Cancel
+                  </button>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={saving || !isEditing}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '0.75rem 1.75rem',
+                    borderRadius: '8px',
+                    backgroundColor: isEditing ? '#1B4D3E' : '#E5E7EB',
+                    color: isEditing ? '#FFFFFF' : '#9CA3AF',
+                    fontWeight: 700,
+                    fontSize: '0.92rem',
+                    border: 'none',
+                    cursor: saving || !isEditing ? 'not-allowed' : 'pointer',
+                    boxShadow: isEditing ? '0 2px 5px rgba(27,77,62,0.25)' : 'none',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title={isEditing ? 'Save changes to database' : 'Profile is currently saved in database'}
+                >
+                  <Save size={16} /> {saving ? 'Saving in DB...' : 'Save in DB'}
+                </button>
+              </div>
+
+              {/* Status Indicator */}
+              <div>
+                {isEditing ? (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 14px',
+                      borderRadius: '9999px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      backgroundColor: '#FEF3C7',
+                      color: '#92400E',
+                      border: '1px solid #FDE68A'
+                    }}
+                  >
+                    <Edit3 size={13} /> Editing Mode Active · Click "Save in DB" when done
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 14px',
+                      borderRadius: '9999px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      backgroundColor: '#ECFDF5',
+                      color: '#065F46',
+                      border: '1px solid #A7F3D0'
+                    }}
+                  >
+                    <CheckCircle2 size={13} /> Saved in Database (Read Only)
+                  </span>
+                )}
+              </div>
+            </div>
           </form>
 
           {/* Quick Link to Account Deletion */}

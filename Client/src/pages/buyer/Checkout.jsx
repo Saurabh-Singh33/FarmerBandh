@@ -35,8 +35,8 @@ export const Checkout = () => {
   const [deliverySlotDate, setDeliverySlotDate] = useState(tomorrow.toISOString().split('T')[0]);
   const [deliverySlotWindow, setDeliverySlotWindow] = useState('Morning (8 AM - 12 PM)');
 
-  // Payment method state (1 = COD, 2 = UPI, 3 = NetBanking, 4 = Card, 5 = Razorpay Payment Link)
-  const [paymentMethod, setPaymentMethod] = useState(5); // Razorpay default
+  // Payment method state: 5 = Razorpay (Online Payment), 4 = COD (Cash on Delivery)
+  const [paymentMethod, setPaymentMethod] = useState(5);
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
   const [razorpayPaidData, setRazorpayPaidData] = useState(null);
 
@@ -123,7 +123,8 @@ export const Checkout = () => {
       navigate('/order-confirmation', { 
         state: { 
           orderResult: result,
-          razorpayPayment: razorpayPaidData 
+          razorpayPayment: paymentMethod === 5 ? razorpayPaidData : null,
+          isCod: paymentMethod === 4
         } 
       });
     } catch (err) {
@@ -388,15 +389,18 @@ export const Checkout = () => {
                 {[
                   {
                     id: 5,
-                    name: '⚡ Razorpay Instant Payment Link (UPI / Cards / NetBanking / QR)',
-                    desc: 'Official Razorpay gateway (plink_Tqe4bgUXaopgZ0) • Flexible custom amounts (less or more than ₹100,000)',
+                    name: '⚡ Razorpay Online Payment (UPI, Cards, NetBanking, QR)',
+                    desc: 'Pay securely using Google Pay, PhonePe, Paytm, UPI, Credit/Debit Cards, or NetBanking.',
                     badge: 'Recommended',
                     isRazorpay: true
                   },
-                  { id: 2, name: 'UPI / BHIM / Google Pay', desc: 'Instant UPI payment confirmation' },
-                  { id: 4, name: 'Credit / Debit Card', desc: 'Pay via Visa, Mastercard, RuPay' },
-                  { id: 3, name: 'Net Banking', desc: 'All major Indian banks supported' },
-                  { id: 1, name: 'Cash on Delivery (COD)', desc: 'Pay cash directly to farmer/transporter on delivery' }
+                  { 
+                    id: 4, 
+                    name: '💵 Cash on Delivery (COD)', 
+                    desc: 'Pay with cash directly to the farmer/delivery partner when your produce is delivered.',
+                    badge: 'Pay on Delivery',
+                    isRazorpay: false 
+                  }
                 ].map((pm) => (
                   <label
                     key={pm.id}
@@ -419,7 +423,11 @@ export const Checkout = () => {
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-slate-900 text-sm">{pm.name}</span>
                             {pm.badge && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                pm.isRazorpay
+                                  ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                  : 'bg-amber-100 text-amber-800 border border-amber-200'
+                              }`}>
                                 {pm.badge}
                               </span>
                             )}
@@ -446,9 +454,9 @@ export const Checkout = () => {
                     {pm.isRazorpay && paymentMethod === pm.id && (
                       <div className="mt-3 pt-3 border-t border-emerald-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-semibold text-slate-700">Link ID:</span>
+                          <span className="font-semibold text-slate-700">Gateway:</span>
                           <span className="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-blue-700 font-bold">
-                            {RAZORPAY_PAYMENT_LINK_ID}
+                            Razorpay Verified
                           </span>
                         </div>
                         {razorpayPaidData ? (
@@ -457,7 +465,7 @@ export const Checkout = () => {
                           </div>
                         ) : (
                           <span className="text-[11px] text-blue-800 font-medium">
-                            Click 'Review Order' to launch authentic Razorpay payment UI
+                            Click 'Open Razorpay UI' or proceed to place order to pay securely
                           </span>
                         )}
                       </div>

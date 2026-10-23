@@ -195,127 +195,45 @@ export const RazorpayPaymentModal = ({
                   INR {selectedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
 
-                {/* Due vs Paid stats */}
                 <div className="mt-3 flex items-center justify-between text-xs font-bold text-slate-500">
                   <span className="text-slate-700">
-                    INR {remainingDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })} DUE
+                    Order Total: INR {selectedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
-                  <span className="text-emerald-700">
-                    INR {selectedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} PAID
+                  <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    Full Payment
                   </span>
-                </div>
-
-                {/* Progress bar */}
-                <div className="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                  <div 
-                    className="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${paidPercent}%` }}
-                  />
-                  <div 
-                    className="bg-slate-200 h-full transition-all duration-300"
-                    style={{ width: `${100 - paidPercent}%` }}
-                  />
                 </div>
               </div>
 
-              {/* Flexible Amount Controller (Pay Less or More than 100,000) */}
-              <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Pay Less or More Amount:
-                  </span>
-                  <span className="text-[11px] text-slate-500">Partial & Full Allowed</span>
+              {/* Order Security & Payment Guarantees */}
+              <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+                <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" /> Razorpay Verified Escrow & Settlement
                 </div>
-
-                {/* Preset Chips */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {[
-                    { label: '₹100,000 (Default)', value: 100000 },
-                    ...(orderTotal && orderTotal !== 100000 ? [{ label: `₹${orderTotal.toLocaleString()} (Order Total)`, value: orderTotal }] : []),
-                    { label: '₹50,000 (Advance)', value: 50000 },
-                    { label: '₹10,000 (Deposit)', value: 10000 },
-                    { label: 'Custom', value: 'custom' }
-                  ].map((chip) => {
-                    const isSelected = chip.value === 'custom' ? isCustomMode : (!isCustomMode && selectedAmount === chip.value);
-                    return (
-                      <button
-                        key={chip.label}
-                        type="button"
-                        onClick={() => {
-                          if (chip.value === 'custom') {
-                            setIsCustomMode(true);
-                          } else {
-                            setIsCustomMode(false);
-                            handleAmountChange(chip.value);
-                          }
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                          isSelected
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                            : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
-                        }`}
-                      >
-                        {chip.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Custom Amount Input Field */}
-                {(isCustomMode || ![100000, 50000, 10000, orderTotal].includes(selectedAmount)) && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-500">₹</span>
-                    <input
-                      type="number"
-                      min="1"
-                      step="100"
-                      value={customAmountInput}
-                      onChange={(e) => {
-                        setCustomAmountInput(e.target.value);
-                        const val = parseFloat(e.target.value);
-                        if (!isNaN(val) && val > 0) {
-                          setSelectedAmount(val);
-                        }
-                      }}
-                      onBlur={handleCustomInputBlur}
-                      placeholder="Enter custom amount..."
-                      className="w-full px-3 py-1.5 bg-white border border-blue-400 rounded-lg text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                <div className="text-[11px] text-slate-600 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>Direct escrow settlement to verified agrarian producer.</span>
                   </div>
-                )}
-                <div className="text-[11px] text-slate-500 mt-2">
-                  * Buyer can pay token/advance or any custom figure less or more than ₹100,000.
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>256-bit bank-grade encryption with instant order confirmation.</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>Supports UPI apps, RuPay, Visa, Mastercard, and NetBanking.</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Actions for Link Sharing & Viewing */}
-            <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="px-3 py-1.5 border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg font-semibold flex items-center gap-1.5 bg-white shadow-xs transition-colors"
-                >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copiedLink ? 'Copied' : 'Copy Link'}
-                </button>
-
-                <a
-                  href={RAZORPAY_PAYMENT_LINK_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg font-semibold flex items-center gap-1.5 transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  Open Live Link
-                </a>
-              </div>
-
-              <div className="flex items-center gap-1 text-slate-500 text-[11px]">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            {/* Bottom Security Footer */}
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Razorpay 256-bit SSL Secure</span>
               </div>
+              <span className="text-[11px] text-slate-400">RBI Certified Payment Aggregator</span>
             </div>
           </div>
 
@@ -452,15 +370,6 @@ export const RazorpayPaymentModal = ({
                   >
                     Pay ₹{selectedAmount.toLocaleString('en-IN')} Now
                   </button>
-
-                  <a
-                    href={RAZORPAY_PAYMENT_LINK_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 w-full py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> Pay on Razorpay.com Page
-                  </a>
                 </div>
               )}
 
