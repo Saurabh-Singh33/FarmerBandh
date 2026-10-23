@@ -18,6 +18,6 @@ public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
             .WithMessage("Delivery slot date must be between today and 14 days in the future.");
 
         RuleFor(x => x.PaymentMethod)
-            .InclusiveBetween(1, 4).WithMessage("Payment method must be 1 (UPI), 2 (Card), 3 (NetBanking), or 4 (COD).");
+            .InclusiveBetween(1, 5).WithMessage("Payment method must be 4 (COD) or 5 (Razorpay).");
     }
 }
