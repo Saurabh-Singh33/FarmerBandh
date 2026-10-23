@@ -114,29 +114,29 @@ body > .skiptranslate {
 }
 
 .footer-link:hover {
-  color: #4ADE80;
-  transform: translateX(4px);
+  color: #34D399;
+  transform: translateX(3px);
 }
 
 .footer-social-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #E2E8F0;
+  color: #94A3B8;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-social-btn:hover {
-  background-color: rgba(34, 197, 94, 0.18);
-  border-color: rgba(74, 222, 128, 0.45);
-  color: #4ADE80;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #34D399;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Hide native Edge / IE password reveal button to prevent duplicate eye icon */
@@ -144,4 +144,17 @@ input::-ms-reveal,
 input::-ms-clear {
   display: none !important;
 }
+
+/* Sidebar scroll: hidden scrollbar for a seamless, scrollbar-free look */
+.sidebar-scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+}
+
 

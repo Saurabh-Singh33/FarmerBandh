@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   User,
   Lock,
@@ -12,7 +13,11 @@ import {
   Eye,
   EyeOff,
   Smartphone,
-  Mail
+  Mail,
+  Trash2,
+  AlertTriangle,
+  X,
+  ShieldAlert
 } from 'lucide-react';
 import { sellerProfileApi } from '../../services/sellerProfileApi';
 import { VerificationBadge } from '../../components/seller/VerificationBadge';
@@ -21,8 +26,9 @@ import { useSeller } from '../../context/SellerContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const SellerProfile = () => {
+  const navigate = useNavigate();
   const { verificationStatus, refreshDashboard } = useSeller();
-  const { updateUser } = useAuth();
+  const { updateUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('profile'); // profile | password | settings
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -60,6 +66,15 @@ export const SellerProfile = () => {
     notifyOnReturn: true,
     notifyOnPayout: true
   });
+
+  // Delete Account State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePwd, setShowDeletePwd] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deleteConfirmed, setDeleteConfirmed] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     const loadAll = async () => {
@@ -195,6 +210,44 @@ export const SellerProfile = () => {
     }
   };
 
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (!deletePassword) {
+      setDeleteError('Please enter your current password to confirm deletion.');
+      return;
+    }
+    if (!deleteConfirmed) {
+      setDeleteError('Please check the confirmation box to acknowledge account deletion.');
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      setDeleteError('');
+      await sellerProfileApi.deleteAccount({
+        password: deletePassword,
+        reason: deleteReason || undefined
+      });
+
+      notify.success('Your farmer account has been closed and deleted successfully.');
+      setShowDeleteModal(false);
+
+      try {
+        await logout();
+      } catch (logoutErr) {
+        console.warn('Logout after delete:', logoutErr);
+      }
+      navigate('/auth');
+    } catch (err) {
+      console.error('Error deleting account:', err);
+      const msg = err?.response?.data?.message || err?.message || 'Failed to delete account. Please verify your password and ensure all orders and payouts are settled.';
+      setDeleteError(msg);
+      notify.error(msg);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ padding: '4rem', textAlign: 'center', color: '#6B7280' }}>
@@ -240,7 +293,7 @@ export const SellerProfile = () => {
       >
         {[
           { id: 'profile', label: 'Farm Information', icon: Building },
-          { id: 'password', label: 'Account Security', icon: Lock },
+          { id: 'password', label: 'Account Security & Deletion', icon: Lock },
           { id: 'settings', label: 'Payout & Store Settings', icon: SettingsIcon }
         ].map((tab) => {
           const Icon = tab.icon;
@@ -527,6 +580,49 @@ export const SellerProfile = () => {
               <Save size={16} /> {saving ? 'Saving...' : 'Update Farm Profile'}
             </button>
           </form>
+
+          {/* Quick Link to Account Deletion */}
+          <div
+            style={{
+              marginTop: '1.75rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px solid #F3F4F6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem'
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>
+                Account Closure & Produce Delisting
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#6B7280', marginTop: '2px' }}>
+                Need to close your store or permanently delete your farmer account?
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('password')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '0.45rem 0.9rem',
+                borderRadius: '6px',
+                border: '1px solid #FECACA',
+                backgroundColor: '#FEF2F2',
+                color: '#DC2626',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              <Trash2 size={14} />
+              <span>Go to Account Deletion</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -698,6 +794,101 @@ export const SellerProfile = () => {
               <Lock size={16} /> {saving ? 'Updating...' : 'Update Password'}
             </button>
           </form>
+
+          {/* Danger Zone: Account Deletion */}
+          <div
+            style={{
+              marginTop: '2.5rem',
+              paddingTop: '2rem',
+              borderTop: '1px solid #F3F4F6'
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FCA5A5',
+                borderRadius: '12px',
+                padding: '1.5rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEE2E2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#DC2626'
+                  }}
+                >
+                  <AlertTriangle size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#991B1B' }}>
+                    Danger Zone: Delete Farmer Account
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#B91C1C' }}>
+                    Permanently close your store, delist produce, and delete your account.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #FECACA',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.83rem',
+                  color: '#4B5563',
+                  lineHeight: 1.5
+                }}
+              >
+                <div style={{ fontWeight: 600, color: '#1F2937', marginBottom: '4px' }}>
+                  Important terms before requesting account deletion:
+                </div>
+                <ul style={{ margin: '4px 0 0 0', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <li>All active crop listings will be immediately delisted from the marketplace.</li>
+                  <li>You cannot delete your account while you have unfulfilled orders or pending return requests.</li>
+                  <li>Any pending payouts must be settled before closure.</li>
+                  <li>Linked bank accounts and credentials will be permanently disconnected.</li>
+                </ul>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteError('');
+                  setDeletePassword('');
+                  setDeleteConfirmed(false);
+                  setDeleteReason('');
+                  setShowDeleteModal(true);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '0.7rem 1.4rem',
+                  borderRadius: '8px',
+                  backgroundColor: '#DC2626',
+                  color: '#FFFFFF',
+                  fontWeight: 600,
+                  fontSize: '0.88rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s',
+                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.2)'
+                }}
+              >
+                <Trash2 size={16} />
+                <span>Delete My Farmer Account</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -856,6 +1047,264 @@ export const SellerProfile = () => {
               <Save size={16} /> {saving ? 'Saving...' : 'Save Operations Settings'}
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.55)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+            backdropFilter: 'blur(3px)'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '520px',
+              width: '100%',
+              padding: '2rem',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.25)',
+              boxSizing: 'border-box',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FEE2E2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#DC2626'
+                  }}
+                >
+                  <Trash2 size={22} />
+                </div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 700, color: '#111827' }}>
+                    Delete Farmer Account
+                  </h2>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.85rem', color: '#6B7280' }}>
+                    Confirm your identity to close your store
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#9CA3AF',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '6px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Error banner if any */}
+            {deleteError && (
+              <div
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #F87171',
+                  borderRadius: '8px',
+                  padding: '0.75rem 1rem',
+                  marginBottom: '1rem',
+                  fontSize: '0.85rem',
+                  color: '#991B1B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleDeleteAccount} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div
+                style={{
+                  backgroundColor: '#FFFBEB',
+                  border: '1px solid #FDE68A',
+                  borderRadius: '8px',
+                  padding: '0.85rem',
+                  fontSize: '0.83rem',
+                  color: '#92400E',
+                  lineHeight: 1.45
+                }}
+              >
+                <strong>Warning:</strong> Deleting your account will immediately delist all your crops, revoke login access, and remove your registered bank details. This action cannot be reversed.
+              </div>
+
+              {/* Password Verification */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  Current Account Password *
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showDeletePwd ? 'text' : 'password'}
+                    required
+                    placeholder="Enter your current password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '0.65rem 0.85rem',
+                      paddingRight: '2.5rem',
+                      border: '1px solid #D1D5DB',
+                      borderRadius: '8px',
+                      fontSize: '0.9rem',
+                      boxSizing: 'border-box',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowDeletePwd(!showDeletePwd)}
+                    aria-label={showDeletePwd ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '0.75rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      color: '#6B7280',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '0.2rem'
+                    }}
+                  >
+                    {showDeletePwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Reason for Deletion */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  Reason for Leaving (Optional)
+                </label>
+                <select
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.85rem',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '8px',
+                    fontSize: '0.88rem',
+                    backgroundColor: '#FFFFFF',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Please select a reason (optional)</option>
+                  <option value="Seasonal break / no current produce">Seasonal break / no current produce</option>
+                  <option value="Retiring / closing farm business">Retiring / closing farm business</option>
+                  <option value="Using a different sales channel">Using a different sales channel</option>
+                  <option value="Payment or payout preferences">Payment or payout preferences</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Confirmation Checkbox */}
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '10px',
+                  cursor: 'pointer',
+                  fontSize: '0.84rem',
+                  color: '#374151'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={deleteConfirmed}
+                  onChange={(e) => setDeleteConfirmed(e.target.checked)}
+                  style={{ marginTop: '3px', width: '16px', height: '16px', accentColor: '#DC2626' }}
+                />
+                <span>
+                  I understand that this action is permanent, all my product listings will be removed, and I will be signed out immediately.
+                </span>
+              </label>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  style={{
+                    padding: '0.65rem 1.25rem',
+                    borderRadius: '8px',
+                    border: '1px solid #D1D5DB',
+                    backgroundColor: '#FFFFFF',
+                    color: '#374151',
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                    cursor: deleting ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={deleting || !deletePassword || !deleteConfirmed}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '0.65rem 1.4rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: deleting || !deletePassword || !deleteConfirmed ? '#FCA5A5' : '#DC2626',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    cursor: deleting || !deletePassword || !deleteConfirmed ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 2px 4px rgba(220, 38, 38, 0.25)'
+                  }}
+                >
+                  {deleting ? (
+                    <>
+                      <RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} />
+                      <span>Deleting Account...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={16} />
+                      <span>Confirm & Delete</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

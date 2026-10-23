@@ -86,8 +86,8 @@ export const AdminSidebar = () => {
   return (
     <aside
       style={{
-        width: '260px',
-        minWidth: '260px',
+        width: '250px',
+        minWidth: '250px',
         height: '100vh',
         position: 'sticky',
         top: 0,
@@ -96,33 +96,31 @@ export const AdminSidebar = () => {
         borderRight: '1px solid #E5E7EB',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '0.75rem 0.75rem',
+        padding: '0.45rem 0.55rem',
         boxSizing: 'border-box',
         zIndex: 90,
         boxShadow: '1px 0 6px rgba(0,0,0,0.03)',
-        overflowY: 'auto'
+        overflow: 'hidden'
       }}
     >
-      <div>
-        {/* Brand Header */}
+      {/* Brand Header (Fixed Top) */}
+      <div style={{ flexShrink: 0, marginBottom: '0.3rem' }}>
         <Link
           to="/admin/dashboard"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.6rem',
+            gap: '0.55rem',
             textDecoration: 'none',
-            padding: '0.2rem 0.35rem 0.65rem 0.35rem',
-            borderBottom: '1px solid #F3F4F6',
-            marginBottom: '0.5rem'
+            padding: '0.15rem 0.3rem 0.4rem 0.3rem',
+            borderBottom: '1px solid #F3F4F6'
           }}
         >
           <div
             style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
+              width: '28px',
+              height: '28px',
+              borderRadius: '7px',
               backgroundColor: '#1B4D3E',
               display: 'flex',
               alignItems: 'center',
@@ -132,24 +130,24 @@ export const AdminSidebar = () => {
               flexShrink: 0
             }}
           >
-            <ShieldAlert size={18} color="#FFFFFF" strokeWidth={2.2} />
+            <ShieldAlert size={16} color="#FFFFFF" strokeWidth={2.2} />
           </div>
           <div>
             <div
               style={{
                 fontFamily: 'Playfair Display, Georgia, serif',
-                fontSize: '1.15rem',
+                fontSize: '1.05rem',
                 fontWeight: 700,
                 color: '#1B4D3E',
                 letterSpacing: '-0.02em',
-                lineHeight: 1.1
+                lineHeight: 1.15
               }}
             >
               FarmerBandh
             </div>
             <div
               style={{
-                fontSize: '0.66rem',
+                fontSize: '0.62rem',
                 color: '#2E7D32',
                 fontWeight: 700,
                 display: 'flex',
@@ -164,100 +162,128 @@ export const AdminSidebar = () => {
             </div>
           </div>
         </Link>
-
-        {/* Navigation Sections */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-          {navSections.map((section) => (
-            <div key={section.title}>
-              <div
-                style={{
-                  fontSize: '0.64rem',
-                  fontWeight: 700,
-                  color: '#9CA3AF',
-                  letterSpacing: '0.08em',
-                  padding: '0 0.5rem 0.2rem 0.5rem',
-                  textTransform: 'uppercase'
-                }}
-              >
-                {section.title}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive =
-                    location.pathname === item.path ||
-                    (item.path !== '/admin/dashboard' && location.pathname.startsWith(item.path + '/'));
-
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0.38rem 0.65rem',
-                        borderRadius: '7px',
-                        textDecoration: 'none',
-                        fontSize: '0.82rem',
-                        fontWeight: isActive ? 700 : 500,
-                        color: isActive ? '#1B4D3E' : '#4B5563',
-                        backgroundColor: isActive ? '#E8F5E9' : 'transparent',
-                        borderLeft: isActive ? '3px solid #1B4D3E' : '3px solid transparent',
-                        transition: 'all 0.12s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = '#F9FBF8';
-                          e.currentTarget.style.color = '#1B4D3E';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = '#4B5563';
-                        }
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                        <Icon size={16} color={isActive ? '#1B4D3E' : '#6B7280'} strokeWidth={isActive ? 2.2 : 1.8} />
-                        <span>{item.name}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
       </div>
 
-      {/* Footer User Info & Actions */}
-      <div
+      {/* Navigation Sections (Evenly distributed to cover all vertical space seamlessly) */}
+      <nav
+        className="sidebar-scroll"
         style={{
-          borderTop: '1px solid #F3F4F6',
-          paddingTop: '0.45rem',
-          marginTop: '0.45rem',
+          flex: 1,
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.4rem'
+          justifyContent: 'space-between',
+          padding: '0.2rem 0',
+          gap: '0.35rem'
+        }}
+      >
+        {navSections.map((section) => (
+          <div key={section.title} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                fontSize: '0.62rem',
+                fontWeight: 700,
+                color: '#9CA3AF',
+                letterSpacing: '0.08em',
+                padding: '0.15rem 0.45rem 0.15rem 0.45rem',
+                textTransform: 'uppercase'
+              }}
+            >
+              {section.title}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1px, 0.25vh, 2.5px)' }}>
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== '/admin/dashboard' && location.pathname.startsWith(item.path + '/'));
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: 'clamp(0.26rem, 0.44vh, 0.38rem) 0.52rem',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      fontSize: '0.8rem',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#1B4D3E' : '#4B5563',
+                      backgroundColor: isActive ? '#E8F5E9' : 'transparent',
+                      borderLeft: isActive ? '3px solid #1B4D3E' : '3px solid transparent',
+                      transition: 'all 0.12s ease',
+                      lineHeight: 1.25
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = '#F9FBF8';
+                        e.currentTarget.style.color = '#1B4D3E';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#4B5563';
+                      }
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.52rem' }}>
+                      <Icon size={15} color={isActive ? '#1B4D3E' : '#6B7280'} strokeWidth={isActive ? 2.2 : 1.8} style={{ flexShrink: 0 }} />
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span
+                        style={{
+                          backgroundColor: '#EF4444',
+                          color: '#FFFFFF',
+                          fontSize: '0.62rem',
+                          fontWeight: 700,
+                          padding: '1px 5px',
+                          borderRadius: '9999px',
+                          lineHeight: 1.2
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      {/* Footer User Info & Actions (Pinned at bottom, ALWAYS in view in one go) */}
+      <div
+        style={{
+          flexShrink: 0,
+          borderTop: '1px solid #E5E7EB',
+          paddingTop: '0.35rem',
+          marginTop: '0.3rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.3rem'
         }}
       >
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.55rem',
-            padding: '0.35rem 0.5rem',
+            gap: '0.45rem',
+            padding: '0.22rem 0.45rem',
             backgroundColor: '#F9FBF8',
-            borderRadius: '8px',
+            borderRadius: '7px',
             border: '1px solid #E5E7EB'
           }}
         >
           <div
             style={{
-              width: '30px',
-              height: '30px',
+              width: '26px',
+              height: '26px',
               borderRadius: '50%',
               backgroundColor: '#1B4D3E',
               color: '#FFFFFF',
@@ -265,7 +291,7 @@ export const AdminSidebar = () => {
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
-              fontSize: '0.78rem',
+              fontSize: '0.72rem',
               flexShrink: 0
             }}
           >
@@ -274,61 +300,69 @@ export const AdminSidebar = () => {
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 color: '#1B4D3E',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                lineHeight: 1.2
+                lineHeight: 1.15
               }}
             >
               {user?.fullName || 'System Admin'}
             </div>
-            <div style={{ fontSize: '0.66rem', color: '#2E7D32', fontWeight: 600, lineHeight: 1.1, marginTop: '1px' }}>
+            <div style={{ fontSize: '0.62rem', color: '#2E7D32', fontWeight: 600, lineHeight: 1.1, marginTop: '1px' }}>
               Platform Administrator
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', gap: '0.35rem' }}>
           <Link
             to="/marketplace"
+            id="admin-sidebar-market-btn"
             style={{
               flex: 1,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '4px',
-              padding: '0.38rem 0.5rem',
+              padding: '0.32rem 0.4rem',
               borderRadius: '6px',
               backgroundColor: '#E8F5E9',
               color: '#1B4D3E',
               border: '1px solid #C8E6C9',
-              fontSize: '0.75rem',
+              fontSize: '0.74rem',
               fontWeight: 600,
-              textDecoration: 'none'
+              textDecoration: 'none',
+              transition: 'background-color 0.12s'
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#DCFCE7')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#E8F5E9')}
           >
             <Store size={13} /> Market
           </Link>
           <button
             onClick={handleLogout}
+            id="admin-sidebar-logout-btn"
             style={{
               flex: 1,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '4px',
-              padding: '0.38rem 0.5rem',
+              padding: '0.32rem 0.4rem',
               borderRadius: '6px',
               backgroundColor: '#FEE2E2',
               color: '#B91C1C',
               border: '1px solid #FECACA',
-              fontSize: '0.75rem',
+              fontSize: '0.74rem',
               fontWeight: 600,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'background-color 0.12s'
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FCDADA')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FEE2E2')}
           >
             <LogOut size={13} /> Logout
           </button>

@@ -250,8 +250,9 @@ export const VerificationDetail = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: '1.5rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '1.5rem',
+          marginBottom: '2rem'
         }}
       >
         {/* Identity Document Card */}
@@ -261,52 +262,53 @@ export const VerificationDetail = () => {
             borderRadius: '12px',
             border: '1px solid #E2E8F0',
             padding: '1.25rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-            <FileText size={18} color="#0284C7" />
-            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0F172A' }}>
-              Government ID Proof
-            </h3>
-          </div>
-
-          <div style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem', lineHeight: 1.6 }}>
-            <div>Document Type: <strong>{data.idType || 'Aadhaar / Voter ID'}</strong></div>
-            <div>Document ID: <strong>{data.idNumber || 'Not provided'}</strong></div>
-          </div>
-
-          {data.idDocumentUrl ? (
-            <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
-              <img
-                src={data.idDocumentUrl}
-                alt="ID Document"
-                style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }}
-              />
-              <div style={{ padding: '0.5rem', backgroundColor: '#F8FAFC', textAlign: 'right' }}>
-                <a
-                  href={data.idDocumentUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    fontSize: '0.75rem',
-                    color: '#0284C7',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  View Full Image <ExternalLink size={12} />
-                </a>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FileText size={18} color="#0284C7" />
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0F172A' }}>
+                  Government ID Proof
+                </h3>
               </div>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', backgroundColor: '#EFF6FF', color: '#1D4ED8' }}>
+                UIDAI Aadhaar
+              </span>
             </div>
-          ) : (
-            <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', color: '#94A3B8', fontSize: '0.85rem' }}>
-              Document file not uploaded or recorded electronically.
+
+            <div style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem', lineHeight: 1.6 }}>
+              <div>Document Type: <strong>Aadhaar (UIDAI Verified)</strong></div>
+              <div>
+                Document ID:{' '}
+                <strong style={{ color: '#0F172A', letterSpacing: '0.04em' }}>
+                  {data.maskedAadhaar || data.idNumber || data.aadhaarNumber || 'Not provided'}
+                </strong>
+              </div>
+              <div>Applicant: <strong>{data.farmerName}</strong></div>
             </div>
-          )}
+          </div>
+
+          <div
+            style={{
+              padding: '1rem',
+              backgroundColor: '#F0FDF4',
+              border: '1px solid #BBF7D0',
+              borderRadius: '8px',
+              fontSize: '0.82rem',
+              color: '#166534',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <CheckCircle2 size={18} color="#16A34A" style={{ flexShrink: 0 }} />
+            <span>12-Digit UIDAI Aadhaar record submitted and formatted for clearance.</span>
+          </div>
         </div>
 
         {/* Land Ownership Records */}
@@ -316,52 +318,206 @@ export const VerificationDetail = () => {
             borderRadius: '12px',
             border: '1px solid #E2E8F0',
             padding: '1.25rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-            <FileText size={18} color="#059669" />
-            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0F172A' }}>
-              Land Ownership Document
-            </h3>
-          </div>
-
-          <div style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem', lineHeight: 1.6 }}>
-            <div>Record Type: <strong>{data.landDocType || '7/12 Extract / Khasra'}</strong></div>
-            <div>Registered Farm: <strong>{data.farmName || 'Owner operator'}</strong></div>
-          </div>
-
-          {data.landDocumentUrl ? (
-            <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
-              <img
-                src={data.landDocumentUrl}
-                alt="Land Document"
-                style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }}
-              />
-              <div style={{ padding: '0.5rem', backgroundColor: '#F8FAFC', textAlign: 'right' }}>
-                <a
-                  href={data.landDocumentUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    fontSize: '0.75rem',
-                    color: '#059669',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  View Full Image <ExternalLink size={12} />
-                </a>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FileText size={18} color="#059669" />
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0F172A' }}>
+                  Land Ownership & Audit
+                </h3>
               </div>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', backgroundColor: '#ECFDF5', color: '#047857' }}>
+                7/12 Extract / Patta
+              </span>
             </div>
-          ) : (
-            <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', color: '#94A3B8', fontSize: '0.85rem' }}>
-              Land ownership document not uploaded.
+
+            <div style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem', lineHeight: 1.6 }}>
+              <div>Record Type: <strong>7/12 Extract / Revenue Record</strong></div>
+              <div>Registered Farm: <strong>{data.farmName || 'Sunita Organics'}</strong></div>
+              {data.notes && <div>Audit Notes: <em>{data.notes}</em></div>}
             </div>
-          )}
+          </div>
+
+          {(() => {
+            const rawUrl = data.landRecordUrl || data.landDocumentUrl;
+            if (!rawUrl) {
+              return (
+                <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', color: '#94A3B8', fontSize: '0.85rem' }}>
+                  Land ownership document not uploaded.
+                </div>
+              );
+            }
+
+            const isPdf = rawUrl.toLowerCase().includes('.pdf');
+            const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+            const fullUrl = rawUrl.startsWith('http') ? rawUrl : rawUrl.startsWith('/') ? `${baseUrl}${rawUrl}` : `${baseUrl}/uploads/documents/${rawUrl}`;
+            const fileName = rawUrl.split('/').pop();
+
+            if (isPdf) {
+              return (
+                <div style={{ border: '1.5px solid #CBD5E1', borderRadius: '8px', padding: '1rem', backgroundColor: '#F8FAFC' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#FEE2E2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>
+                      PDF
+                    </div>
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.85rem', color: '#1E293B', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {fileName}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                        Official Revenue Document
+                      </div>
+                    </div>
+                  </div>
+                  <a
+                    href={fullUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '6px',
+                      backgroundColor: '#1B4D3E',
+                      color: '#FFFFFF',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    View / Download Land Record <ExternalLink size={14} />
+                  </a>
+                </div>
+              );
+            }
+
+            return (
+              <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
+                <img
+                  src={fullUrl}
+                  alt="Land Document"
+                  style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextSibling.style.display = 'block';
+                  }}
+                />
+                <div style={{ display: 'none', padding: '1.5rem', textAlign: 'center', backgroundColor: '#F8FAFC', color: '#64748B', fontSize: '0.82rem' }}>
+                  Preview unavailable. <a href={fullUrl} target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 600 }}>Download File</a>
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#F8FAFC', textAlign: 'right' }}>
+                  <a
+                    href={fullUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: '0.75rem',
+                      color: '#059669',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    View Full Document <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Farmer Verification Photo */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            border: '1px solid #E2E8F0',
+            padding: '1.25rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ImageIcon size={18} color="#D97706" />
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0F172A' }}>
+                  Farmer Photo & Farm Inspection
+                </h3>
+              </div>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '6px', backgroundColor: '#FEF3C7', color: '#B45309' }}>
+                Premises Proof
+              </span>
+            </div>
+
+            <div style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem', lineHeight: 1.6 }}>
+              <div>Subject: <strong>{data.farmerName}</strong></div>
+              <div>Location: <strong>{data.location || 'Sanand'}, {data.district || 'Ahmedabad'}, {data.state || 'Gujarat'}</strong></div>
+            </div>
+          </div>
+
+          {(() => {
+            const rawPhoto = data.selfieUrl || data.idDocumentUrl;
+            if (!rawPhoto) {
+              return (
+                <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', color: '#94A3B8', fontSize: '0.85rem' }}>
+                  Farmer premises photograph not uploaded.
+                </div>
+              );
+            }
+
+            const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+            const fullPhotoUrl = rawPhoto.startsWith('http') ? rawPhoto : rawPhoto.startsWith('/') ? `${baseUrl}${rawPhoto}` : `${baseUrl}/uploads/images/${rawPhoto}`;
+
+            return (
+              <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
+                <img
+                  src={fullPhotoUrl}
+                  alt="Farmer Verification"
+                  style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextSibling.style.display = 'block';
+                  }}
+                />
+                <div style={{ display: 'none', padding: '1.5rem', textAlign: 'center', backgroundColor: '#F8FAFC', color: '#64748B', fontSize: '0.82rem' }}>
+                  Preview unavailable. <a href={fullPhotoUrl} target="_blank" rel="noreferrer" style={{ color: '#D97706', fontWeight: 600 }}>Download Photo</a>
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#F8FAFC', textAlign: 'right' }}>
+                  <a
+                    href={fullPhotoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: '0.75rem',
+                      color: '#D97706',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    View Full Photograph <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 

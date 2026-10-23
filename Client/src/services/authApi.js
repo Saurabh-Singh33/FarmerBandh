@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { notify } from '../context/NotificationContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
@@ -103,7 +104,9 @@ authClient.interceptors.response.use(
       try {
         return await authClient(originalRequest);
       } catch (retryErr) {
-        toast.error('Network connection issue. Please verify your internet connection.', 'Connection Error');
+        if (typeof notify !== 'undefined' && notify?.error) {
+          notify.error('Network connection issue. Please verify that the backend server is running.', 'Connection Error');
+        }
         return Promise.reject(retryErr);
       }
     }

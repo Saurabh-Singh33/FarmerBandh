@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   User,
   Mail,
@@ -16,14 +16,17 @@ import {
   CheckCircle2,
   Sparkles,
   Edit3,
-  X
+  X,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { buyerProfileApi } from '../../services/buyerProfileApi';
 import { notify } from '../../context/NotificationContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const BuyerProfile = () => {
-  const { user: authUser, updateUser } = useAuth();
+  const navigate = useNavigate();
+  const { user: authUser, updateUser, logout } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('personal'); // personal | address | security
   const [loading, setLoading] = useState(true);
@@ -74,6 +77,15 @@ export const BuyerProfile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Delete Account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePwd, setShowDeletePwd] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deleteConfirmed, setDeleteConfirmed] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const fetchProfile = async () => {
     try {
@@ -230,6 +242,44 @@ export const BuyerProfile = () => {
       notify.error(err.response?.data?.message || err.message || 'Failed to update password.');
     } finally {
       setChangingPassword(false);
+    }
+  };
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (!deletePassword) {
+      setDeleteError('Please enter your current password to confirm deletion.');
+      return;
+    }
+    if (!deleteConfirmed) {
+      setDeleteError('Please check the confirmation box to acknowledge account deletion.');
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      setDeleteError('');
+      await buyerProfileApi.deleteAccount({
+        password: deletePassword,
+        reason: deleteReason || undefined
+      });
+
+      notify.success('Your buyer account has been deleted successfully.');
+      setShowDeleteModal(false);
+
+      try {
+        await logout();
+      } catch (logoutErr) {
+        console.warn('Logout after delete:', logoutErr);
+      }
+      navigate('/auth');
+    } catch (err) {
+      console.error('Error deleting account:', err);
+      const msg = err?.response?.data?.message || err?.message || 'Failed to delete account. Please verify your password and ensure all orders are delivered.';
+      setDeleteError(msg);
+      notify.error(msg);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -790,21 +840,208 @@ export const BuyerProfile = () => {
 
         {/* Tab 3: Security & Password */}
         {activeTab === 'security' && (
-          <form
-            onSubmit={handleSavePassword}
-            className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm"
-          >
-            <div className="mb-6 pb-4 border-b border-slate-100">
-              <h2 className="text-lg font-bold text-slate-900 font-sans tracking-tight">
-                Password & Account Security
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Update your credentials regularly to keep your buyer orders and payments secure.
-              </p>
+          <div className="space-y-6">
+            <form
+              onSubmit={handleSavePassword}
+              className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm"
+            >
+              <div className="mb-6 pb-4 border-b border-slate-100">
+                <h2 className="text-lg font-bold text-slate-900 font-sans tracking-tight">
+                  Password & Account Security
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                  Update your credentials regularly to keep your buyer orders and payments secure.
+                </p>
+              </div>
+
+              <div className="space-y-4 max-w-lg">
+                {/* Current Password */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase mb-2">
+                    Current Password <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+                    <input
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      name="currentPassword"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordChange}
+                      required
+                      placeholder="Enter current password"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword((prev) => !prev)}
+                      className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    >
+                      {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* New Password */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase mb-2">
+                    New Password <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      name="newPassword"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordChange}
+                      required
+                      placeholder="At least 6 characters"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((prev) => !prev)}
+                      className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    >
+                      {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm New Password */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase mb-2">
+                    Confirm New Password <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={passwordForm.confirmPassword}
+                      onChange={handlePasswordChange}
+                      required
+                      placeholder="Re-enter new password"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-100 flex justify-start">
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1B4D3E] text-white text-sm font-semibold hover:bg-[#143B2F] transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {changingPassword ? (
+                    <>
+                      <RefreshCw size={16} className="spin-animate" /> Updating Password...
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={16} /> Update Password
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Danger Zone: Delete Buyer Account */}
+            <div className="bg-rose-50/70 border border-rose-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+              <div className="flex items-start gap-3.5 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                  <AlertTriangle size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-rose-900 tracking-tight">
+                    Danger Zone: Delete Buyer Account
+                  </h3>
+                  <p className="text-xs sm:text-sm text-rose-700 mt-0.5">
+                    Permanently close and delete your Buyer account.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white border border-rose-100 rounded-xl p-4 mb-5 text-xs sm:text-sm text-slate-600 leading-relaxed space-y-1.5">
+                <div className="font-semibold text-slate-800">
+                  Please review these details before requesting deletion:
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-slate-600 pl-1">
+                  <li>You cannot delete your account if you have active orders currently in progress or out for delivery.</li>
+                  <li>Open return or dispute requests must be resolved first.</li>
+                  <li>Saved delivery addresses and checkout preferences will be permanently wiped.</li>
+                  <li>You will be logged out immediately and will not be able to sign in with this account.</li>
+                </ul>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteError('');
+                  setDeletePassword('');
+                  setDeleteConfirmed(false);
+                  setDeleteReason('');
+                  setShowDeleteModal(true);
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-sm shadow-rose-600/20 cursor-pointer"
+              >
+                <Trash2 size={16} /> Delete Buyer Account
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Delete Buyer Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                  <Trash2 size={22} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                    Delete Buyer Account
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Confirm your credentials to permanently close your account
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg cursor-pointer"
+              >
+                <X size={20} />
+              </button>
             </div>
 
-            <div className="space-y-4 max-w-lg">
-              {/* Current Password */}
+            {/* Error banner if any */}
+            {deleteError && (
+              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4 text-xs sm:text-sm text-rose-700 flex items-start gap-2">
+                <AlertTriangle size={16} className="shrink-0 mt-0.5 text-rose-600" />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleDeleteAccount} className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-800 leading-relaxed">
+                <span className="font-semibold">Notice:</span> Deleting your account is permanent. All pending login sessions will be terminated and your profile will be deactivated.
+              </div>
+
+              {/* Password Verification */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase mb-2">
                   Current Password <span className="text-rose-500">*</span>
@@ -812,98 +1049,86 @@ export const BuyerProfile = () => {
                 <div className="relative flex items-center">
                   <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
                   <input
-                    type={showCurrentPassword ? 'text' : 'password'}
-                    name="currentPassword"
-                    value={passwordForm.currentPassword}
-                    onChange={handlePasswordChange}
+                    type={showDeletePwd ? 'text' : 'password'}
                     required
-                    placeholder="Enter current password"
+                    placeholder="Enter your current password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
                     className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowCurrentPassword((prev) => !prev)}
+                    onClick={() => setShowDeletePwd(!showDeletePwd)}
+                    aria-label={showDeletePwd ? 'Hide password' : 'Show password'}
                     className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                   >
-                    {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showDeletePwd ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              {/* New Password */}
+              {/* Reason for Deletion */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase mb-2">
-                  New Password <span className="text-rose-500">*</span>
+                  Reason for Leaving (Optional)
                 </label>
-                <div className="relative flex items-center">
-                  <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    name="newPassword"
-                    value={passwordForm.newPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    placeholder="At least 6 characters"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword((prev) => !prev)}
-                    className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                  >
-                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+                <select
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
+                >
+                  <option value="">Please select a reason (optional)</option>
+                  <option value="No longer ordering farm produce">No longer ordering farm produce</option>
+                  <option value="Moving to a different location">Moving to a different location</option>
+                  <option value="Found an alternative marketplace">Found an alternative marketplace</option>
+                  <option value="Creating a new account">Creating a new account</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
 
-              {/* Confirm New Password */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase mb-2">
-                  Confirm New Password <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative flex items-center">
-                  <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={passwordForm.confirmPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    placeholder="Re-enter new password"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]/15 transition-all shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+              {/* Confirmation Checkbox */}
+              <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600 pt-1">
+                <input
+                  type="checkbox"
+                  checked={deleteConfirmed}
+                  onChange={(e) => setDeleteConfirmed(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-300 accent-rose-600"
+                />
+                <span>
+                  I confirm that I want to permanently delete my buyer account and understand this action cannot be undone.
+                </span>
+              </label>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-all cursor-pointer disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={deleting || !deletePassword || !deleteConfirmed}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-sm shadow-rose-600/20 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
+                >
+                  {deleting ? (
+                    <>
+                      <RefreshCw size={16} className="spin-animate" /> Deleting Account...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={16} /> Confirm & Delete
+                    </>
+                  )}
+                </button>
               </div>
-            </div>
-
-            <div className="mt-8 pt-4 border-t border-slate-100 flex justify-start">
-              <button
-                type="submit"
-                disabled={changingPassword}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1B4D3E] text-white text-sm font-semibold hover:bg-[#143B2F] transition-all shadow-sm cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {changingPassword ? (
-                  <>
-                    <RefreshCw size={16} className="spin-animate" /> Updating Password...
-                  </>
-                ) : (
-                  <>
-                    <Lock size={16} /> Update Password
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-
-      </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -46,13 +46,13 @@ export const FooterLanguageSelector = () => {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, rgba(20, 56, 44, 0.55) 0%, rgba(10, 30, 23, 0.75) 100%)',
+        background: 'rgba(255, 255, 255, 0.025)',
         backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(74, 222, 128, 0.16)',
+        border: '1px solid rgba(255, 255, 255, 0.07)',
         borderRadius: '16px',
         padding: '1.25rem 1.6rem',
         marginBottom: '2.5rem',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
         position: 'relative'
       }}
     >
@@ -74,13 +74,12 @@ export const FooterLanguageSelector = () => {
               width: '40px',
               height: '40px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(16, 185, 129, 0.08))',
-              border: '1px solid rgba(74, 222, 128, 0.3)',
+              background: 'rgba(16, 185, 129, 0.08)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#4ADE80',
-              boxShadow: '0 2px 10px rgba(34, 197, 94, 0.15)',
+              color: '#34D399',
               flexShrink: 0
             }}
           >
@@ -104,9 +103,9 @@ export const FooterLanguageSelector = () => {
                 style={{
                   fontSize: '0.72rem',
                   fontWeight: 600,
-                  color: '#86EFAC',
-                  backgroundColor: 'rgba(34, 197, 94, 0.12)',
-                  border: '1px solid rgba(74, 222, 128, 0.25)',
+                  color: '#94A3B8',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                   padding: '2px 8px',
                   borderRadius: '9999px'
                 }}
@@ -154,13 +153,13 @@ export const FooterLanguageSelector = () => {
                   padding: '0.55rem 1rem',
                   borderRadius: '10px',
                   border: isActive
-                    ? '1.5px solid #22C55E'
-                    : '1px solid rgba(255, 255, 255, 0.12)',
+                    ? '1.5px solid #10B981'
+                    : '1px solid rgba(255, 255, 255, 0.09)',
                   backgroundColor: isActive
-                    ? 'rgba(34, 197, 94, 0.18)'
-                    : 'rgba(255, 255, 255, 0.04)',
+                    ? 'rgba(16, 185, 129, 0.12)'
+                    : 'rgba(255, 255, 255, 0.03)',
                   boxShadow: isActive
-                    ? '0 0 14px rgba(34, 197, 94, 0.22), 0 2px 6px rgba(0, 0, 0, 0.25)'
+                    ? '0 2px 8px rgba(0, 0, 0, 0.2)'
                     : 'none',
                   color: '#FFFFFF',
                   cursor: isActive ? 'default' : 'pointer',
@@ -169,15 +168,15 @@ export const FooterLanguageSelector = () => {
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.09)';
-                    e.currentTarget.style.borderColor = 'rgba(74, 222, 128, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }
                 }}
@@ -187,7 +186,7 @@ export const FooterLanguageSelector = () => {
                   style={{
                     fontSize: '0.9rem',
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#FFFFFF' : '#E2E8F0',
+                    color: isActive ? '#FFFFFF' : '#CBD5E1',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.3rem'
@@ -198,7 +197,7 @@ export const FooterLanguageSelector = () => {
                     <span
                       style={{
                         fontSize: '0.72rem',
-                        color: isActive ? '#86EFAC' : '#94A3B8',
+                        color: isActive ? '#A7F3D0' : '#64748B',
                         fontWeight: 400
                       }}
                     >
@@ -213,13 +212,12 @@ export const FooterLanguageSelector = () => {
                       width: '16px',
                       height: '16px',
                       borderRadius: '50%',
-                      backgroundColor: '#22C55E',
+                      backgroundColor: '#10B981',
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#081B15',
-                      marginLeft: '0.2rem',
-                      boxShadow: '0 0 6px rgba(34, 197, 94, 0.6)'
+                      color: '#FFFFFF',
+                      marginLeft: '0.2rem'
                     }}
                   >
                     <Check size={11} strokeWidth={3} />
@@ -236,21 +234,21 @@ export const FooterLanguageSelector = () => {
         style={{
           marginTop: '1rem',
           paddingTop: '0.75rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.07)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '0.5rem',
           fontSize: '0.76rem',
-          color: '#94A3B8'
+          color: '#64748B'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           {isTranslating ? (
             <>
-              <Loader2 size={13} className="spin-animate" color="#4ADE80" />
-              <span style={{ color: '#86EFAC', fontWeight: 500 }}>
+              <Loader2 size={13} className="spin-animate" color="#10B981" />
+              <span style={{ color: '#94A3B8', fontWeight: 500 }}>
                 Translating marketplace... કૃપા કરીને રાહ જુઓ... कृपया प्रतीक्षा करें...
               </span>
             </>
@@ -261,14 +259,13 @@ export const FooterLanguageSelector = () => {
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  backgroundColor: '#22C55E',
-                  display: 'inline-block',
-                  boxShadow: '0 0 6px #22C55E'
+                  backgroundColor: '#10B981',
+                  display: 'inline-block'
                 }}
               />
-              <span>
+              <span style={{ color: '#94A3B8' }}>
                 Active Language:{' '}
-                <strong style={{ color: '#F1F5F9', fontWeight: 600 }}>
+                <strong style={{ color: '#E2E8F0', fontWeight: 600 }}>
                   {currentLanguage === 'hi'
                     ? 'हिन्दी (Hindi)'
                     : currentLanguage === 'gu'
@@ -280,8 +277,8 @@ export const FooterLanguageSelector = () => {
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#6EE7B7' }}>
-          <ShieldCheck size={14} color="#4ADE80" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#64748B' }}>
+          <ShieldCheck size={14} color="#10B981" />
           <span>Regional Language Support for Gujarat & India</span>
         </div>
       </div>

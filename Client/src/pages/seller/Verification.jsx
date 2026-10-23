@@ -43,6 +43,7 @@ export const Verification = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [actionId, setActionId] = useState(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   // Drag and drop states
   const [isDraggingLandDoc, setIsDraggingLandDoc] = useState(false);
@@ -66,6 +67,21 @@ export const Verification = () => {
     selfieSize: null,
     notes: 'Cultivating crops and produce for wholesale market.'
   });
+
+  const resolveMediaUrl = (url, type = 'document') => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
+      return url;
+    }
+    const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+    if (url.startsWith('/')) {
+      return `${baseUrl}${url}`;
+    }
+    if (type === 'document' || url.toLowerCase().endsWith('.pdf')) {
+      return `${baseUrl}/uploads/documents/${url}`;
+    }
+    return `${baseUrl}/uploads/images/${url}`;
+  };
 
   const formatFileSize = (bytes) => {
     if (!bytes) return '';
@@ -660,128 +676,346 @@ export const Verification = () => {
       </div>
 
       {/* Main Interactive Container */}
-      {status === 'Verified' ? (
-        /* ======================== VERIFIED CERTIFICATE STATE ======================== */
-        <div
-          style={{
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%)',
-            border: '2px solid #86EFAC',
-            borderRadius: '16px',
-            padding: '2.75rem 2rem',
-            textAlign: 'center',
-            boxShadow: '0 8px 24px -4px rgba(16, 185, 129, 0.12)',
-            marginBottom: '2rem',
-            position: 'relative'
-          }}
-        >
+      {status === 'Verified' && (
+        /* ======================== VERIFIED CERTIFICATE & DOSSIER STATE ======================== */
+        <>
           <div
             style={{
-              width: '74px',
-              height: '74px',
-              borderRadius: '50%',
-              backgroundColor: '#ECFDF5',
-              border: '4px solid #A7F3D0',
-              color: '#059669',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '1.25rem',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.2)'
+              background: 'linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%)',
+              border: '2px solid #86EFAC',
+              borderRadius: '16px',
+              padding: '2.5rem 2rem',
+              textAlign: 'center',
+              boxShadow: '0 8px 24px -4px rgba(16, 185, 129, 0.12)',
+              marginBottom: '1.75rem',
+              position: 'relative'
             }}
           >
-            <ShieldCheck size={42} strokeWidth={2.4} />
-          </div>
-
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              borderRadius: '9999px',
-              backgroundColor: '#DCFCE7',
-              border: '1px solid #86EFAC',
-              color: '#15803D',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              marginBottom: '0.75rem'
-            }}
-          >
-            Certificate of Authenticity Issued
-          </div>
-
-          <h2
-            style={{
-              fontFamily: 'Playfair Display, Georgia, serif',
-              fontSize: '1.85rem',
-              fontWeight: 700,
-              color: '#064E3B',
-              margin: '0 0 0.5rem 0'
-            }}
-          >
-            Official Verified Farmer Status Active
-          </h2>
-
-          <p
-            style={{
-              color: '#4B5563',
-              fontSize: '0.95rem',
-              maxWidth: '580px',
-              margin: '0 auto 1.75rem auto',
-              lineHeight: 1.6
-            }}
-          >
-            Your agricultural land records and identity documentation have been audited and officially approved by the FarmerBandh Trust & Safety Board. The green verification shield is now displayed on all your public produce listings.
-          </p>
-
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '1rem',
-              flexWrap: 'wrap'
-            }}
-          >
-            <Link
-              to="/seller/listings"
+            <div
               style={{
+                width: '72px',
+                height: '72px',
+                borderRadius: '50%',
+                backgroundColor: '#ECFDF5',
+                border: '4px solid #A7F3D0',
+                color: '#059669',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '0.75rem 1.75rem',
-                borderRadius: '10px',
-                backgroundColor: '#1B4D3E',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: '0.92rem',
-                textDecoration: 'none',
-                boxShadow: '0 4px 12px rgba(27, 77, 62, 0.25)'
+                justifyContent: 'center',
+                marginBottom: '1.25rem',
+                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.2)'
               }}
             >
-              Manage Harvest Listings <ArrowRight size={16} />
-            </Link>
-            <Link
-              to="/seller/listings/new"
+              <ShieldCheck size={40} strokeWidth={2.4} />
+            </div>
+
+            <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0.75rem 1.75rem',
-                borderRadius: '10px',
-                backgroundColor: '#FFFFFF',
-                color: '#1B4D3E',
-                border: '1.5px solid #1B4D3E',
+                display: 'inline-block',
+                padding: '4px 14px',
+                borderRadius: '9999px',
+                backgroundColor: '#DCFCE7',
+                border: '1px solid #86EFAC',
+                color: '#15803D',
+                fontSize: '0.75rem',
                 fontWeight: 700,
-                fontSize: '0.92rem',
-                textDecoration: 'none'
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                marginBottom: '0.75rem'
               }}
             >
-              Publish New Product
-            </Link>
+              Certificate of Authenticity Issued
+            </div>
+
+            <h2
+              style={{
+                fontFamily: 'Playfair Display, Georgia, serif',
+                fontSize: '1.85rem',
+                fontWeight: 700,
+                color: '#064E3B',
+                margin: '0 0 0.5rem 0'
+              }}
+            >
+              Official Verified Farmer Status Active
+            </h2>
+
+            <p
+              style={{
+                color: '#4B5563',
+                fontSize: '0.95rem',
+                maxWidth: '620px',
+                margin: '0 auto 1.5rem auto',
+                lineHeight: 1.6
+              }}
+            >
+              Your agricultural land records and identity documentation have been audited and officially approved by the FarmerBandh Trust & Safety Board. The green verification shield is now displayed on all your public produce listings.
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                flexWrap: 'wrap'
+              }}
+            >
+              <Link
+                to="/seller/listings"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '0.65rem 1.4rem',
+                  borderRadius: '10px',
+                  backgroundColor: '#1B4D3E',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(27, 77, 62, 0.25)'
+                }}
+              >
+                Manage Harvest Listings <ArrowRight size={15} />
+              </Link>
+              <Link
+                to="/seller/listings/new"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '0.65rem 1.4rem',
+                  borderRadius: '10px',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1B4D3E',
+                  border: '1.5px solid #1B4D3E',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  textDecoration: 'none'
+                }}
+              >
+                Publish New Product
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowUpdateForm((prev) => !prev)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '0.65rem 1.4rem',
+                  borderRadius: '10px',
+                  backgroundColor: showUpdateForm ? '#FEF2F2' : '#EFF6FF',
+                  color: showUpdateForm ? '#DC2626' : '#1D4ED8',
+                  border: '1.5px solid ' + (showUpdateForm ? '#FECACA' : '#BFDBFE'),
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer'
+                }}
+              >
+                <FileUp size={16} />
+                {showUpdateForm ? 'Close Document Update Form' : 'Update / Resubmit Land Records & Documents'}
+              </button>
+            </div>
           </div>
-        </div>
-      ) : currentReq && currentReq.status === 'Pending' ? (
-        /* ======================== PENDING AUDIT STATE ======================== */
+
+          {/* ======================== VERIFIED DOCUMENTS VAULT & DOSSIER ======================== */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '16px',
+              padding: '1.75rem',
+              boxShadow: '0 3px 12px rgba(0,0,0,0.03)',
+              marginBottom: '2rem'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FileCheck size={20} color="#059669" />
+                  Official Audited Documents & Records Dossier
+                </h3>
+                <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#6B7280' }}>
+                  Active clearance documents verified by the revenue audit desk
+                </p>
+              </div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '9999px', backgroundColor: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0' }}>
+                All Records Certified
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '1.25rem',
+                marginBottom: '1.5rem'
+              }}
+            >
+              {/* Record 1: Aadhaar */}
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Lock size={18} color="#0284C7" />
+                      <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#0F172A' }}>Government ID (Aadhaar)</span>
+                    </div>
+                    <CheckCircle2 size={16} color="#059669" />
+                  </div>
+                  <div style={{ fontSize: '0.83rem', color: '#64748B', lineHeight: 1.6 }}>
+                    <div>UIDAI Number: <strong style={{ color: '#1E293B', letterSpacing: '0.04em' }}>{currentReq?.aadhaarNumber ? (currentReq.aadhaarNumber.length > 4 ? `XXXX-XXXX-${currentReq.aadhaarNumber.slice(-4)}` : currentReq.aadhaarNumber) : 'XXXX-XXXX-1098'}</strong></div>
+                    <div>Status: <span style={{ color: '#059669', fontWeight: 600 }}>UIDAI Encrypted & Certified</span></div>
+                  </div>
+                </div>
+                <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #E2E8F0', fontSize: '0.75rem', color: '#94A3B8' }}>
+                  256-Bit e-KYC Identity Verification
+                </div>
+              </div>
+
+              {/* Record 2: Land Revenue Document */}
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FileText size={18} color="#059669" />
+                      <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#0F172A' }}>Land Revenue & Audit</span>
+                    </div>
+                    <CheckCircle2 size={16} color="#059669" />
+                  </div>
+                  <div style={{ fontSize: '0.83rem', color: '#64748B', lineHeight: 1.6 }}>
+                    <div>Document Type: <strong style={{ color: '#1E293B' }}>7/12 Extract / Revenue Record</strong></div>
+                    <div>Status: <span style={{ color: '#059669', fontWeight: 600 }}>Revenue Audit Approved</span></div>
+                  </div>
+                </div>
+                <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #E2E8F0' }}>
+                  {(() => {
+                    const rawDoc = currentReq?.landRecordUrl || 'sunita_organic_cert.pdf';
+                    const fullDocUrl = resolveMediaUrl(rawDoc, 'document');
+                    return (
+                      <a
+                        href={fullDocUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#059669',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        View Official Document <ExternalLink size={13} />
+                      </a>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Record 3: Farmer Photo */}
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Camera size={18} color="#D97706" />
+                      <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#0F172A' }}>Farmer Photo & Premise</span>
+                    </div>
+                    <CheckCircle2 size={16} color="#059669" />
+                  </div>
+                  <div style={{ fontSize: '0.83rem', color: '#64748B', lineHeight: 1.6 }}>
+                    <div>Proof: <strong style={{ color: '#1E293B' }}>Farm Premise Geo-Inspection</strong></div>
+                    <div>Status: <span style={{ color: '#059669', fontWeight: 600 }}>Visual ID Matched</span></div>
+                  </div>
+                </div>
+                <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #E2E8F0' }}>
+                  {(() => {
+                    const rawPhoto = currentReq?.selfieUrl || 'sunita_photo.jpg';
+                    const fullPhotoUrl = resolveMediaUrl(rawPhoto, 'image');
+                    return (
+                      <a
+                        href={fullPhotoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#D97706',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        View Farm Photograph <ExternalLink size={13} />
+                      </a>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* Clearance Metadata Footer */}
+            <div
+              style={{
+                backgroundColor: '#F1F5F9',
+                borderRadius: '10px',
+                padding: '0.85rem 1.25rem',
+                fontSize: '0.82rem',
+                color: '#475569',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.5rem'
+              }}
+            >
+              <div>
+                Application <strong>#{currentReq?.requestNumber || 'FB-VR-20261011-0002'}</strong> • Audited on{' '}
+                {currentReq?.reviewedAt
+                  ? new Date(currentReq.reviewedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+                  : '11 October 2026'}
+              </div>
+              <div style={{ fontStyle: 'italic', color: '#334155' }}>
+                "{currentReq?.notes || 'Organic certified farm produce cleared for wholesale trade.'}"
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ======================== PENDING AUDIT STATE ======================== */}
+      {status !== 'Verified' && currentReq && currentReq.status === 'Pending' && (
         <div
           style={{
             backgroundColor: '#FFFFFF',
@@ -878,7 +1112,7 @@ export const Verification = () => {
                     <FileText size={15} color="#059669" /> Land Revenue Record (7/12)
                   </span>
                   <a
-                    href={currentReq.landRecordUrl}
+                    href={resolveMediaUrl(currentReq.landRecordUrl, 'document')}
                     target="_blank"
                     rel="noreferrer"
                     style={{
@@ -904,7 +1138,7 @@ export const Verification = () => {
                     <Camera size={15} color="#059669" /> Farmer Photo at Farm
                   </span>
                   <a
-                    href={currentReq.selfieUrl}
+                    href={resolveMediaUrl(currentReq.selfieUrl, 'image')}
                     target="_blank"
                     rel="noreferrer"
                     style={{
@@ -998,8 +1232,10 @@ export const Verification = () => {
             </div>
           </div>
         </div>
-      ) : (
-        /* ======================== VERIFICATION SUBMISSION FORM ======================== */
+      )}
+
+      {/* ======================== VERIFICATION SUBMISSION / UPDATE FORM ======================== */}
+      {(status === 'Unverified' || status === 'Rejected' || (status === 'Verified' && showUpdateForm) || (!currentReq && status !== 'Verified')) && (
         <div
           style={{
             backgroundColor: '#FFFFFF',

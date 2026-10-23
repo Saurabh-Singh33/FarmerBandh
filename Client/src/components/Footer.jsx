@@ -8,9 +8,9 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        background: 'radial-gradient(ellipse 90% 60% at 50% 0%, #123528 0%, #081B14 100%)',
+        background: 'radial-gradient(ellipse 80% 50% at 50% 0%, #0F1C16 0%, #070D0A 100%)',
         color: '#E2E8F0',
-        borderTop: '1px solid rgba(74, 222, 128, 0.15)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
         paddingTop: '3.75rem',
         paddingBottom: '2.5rem'
@@ -44,15 +44,15 @@ export const Footer = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
+                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#081B14',
-                boxShadow: '0 4px 14px rgba(34,197,94,0.35)'
+                color: '#FFFFFF',
+                boxShadow: '0 3px 12px rgba(16, 185, 129, 0.25)'
               }}
             >
-              <SproutIcon size={22} color="#081B14" />
+              <SproutIcon size={22} color="#FFFFFF" />
             </div>
             <div>
               <span
@@ -68,7 +68,7 @@ export const Footer = () => {
               >
                 FarmerBandh
               </span>
-              <span style={{ fontSize: '0.7rem', color: '#4ADE80', letterSpacing: '0.08em', fontWeight: 700 }}>
+              <span style={{ fontSize: '0.7rem', color: '#34D399', letterSpacing: '0.08em', fontWeight: 700 }}>
                 DIRECT LOCAL PRODUCE
               </span>
             </div>
@@ -90,13 +90,13 @@ export const Footer = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              backgroundColor: 'rgba(34, 197, 94, 0.08)',
-              border: '1px solid rgba(74, 222, 128, 0.22)',
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               padding: '5px 12px',
               borderRadius: '9999px',
               fontSize: '0.78rem',
               fontWeight: 500,
-              color: '#86EFAC'
+              color: '#94A3B8'
             }}
           >
             <span
@@ -104,8 +104,8 @@ export const Footer = () => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#22C55E',
-                boxShadow: '0 0 8px #22C55E'
+                backgroundColor: '#10B981',
+                boxShadow: '0 0 6px rgba(16, 185, 129, 0.5)'
               }}
             />
             Built for farmers across Gujarat & India
@@ -245,12 +245,12 @@ export const Footer = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.86rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8' }}>
-              <Mail size={15} color="#4ADE80" style={{ flexShrink: 0 }} />
+              <Mail size={15} color="#10B981" style={{ flexShrink: 0 }} />
               <span>Email:</span>
               <a
                 href="mailto:support@farmerbandh.com"
                 style={{ color: '#F1F5F9', textDecoration: 'none', fontWeight: 500, transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#4ADE80')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#34D399')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#F1F5F9')}
               >
                 support@farmerbandh.com
@@ -258,20 +258,20 @@ export const Footer = () => {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8' }}>
-              <Phone size={15} color="#4ADE80" style={{ flexShrink: 0 }} />
+              <Phone size={15} color="#10B981" style={{ flexShrink: 0 }} />
               <span>Toll-Free:</span>
               <a
                 href="tel:1800123456"
                 style={{ color: '#F1F5F9', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#4ADE80')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#34D399')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#F1F5F9')}
               >
                 1800-123-456
               </a>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#6EE7B7', marginTop: '2px' }}>
-              <Clock size={14} color="#4ADE80" style={{ flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#94A3B8', marginTop: '2px' }}>
+              <Clock size={14} color="#10B981" style={{ flexShrink: 0 }} />
               <span>Mon – Sat: 9:00 AM – 6:00 PM IST</span>
             </div>
           </div>
@@ -289,7 +289,7 @@ export const Footer = () => {
           maxWidth: '1200px',
           margin: '0 auto',
           padding: '1.5rem 1.5rem 0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -303,12 +303,12 @@ export const Footer = () => {
           © {new Date().getFullYear()} FarmerBandh · All rights reserved.
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#86EFAC', fontSize: '0.78rem' }}>
-          <ShieldCheck size={14} color="#4ADE80" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#94A3B8', fontSize: '0.78rem' }}>
+          <ShieldCheck size={15} color="#10B981" />
           <span>Direct Farm-to-Buyer Escrow Protection</span>
         </div>
 
-        <div style={{ color: '#94A3B8', fontSize: '0.78rem' }}>
+        <div style={{ color: '#64748B', fontSize: '0.78rem' }}>
           Proudly crafted for Indian Agriculture 🇮🇳
         </div>
       </div>

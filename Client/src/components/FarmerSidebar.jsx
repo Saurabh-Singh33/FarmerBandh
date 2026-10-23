@@ -50,73 +50,88 @@ export const FarmerSidebar = () => {
     return name[0].toUpperCase();
   };
 
-  const navItems = [
+  const navSections = [
     {
-      name: 'Seller Hub',
-      path: '/seller/dashboard',
-      icon: LayoutDashboard
+      title: 'COMMERCE & SALES',
+      items: [
+        {
+          name: 'Seller Hub',
+          path: '/seller/dashboard',
+          icon: LayoutDashboard
+        },
+        {
+          name: 'My Listings',
+          path: '/seller/listings',
+          icon: Package,
+          badge: dashboard?.activeListingsCount != null ? `${dashboard.activeListingsCount}` : null
+        },
+        {
+          name: 'Orders Queue',
+          path: '/seller/orders',
+          icon: ClipboardList,
+          badge: dashboard?.pendingOrdersCount > 0 ? `${dashboard.pendingOrdersCount}` : null
+        },
+        {
+          name: 'Negotiations',
+          path: '/seller/negotiations',
+          icon: Handshake,
+          badge: unreadCount > 0 ? `${unreadCount}` : null
+        }
+      ]
     },
     {
-      name: 'My Listings',
-      path: '/seller/listings',
-      icon: Package,
-      badge: dashboard?.activeListingsCount != null ? `${dashboard.activeListingsCount}` : null
+      title: 'FINANCE & OPERATIONS',
+      items: [
+        {
+          name: 'Returns',
+          path: '/seller/returns',
+          icon: RotateCcw,
+          badge: dashboard?.openReturnsCount > 0 ? `${dashboard.openReturnsCount}` : null
+        },
+        {
+          name: 'Disputes',
+          path: '/seller/disputes',
+          icon: MessageSquareWarning
+        },
+        {
+          name: 'Payouts & Earnings',
+          path: '/seller/payouts',
+          icon: Wallet
+        },
+        {
+          name: 'Analytics',
+          path: '/seller/analytics',
+          icon: BarChart3
+        }
+      ]
     },
     {
-      name: 'Orders Queue',
-      path: '/seller/orders',
-      icon: ClipboardList,
-      badge: dashboard?.pendingOrdersCount > 0 ? `${dashboard.pendingOrdersCount}` : null
-    },
-    {
-      name: 'Negotiations',
-      path: '/seller/negotiations',
-      icon: Handshake,
-      badge: unreadCount > 0 ? `${unreadCount}` : null
-    },
-    {
-      name: 'Returns',
-      path: '/seller/returns',
-      icon: RotateCcw,
-      badge: dashboard?.openReturnsCount > 0 ? `${dashboard.openReturnsCount}` : null
-    },
-    {
-      name: 'Disputes',
-      path: '/seller/disputes',
-      icon: MessageSquareWarning
-    },
-    {
-      name: 'Payouts & Earnings',
-      path: '/seller/payouts',
-      icon: Wallet
-    },
-    {
-      name: 'Analytics',
-      path: '/seller/analytics',
-      icon: BarChart3
-    },
-    {
-      name: 'Verification',
-      path: '/seller/verification',
-      icon: ShieldCheck,
-      badge: verificationStatus === 'Verified' ? '✓' : (verificationStatus === 'Pending' ? '...' : '!')
-    },
-    {
-      name: 'Farm Profile',
-      path: '/seller/profile',
-      icon: Settings
-    },
-    {
-      name: 'Notifications',
-      path: '/notifications',
-      icon: Bell,
-      badge: notifUnreadCount > 0 ? `${notifUnreadCount}` : null
-    },
-    {
-      name: 'Marketplace',
-      path: '/marketplace',
-      icon: Store,
-      badge: 'Buyer View'
+      title: 'ACCOUNT & SYSTEM',
+      items: [
+        {
+          name: 'Verification',
+          path: '/seller/verification',
+          icon: ShieldCheck,
+          badge: verificationStatus === 'Verified' ? '✓' : (verificationStatus === 'Pending' ? '...' : '!')
+        },
+        {
+          name: 'Farm Profile',
+          path: '/seller/profile',
+          icon: Settings
+        },
+        {
+          name: 'Notifications',
+          path: '/notifications',
+          icon: Bell,
+          badge: notifUnreadCount > 0 ? `${notifUnreadCount}` : null
+        },
+        {
+          name: 'Marketplace',
+          path: '/marketplace',
+          icon: Store,
+          badge: 'Buyer View'
+        }
+      ]
     }
   ];
 
@@ -132,33 +147,31 @@ export const FarmerSidebar = () => {
         borderRight: '1px solid #E5E7EB',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '0.75rem 0.75rem',
+        padding: '0.5rem 0.6rem',
         boxSizing: 'border-box',
         zIndex: 90,
         boxShadow: '1px 0 4px rgba(0,0,0,0.03)',
-        overflowY: 'auto'
+        overflow: 'hidden'
       }}
     >
       {/* Top Section: Logo & Branding */}
-      <div>
+      <div style={{ flexShrink: 0, marginBottom: '0.35rem' }}>
         <Link
           to="/seller/dashboard"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.6rem',
+            gap: '0.55rem',
             textDecoration: 'none',
-            padding: '0.2rem 0.35rem 0.65rem 0.35rem',
-            borderBottom: '1px solid #F3F4F6',
-            marginBottom: '0.5rem'
+            padding: '0.15rem 0.35rem 0.45rem 0.35rem',
+            borderBottom: '1px solid #F3F4F6'
           }}
         >
           <div
             style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
+              width: '28px',
+              height: '28px',
+              borderRadius: '7px',
               backgroundColor: '#1B4D3E',
               display: 'flex',
               alignItems: 'center',
@@ -168,24 +181,24 @@ export const FarmerSidebar = () => {
               flexShrink: 0
             }}
           >
-            <Sprout size={18} color="#FFFFFF" strokeWidth={2.2} />
+            <Sprout size={16} color="#FFFFFF" strokeWidth={2.2} />
           </div>
           <div>
             <div
               style={{
                 fontFamily: 'Playfair Display, Georgia, serif',
-                fontSize: '1.15rem',
+                fontSize: '1.05rem',
                 fontWeight: 700,
                 color: '#1B4D3E',
                 letterSpacing: '-0.02em',
-                lineHeight: 1.1
+                lineHeight: 1.15
               }}
             >
               FarmerBandh
             </div>
             <div
               style={{
-                fontSize: '0.68rem',
+                fontSize: '0.64rem',
                 color: '#2E7D32',
                 fontWeight: 600,
                 display: 'flex',
@@ -198,81 +211,114 @@ export const FarmerSidebar = () => {
             </div>
           </div>
         </Link>
-
-        {/* Navigation Items */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.4rem 0.65rem',
-                  borderRadius: '7px',
-                  textDecoration: 'none',
-                  fontSize: '0.84rem',
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? '#1B4D3E' : '#4B5563',
-                  backgroundColor: isActive ? '#E8F5E9' : 'transparent',
-                  transition: 'all 0.12s ease',
-                  border: isActive ? '1px solid #C8E6C9' : '1px solid transparent'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = '#F9FBF8';
-                    e.currentTarget.style.color = '#1B4D3E';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#4B5563';
-                  }
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <Icon
-                    size={17}
-                    color={isActive ? '#1B4D3E' : '#6B7280'}
-                    strokeWidth={isActive ? 2.2 : 1.8}
-                  />
-                  <span>{item.name}</span>
-                </div>
-                {item.badge && (
-                  <span
-                    style={{
-                      fontSize: '0.62rem',
-                      padding: '1px 5px',
-                      borderRadius: '5px',
-                      backgroundColor: isActive ? '#C8E6C9' : '#F3F4F6',
-                      color: isActive ? '#1B4D3E' : '#6B7280',
-                      fontWeight: 600,
-                      lineHeight: '1.2'
-                    }}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
       </div>
 
-      {/* Bottom Section: Farmer Profile & Logout */}
-      <div
+      {/* Navigation Sections (Evenly distributed to cover all space seamlessly) */}
+      <nav
+        className="sidebar-scroll"
         style={{
-          borderTop: '1px solid #F3F4F6',
-          paddingTop: '0.5rem',
+          flex: 1,
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.4rem'
+          justifyContent: 'space-between',
+          padding: '0.2rem 0',
+          gap: '0.35rem'
+        }}
+      >
+        {navSections.map((section) => (
+          <div key={section.title} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                fontSize: '0.62rem',
+                fontWeight: 700,
+                color: '#9CA3AF',
+                letterSpacing: '0.08em',
+                padding: '0.15rem 0.45rem 0.15rem 0.45rem',
+                textTransform: 'uppercase'
+              }}
+            >
+              {section.title}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1px, 0.25vh, 2.5px)' }}>
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: 'clamp(0.26rem, 0.44vh, 0.38rem) 0.52rem',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      fontSize: '0.8rem',
+                      fontWeight: isActive ? 600 : 500,
+                      color: isActive ? '#1B4D3E' : '#4B5563',
+                      backgroundColor: isActive ? '#E8F5E9' : 'transparent',
+                      borderLeft: isActive ? '3px solid #1B4D3E' : '3px solid transparent',
+                      transition: 'all 0.12s ease',
+                      lineHeight: 1.25
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = '#F9FBF8';
+                        e.currentTarget.style.color = '#1B4D3E';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#4B5563';
+                      }
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.52rem' }}>
+                      <Icon
+                        size={15}
+                        color={isActive ? '#1B4D3E' : '#6B7280'}
+                        strokeWidth={isActive ? 2.2 : 1.8}
+                        style={{ flexShrink: 0 }}
+                      />
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span
+                        style={{
+                          fontSize: '0.62rem',
+                          padding: '1px 5px',
+                          borderRadius: '5px',
+                          backgroundColor: isActive ? '#C8E6C9' : '#F3F4F6',
+                          color: isActive ? '#1B4D3E' : '#6B7280',
+                          fontWeight: 600,
+                          lineHeight: '1.2'
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      {/* Bottom Section: Farmer Profile & Logout (Pinned, always visible) */}
+      <div
+        style={{
+          flexShrink: 0,
+          borderTop: '1px solid #F3F4F6',
+          paddingTop: '0.4rem',
+          marginTop: '0.35rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.35rem'
         }}
       >
         {/* User Card */}

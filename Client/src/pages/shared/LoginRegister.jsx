@@ -376,6 +376,78 @@ export const LoginRegister = () => {
                   Create an account
                 </span>
               </div>
+
+              {/* Quick Demo Access Pills */}
+              <div style={{ marginTop: '1.25rem', paddingTop: '0.85rem', borderTop: '1px dashed #E5E7EB' }}>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem', textAlign: 'center' }}>
+                  Quick Demo Access (Click to auto-fill)
+                </div>
+                <div style={{ display: 'flex', gap: '0.45rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    id="demo-login-admin"
+                    onClick={() => {
+                      setEmail('admin@farmerbandh.com');
+                      setPassword('Admin@123');
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#FEF3C7',
+                      color: '#92400E',
+                      border: '1px solid #FDE68A',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                    title="Auto-fill System Admin credentials"
+                  >
+                    👑 Admin
+                  </button>
+                  <button
+                    type="button"
+                    id="demo-login-farmer"
+                    onClick={() => {
+                      setEmail('ramesh@farm.com');
+                      setPassword('Farmer@123');
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#ECFDF5',
+                      color: '#065F46',
+                      border: '1px solid #A7F3D0',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                    title="Auto-fill Farmer Seller credentials"
+                  >
+                    🚜 Farmer
+                  </button>
+                  <button
+                    type="button"
+                    id="demo-login-buyer"
+                    onClick={() => {
+                      setEmail('anita@farm.com');
+                      setPassword('Buyer@123');
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#EFF6FF',
+                      color: '#1E40AF',
+                      border: '1px solid #BFDBFE',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                    title="Auto-fill Buyer credentials"
+                  >
+                    🛒 Buyer
+                  </button>
+                </div>
+              </div>
             </form>
           ) : (
             /* REGISTER FORM */

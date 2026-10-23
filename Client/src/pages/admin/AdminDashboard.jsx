@@ -76,7 +76,7 @@ export const AdminDashboard = () => {
   const kpis = [
     {
       title: 'Platform GMV',
-      value: formatCurrency(data?.totalGmv || 0),
+      value: formatCurrency(data?.revenue?.gmvThisMonth ?? data?.totalGmv ?? 0),
       trend: data?.gmvGrowthPercent,
       trendLabel: 'this month',
       icon: IndianRupee,
@@ -86,7 +86,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Platform Net Revenue',
-      value: formatCurrency(data?.platformRevenue || 0),
+      value: formatCurrency(data?.revenue?.commissionThisMonth ?? data?.platformRevenue ?? 0),
       trend: data?.revenueGrowthPercent,
       trendLabel: 'commission & fees',
       icon: TrendingUp,
@@ -96,8 +96,8 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Total Users',
-      value: (data?.totalUsers || 0).toLocaleString(),
-      subtitle: `${data?.totalFarmers || 0} farmers • ${data?.totalBuyers || 0} buyers`,
+      value: (data?.users?.total ?? data?.totalUsers ?? 0).toLocaleString(),
+      subtitle: `${data?.users?.farmers ?? data?.totalFarmers ?? 0} farmers • ${data?.users?.buyers ?? data?.totalBuyers ?? 0} buyers`,
       icon: Users,
       iconColor: '#7C3AED',
       iconBg: '#F5F3FF',
@@ -105,8 +105,8 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Completed Orders',
-      value: (data?.totalOrders || 0).toLocaleString(),
-      subtitle: `${data?.activeOrdersCount || 0} in progress`,
+      value: (data?.orders?.total ?? data?.totalOrders ?? 0).toLocaleString(),
+      subtitle: `${data?.orders?.pending ?? data?.activeOrdersCount ?? 0} in progress`,
       icon: ClipboardList,
       iconColor: '#D97706',
       iconBg: '#FEF3C7',
@@ -117,7 +117,7 @@ export const AdminDashboard = () => {
   const pendingItems = [
     {
       title: 'Pending Verifications',
-      count: data?.pendingVerificationsCount || 0,
+      count: data?.verifications?.pending ?? data?.pendingVerificationsCount ?? 0,
       path: '/admin/verifications',
       icon: UserCheck,
       color: '#0284C7',
@@ -126,7 +126,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Pending Payouts',
-      count: data?.pendingPayoutsCount || 0,
+      count: data?.payouts?.pending ?? data?.pendingPayoutsCount ?? 0,
       path: '/admin/payouts',
       icon: Wallet,
       color: '#D97706',
@@ -135,7 +135,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Open Disputes',
-      count: data?.openDisputesCount || 0,
+      count: data?.disputes?.open ?? data?.openDisputesCount ?? 0,
       path: '/admin/disputes',
       icon: MessageSquareWarning,
       color: '#DC2626',
@@ -144,7 +144,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Pending Refunds',
-      count: data?.pendingRefundsCount || 0,
+      count: data?.refunds?.pending ?? data?.pendingRefundsCount ?? 0,
       path: '/admin/refunds',
       icon: RotateCcw,
       color: '#475569',
