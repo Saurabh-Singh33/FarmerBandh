@@ -10,10 +10,47 @@ namespace FarmerBandh.API.Controllers;
 public class ChatbotController : ControllerBase
 {
     private readonly IChatbotService _chatbotService;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public ChatbotController(IChatbotService chatbotService)
+    public ChatbotController(IChatbotService chatbotService, IHttpClientFactory httpClientFactory)
     {
         _chatbotService = chatbotService;
+        _httpClientFactory = httpClientFactory;
+    }
+
+    [HttpGet("tts")]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
+    public async Task<IActionResult> GetTtsAudio([FromQuery] string text, [FromQuery] string lang = "gu")
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return BadRequest(new { message = "Text parameter is required." });
+        }
+
+        var cleanText = text.Length > 250 ? text.Substring(0, 250) : text;
+        var encoded = Uri.EscapeDataString(cleanText);
+        var targetLang = string.IsNullOrWhiteSpace(lang) ? "gu" : lang.ToLowerInvariant();
+        var url = $"https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl={targetLang}&q={encoded}";
+
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.Timeout = TimeSpan.FromSeconds(8);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var bytes = await response.Content.ReadAsByteArrayAsync();
+                return File(bytes, "audio/mpeg");
+            }
+        }
+        catch
+        {
+            // Fall through to 404
+        }
+
+        return NotFound();
     }
 
     [HttpPost("chat")]

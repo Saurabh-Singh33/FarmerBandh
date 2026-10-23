@@ -25,16 +25,25 @@ public static class DbSeeder
 
         try
         {
-            await context.Database.ExecuteSqlRawAsync("ALTER TABLE `Users` ADD COLUMN IF NOT EXISTS `ProfilePictureUrl` VARCHAR(500) NULL;");
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS `ContactMessages` (
+                    `Id` CHAR(36) NOT NULL PRIMARY KEY,
+                    `Name` VARCHAR(150) NOT NULL,
+                    `Email` VARCHAR(200) NOT NULL,
+                    `Phone` VARCHAR(50) NULL,
+                    `UserType` VARCHAR(50) NOT NULL DEFAULT 'general',
+                    `Subject` VARCHAR(250) NOT NULL,
+                    `Message` TEXT NOT NULL,
+                    `Status` VARCHAR(50) NOT NULL DEFAULT 'Pending',
+                    `AdminNotes` TEXT NULL,
+                    `AdminReplyText` TEXT NULL,
+                    `RepliedAt` DATETIME NULL,
+                    `RepliedByUserId` CHAR(36) NULL,
+                    `CreatedAt` DATETIME NOT NULL,
+                    `UpdatedAt` DATETIME NOT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         }
-        catch
-        {
-            try
-            {
-                await context.Database.ExecuteSqlRawAsync("ALTER TABLE `Users` ADD COLUMN `ProfilePictureUrl` VARCHAR(500) NULL;");
-            }
-            catch { /* Column already exists */ }
-        }
+        catch { /* Table already exists or database engine handled */ }
 
         // 1. Seed Users & Farmers & Buyers if missing
         var defaultAdminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL")?.Trim().ToLower() ?? "admin@farmerbandh.com";

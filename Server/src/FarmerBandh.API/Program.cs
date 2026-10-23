@@ -7,6 +7,7 @@ using FarmerBandh.Application.Validators;
 using FarmerBandh.Infrastructure.Data;
 using FarmerBandh.Infrastructure.Data.Seed;
 using FarmerBandh.Infrastructure.Repositories;
+using FarmerBandh.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -111,6 +112,11 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 // Chatbot AI Companion (OpenRouter)
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IChatbotService, ChatbotService>();
+
+// Contact Support & Email Services
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IContactService, ContactService>();
 
 // Hosted background service for expiring stale negotiations every 15 min
 builder.Services.AddHostedService<NegotiationExpiryService>();
