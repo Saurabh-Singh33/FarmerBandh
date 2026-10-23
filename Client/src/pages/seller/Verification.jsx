@@ -226,8 +226,7 @@ export const Verification = () => {
   };
 
   const handleMockReject = async (id) => {
-    const reason = window.prompt('Enter rejection reason for dev simulation:', 'Land record copy was blurry or incomplete.');
-    if (!reason) return;
+    const reason = 'Land record copy was blurry or incomplete.';
 
     try {
       setActionId(id);

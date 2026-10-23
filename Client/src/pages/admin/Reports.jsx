@@ -39,9 +39,13 @@ export const Reports = () => {
     return { from: from.toISOString(), to: to.toISOString() };
   };
 
-  const loadAllReports = async () => {
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const loadAllReports = async (showFullLoading = true) => {
     try {
-      setLoading(true);
+      if (showFullLoading) setLoading(true);
+      else setIsSyncing(true);
+
       const { from, to } = calculateDates(range);
 
       const [ov, rev, usr, tf, tb, tp, cat, loc] = await Promise.all([
@@ -64,14 +68,22 @@ export const Reports = () => {
       setCategories(cat || []);
       setLocations(loc || []);
     } catch (err) {
-      notify.error(err.response?.data?.message || err.message || 'Failed to load analytics.');
+      if (showFullLoading) {
+        notify.error(err.response?.data?.message || err.message || 'Failed to load analytics.');
+      }
     } finally {
       setLoading(false);
+      setIsSyncing(false);
     }
   };
 
   useEffect(() => {
-    loadAllReports();
+    loadAllReports(true);
+    // Real-time live polling every 20 seconds
+    const interval = setInterval(() => {
+      loadAllReports(false);
+    }, 20000);
+    return () => clearInterval(interval);
   }, [range]);
 
   const formatCurrency = (val) => {
@@ -202,8 +214,22 @@ export const Reports = () => {
           </p>
         </div>
 
-        {/* Range Selector & CSV Export */}
+        {/* Range Selector & Real-Time Sync & CSV Export */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Real-Time Live
+          </span>
+
+          <button
+            type="button"
+            onClick={() => loadAllReports(false)}
+            title="Refresh analytics data"
+            className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
+          >
+            <RefreshCw size={14} className={isSyncing ? 'animate-spin text-emerald-700' : ''} />
+          </button>
+
           <div style={{ display: 'inline-flex', backgroundColor: '#E2E8F0', padding: '2px', borderRadius: '8px' }}>
             {[
               { id: '7d', label: '7 Days' },
@@ -254,7 +280,7 @@ export const Reports = () => {
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '1.25rem' }}>
           <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 600 }}>Period GMV</span>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', marginTop: '4px' }}>
-            {formatCurrency(overview?.totalGmv || 0)}
+            {formatCurrency(overview?.totalGmv ?? overview?.totalRevenue ?? 0)}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#16A34A', marginTop: '4px', fontWeight: 600 }}>
             Gross merchandise traded
@@ -264,7 +290,7 @@ export const Reports = () => {
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '1.25rem' }}>
           <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 600 }}>Platform Net Revenue</span>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#059669', marginTop: '4px' }}>
-            {formatCurrency(overview?.netRevenue || 0)}
+            {formatCurrency(overview?.netRevenue ?? overview?.platformFeeRevenue ?? 0)}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
             Commission + platform charges

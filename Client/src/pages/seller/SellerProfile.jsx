@@ -381,9 +381,10 @@ export const SellerProfile = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <h1
               style={{
-                fontFamily: 'Playfair Display, Georgia, serif',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                 fontSize: '1.85rem',
-                fontWeight: 700,
+                fontWeight: 800,
+                letterSpacing: '-0.025em',
                 color: '#1B4D3E',
                 margin: 0
               }}

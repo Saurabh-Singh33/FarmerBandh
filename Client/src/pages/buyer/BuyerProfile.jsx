@@ -398,7 +398,7 @@ export const BuyerProfile = () => {
         {/* Page Title & Breadcrumbs */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 font-serif tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B4D3E] font-sans tracking-tight">
               My Profile & Account
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">

@@ -135,11 +135,11 @@ export const AdminSidebar = () => {
           <div>
             <div
               style={{
-                fontFamily: 'Playfair Display, Georgia, serif',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                 fontSize: '1.05rem',
-                fontWeight: 700,
+                fontWeight: 800,
                 color: '#1B4D3E',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.025em',
                 lineHeight: 1.15
               }}
             >

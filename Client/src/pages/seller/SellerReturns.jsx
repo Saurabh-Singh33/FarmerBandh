@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { RotateCcw, CheckCircle2, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { RotateCcw, CheckCircle2, XCircle, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { returnApi } from '../../services/returnApi';
 import StatusPill from '../../components/StatusPill';
 import { notify } from '../../context/NotificationContext';
@@ -32,19 +32,41 @@ export default function SellerReturns() {
     }
   };
 
-  const handleUpdateStatus = async (id, status) => {
-    const sellerNote = prompt(
-      status === 'Approved'
-        ? 'Enter approval note or instructions for buyer (optional):'
-        : 'Enter rejection reason for buyer:'
-    );
-    if (status === 'Rejected' && !sellerNote) return;
+  // In-app Return Status Action Modal (replaces browser window.prompt)
+  const [returnModal, setReturnModal] = useState({
+    isOpen: false,
+    id: null,
+    status: 'Approved',
+    note: ''
+  });
+
+  const openReturnModal = (id, status) => {
+    setReturnModal({
+      isOpen: true,
+      id,
+      status,
+      note: status === 'Approved' ? 'Return accepted. Replacement produce or refund initiated.' : ''
+    });
+  };
+
+  const closeReturnModal = () => {
+    setReturnModal({ isOpen: false, id: null, status: 'Approved', note: '' });
+  };
+
+  const handleConfirmReturnUpdate = async (e) => {
+    e?.preventDefault();
+    const { id, status, note } = returnModal;
+    if (status === 'Rejected' && !note.trim()) {
+      notify.warning('Please enter a rejection reason for the buyer.');
+      return;
+    }
 
     setUpdatingId(id);
     try {
-      const updated = await returnApi.updateReturnStatus(id, status, sellerNote || '');
+      const updated = await returnApi.updateReturnStatus(id, status, note.trim());
       setReturns((prev) => prev.map((r) => (r.id === id ? { ...r, ...updated, status } : r)));
-      notify.success(`Return status updated to ${status}.`, 'Return Updated');
+      closeReturnModal();
+      notify.success(`Return request marked as ${status}.`, 'Return Updated');
     } catch (err) {
       console.error('Failed to update return status:', err);
       notify.error(err.response?.data?.message || 'Failed to update status.');
@@ -159,16 +181,18 @@ export default function SellerReturns() {
                     {isPending && (
                       <>
                         <button
-                          onClick={() => handleUpdateStatus(ret.id, 'Approved')}
+                          type="button"
+                          onClick={() => openReturnModal(ret.id, 'Approved')}
                           disabled={isBusy}
-                          className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-lg shadow-sm disabled:opacity-50 inline-flex items-center gap-1"
+                          className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-lg shadow-sm disabled:opacity-50 inline-flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" /> Approve
                         </button>
                         <button
-                          onClick={() => handleUpdateStatus(ret.id, 'Rejected')}
+                          type="button"
+                          onClick={() => openReturnModal(ret.id, 'Rejected')}
                           disabled={isBusy}
-                          className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg shadow-sm disabled:opacity-50 inline-flex items-center gap-1"
+                          className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg shadow-sm disabled:opacity-50 inline-flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <XCircle className="w-3.5 h-3.5" /> Reject
                         </button>
@@ -179,6 +203,90 @@ export default function SellerReturns() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* In-App Return Modal Dialog */}
+      {returnModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">
+                  {returnModal.status === 'Approved' ? 'Approve Return Request' : 'Reject Return Request'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {returnModal.status === 'Approved'
+                    ? 'Confirm acceptance and enter fulfillment instructions for the buyer.'
+                    : 'Specify the reason why this return cannot be accepted.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeReturnModal}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmReturnUpdate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {returnModal.status === 'Approved'
+                    ? 'Instructions / note for buyer (optional):'
+                    : 'Rejection reason (required):'}
+                </label>
+                <textarea
+                  rows={3}
+                  value={returnModal.note}
+                  onChange={(e) => setReturnModal((prev) => ({ ...prev, note: e.target.value }))}
+                  placeholder={
+                    returnModal.status === 'Approved'
+                      ? 'e.g., Return approved. Please keep package ready for pickup...'
+                      : 'e.g., Produce was inspected and met agreed quality specifications...'
+                  }
+                  required={returnModal.status === 'Rejected'}
+                  autoFocus
+                  className="w-full p-3 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 outline-none text-slate-800 resize-none shadow-xs"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={closeReturnModal}
+                  disabled={updatingId !== null}
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={updatingId !== null || (returnModal.status === 'Rejected' && !returnModal.note.trim())}
+                  className={`px-5 py-2 text-white font-bold text-xs rounded-xl shadow-xs disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    returnModal.status === 'Approved'
+                      ? 'bg-emerald-800 hover:bg-emerald-900'
+                      : 'bg-rose-600 hover:bg-rose-700'
+                  }`}
+                >
+                  {updatingId !== null ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Updating...
+                    </>
+                  ) : returnModal.status === 'Approved' ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Confirm Approval
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3.5 h-3.5" /> Confirm Rejection
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

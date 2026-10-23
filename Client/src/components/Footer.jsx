@@ -8,9 +8,10 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        background: 'radial-gradient(ellipse 80% 50% at 50% 0%, #0F1C16 0%, #070D0A 100%)',
-        color: '#E2E8F0',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'linear-gradient(180deg, #EBF3EB 0%, #DCE8DC 100%)',
+        color: '#24382C',
+        borderTop: '3px solid #1B4D3E',
+        boxShadow: '0 -4px 20px rgba(27, 77, 62, 0.05)',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
         paddingTop: '3.75rem',
         paddingBottom: '2.5rem'
@@ -44,12 +45,12 @@ export const Footer = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #1B4D3E 0%, #2D6A4F 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#FFFFFF',
-                boxShadow: '0 3px 12px rgba(16, 185, 129, 0.25)'
+                boxShadow: '0 3px 12px rgba(27, 77, 62, 0.25)'
               }}
             >
               <SproutIcon size={22} color="#FFFFFF" />
@@ -60,7 +61,7 @@ export const Footer = () => {
                   fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                   fontSize: '1.4rem',
                   fontWeight: 800,
-                  color: '#FFFFFF',
+                  color: '#1B4D3E',
                   letterSpacing: '-0.025em',
                   display: 'block',
                   lineHeight: 1.15
@@ -68,7 +69,7 @@ export const Footer = () => {
               >
                 FarmerBandh
               </span>
-              <span style={{ fontSize: '0.7rem', color: '#34D399', letterSpacing: '0.08em', fontWeight: 700 }}>
+              <span style={{ fontSize: '0.7rem', color: '#2D6A4F', letterSpacing: '0.08em', fontWeight: 800 }}>
                 DIRECT LOCAL PRODUCE
               </span>
             </div>
@@ -77,9 +78,10 @@ export const Footer = () => {
           <p
             style={{
               fontSize: '0.88rem',
-              color: '#94A3B8',
+              color: '#2C4235',
               lineHeight: 1.65,
-              margin: '0 0 1.25rem 0'
+              margin: '0 0 1.25rem 0',
+              fontWeight: 450
             }}
           >
             Direct farm-to-buyer agricultural marketplace. Connecting verified regional growers with commercial buyers through transparent negotiation, fair pricing, and escrow protection.
@@ -89,23 +91,24 @@ export const Footer = () => {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              padding: '5px 12px',
+              gap: '0.55rem',
+              backgroundColor: '#FFFFFF',
+              border: '1.5px solid #C4D9C4',
+              padding: '6px 14px',
               borderRadius: '9999px',
               fontSize: '0.78rem',
-              fontWeight: 500,
-              color: '#94A3B8'
+              fontWeight: 600,
+              color: '#1B4D3E',
+              boxShadow: '0 2px 8px rgba(27, 77, 62, 0.06)'
             }}
           >
             <span
               style={{
-                width: '6px',
-                height: '6px',
+                width: '7px',
+                height: '7px',
                 borderRadius: '50%',
                 backgroundColor: '#10B981',
-                boxShadow: '0 0 6px rgba(16, 185, 129, 0.5)'
+                boxShadow: '0 0 6px rgba(16, 185, 129, 0.55)'
               }}
             />
             Built for farmers across Gujarat & India
@@ -117,11 +120,11 @@ export const Footer = () => {
           <h2
             style={{
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: '0.78rem',
-              fontWeight: 700,
+              fontSize: '0.82rem',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: '#F8FAFC',
+              letterSpacing: '0.09em',
+              color: '#1B4D3E',
               marginBottom: '1.25rem'
             }}
           >
@@ -161,11 +164,11 @@ export const Footer = () => {
           <h2
             style={{
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: '0.78rem',
-              fontWeight: 700,
+              fontSize: '0.82rem',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: '#F8FAFC',
+              letterSpacing: '0.09em',
+              color: '#1B4D3E',
               marginBottom: '1.25rem'
             }}
           >
@@ -200,11 +203,11 @@ export const Footer = () => {
           <h2
             style={{
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: '0.78rem',
-              fontWeight: 700,
+              fontSize: '0.82rem',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: '#F8FAFC',
+              letterSpacing: '0.09em',
+              color: '#1B4D3E',
               marginBottom: '1.25rem'
             }}
           >
@@ -244,34 +247,34 @@ export const Footer = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.86rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8' }}>
-              <Mail size={15} color="#10B981" style={{ flexShrink: 0 }} />
-              <span>Email:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', color: '#425C4D' }}>
+              <Mail size={15} color="#1B4D3E" style={{ flexShrink: 0 }} />
+              <span style={{ fontWeight: 600 }}>Email:</span>
               <a
                 href="mailto:support@farmerbandh.com"
-                style={{ color: '#F1F5F9', textDecoration: 'none', fontWeight: 500, transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#34D399')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#F1F5F9')}
+                style={{ color: '#1B4D3E', textDecoration: 'none', fontWeight: 700, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#2D6A4F')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#1B4D3E')}
               >
                 support@farmerbandh.com
               </a>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8' }}>
-              <Phone size={15} color="#10B981" style={{ flexShrink: 0 }} />
-              <span>Toll-Free:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', color: '#425C4D' }}>
+              <Phone size={15} color="#1B4D3E" style={{ flexShrink: 0 }} />
+              <span style={{ fontWeight: 600 }}>Toll-Free:</span>
               <a
                 href="tel:1800123456"
-                style={{ color: '#F1F5F9', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#34D399')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#F1F5F9')}
+                style={{ color: '#1B4D3E', textDecoration: 'none', fontWeight: 800, fontSize: '0.92rem', transition: 'color 0.15s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#2D6A4F')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#1B4D3E')}
               >
                 1800-123-456
               </a>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#94A3B8', marginTop: '2px' }}>
-              <Clock size={14} color="#10B981" style={{ flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', fontSize: '0.78rem', color: '#425C4D', marginTop: '2px', fontWeight: 500 }}>
+              <Clock size={14} color="#1B4D3E" style={{ flexShrink: 0 }} />
               <span>Mon – Sat: 9:00 AM – 6:00 PM IST</span>
             </div>
           </div>
@@ -289,26 +292,26 @@ export const Footer = () => {
           maxWidth: '1200px',
           margin: '0 auto',
           padding: '1.5rem 1.5rem 0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          borderTop: '1.5px solid #C4D9C4',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '1rem',
           fontSize: '0.8rem',
-          color: '#64748B'
+          color: '#425C4D'
         }}
       >
-        <div>
+        <div style={{ fontWeight: 500 }}>
           © {new Date().getFullYear()} FarmerBandh · All rights reserved.
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#94A3B8', fontSize: '0.78rem' }}>
-          <ShieldCheck size={15} color="#10B981" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#1B4D3E', fontSize: '0.8rem', fontWeight: 700 }}>
+          <ShieldCheck size={16} color="#1B4D3E" />
           <span>Direct Farm-to-Buyer Escrow Protection</span>
         </div>
 
-        <div style={{ color: '#64748B', fontSize: '0.78rem' }}>
+        <div style={{ color: '#425C4D', fontSize: '0.78rem', fontWeight: 500 }}>
           Proudly crafted for Indian Agriculture 🇮🇳
         </div>
       </div>

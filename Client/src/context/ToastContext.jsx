@@ -18,21 +18,32 @@ export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
   const addToast = useCallback((message, type = 'info', title = '') => {
-    const id = Date.now() + Math.random().toString(36).substring(2, 9);
-    const newToast = {
-      id,
-      message,
-      type,
-      title: title || (type.charAt(0).toUpperCase() + type.slice(1)),
-      timestamp: Date.now()
-    };
+    if (!message) return;
+    const computedTitle = title || (type.charAt(0).toUpperCase() + type.slice(1));
 
-    setToasts((prev) => [...prev, newToast]);
+    setToasts((prev) => {
+      // Deduplicate: Don't show multiple copies of identical toast at the same time
+      const isDuplicate = prev.some(
+        (t) => t.message === message && t.type === type && t.title === computedTitle
+      );
+      if (isDuplicate) return prev;
 
-    // Auto-dismiss after 4 seconds
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+      const id = Date.now() + Math.random().toString(36).substring(2, 9);
+      const newToast = {
+        id,
+        message,
+        type,
+        title: computedTitle,
+        timestamp: Date.now()
+      };
+
+      // Auto-dismiss after 4 seconds
+      setTimeout(() => {
+        setToasts((current) => current.filter((t) => t.id !== id));
+      }, 4000);
+
+      return [...prev, newToast];
+    });
   }, []);
 
   const removeToast = useCallback((id) => {

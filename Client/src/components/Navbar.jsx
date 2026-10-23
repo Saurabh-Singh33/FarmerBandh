@@ -214,11 +214,11 @@ export const Navbar = () => {
             </div>
             <div>
               <span style={{
-                fontFamily: 'Playfair Display, Georgia, serif',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                 fontSize: '1.4rem',
-                fontWeight: 700,
+                fontWeight: 800,
                 color: '#1B4D3E',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.025em',
                 lineHeight: 1.15,
                 display: 'block'
               }}>
@@ -395,11 +395,11 @@ export const Navbar = () => {
         </div>
         <div>
           <span style={{
-            fontFamily: 'Playfair Display, Georgia, serif',
+            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
             fontSize: '1.4rem',
-            fontWeight: 700,
+            fontWeight: 800,
             color: '#1B4D3E',
-            letterSpacing: '-0.02em'
+            letterSpacing: '-0.025em'
           }}>
             FarmerBandh
           </span>

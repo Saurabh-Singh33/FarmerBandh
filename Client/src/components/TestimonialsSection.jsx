@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { SproutIcon } from './SocialIcons';
+import { toast } from '../context/ToastContext';
 
 const INITIAL_REVIEWS = [
   {
@@ -193,7 +194,7 @@ export const TestimonialsSection = () => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.review.trim()) {
-      alert('Please fill in your name and review experience.');
+      toast.warning('Please fill in your name and review experience.');
       return;
     }
 

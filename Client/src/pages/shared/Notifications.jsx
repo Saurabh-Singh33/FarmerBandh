@@ -71,7 +71,9 @@ export const Notifications = () => {
       setTotalCount(data?.totalCount || 0);
       setSelectedIds(new Set());
     } catch (err) {
-      toast.error('Failed to load notifications. Please try again.');
+      if (err.response) {
+        toast.error('Failed to load notifications. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

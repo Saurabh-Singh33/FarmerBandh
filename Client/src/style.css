@@ -12,7 +12,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, .serif-heading {
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.serif-heading {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
@@ -102,11 +107,12 @@ body > .skiptranslate {
   display: none !important;
 }
 
-/* Footer Refinements */
+/* Footer Refinements - Modern Clean Highlighted Natural Theme */
 .footer-link {
-  color: #94A3B8;
+  color: #2C4235;
   text-decoration: none;
   font-size: 0.88rem;
+  font-weight: 500;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
@@ -114,29 +120,31 @@ body > .skiptranslate {
 }
 
 .footer-link:hover {
-  color: #34D399;
-  transform: translateX(3px);
+  color: #1B4D3E;
+  font-weight: 700;
+  transform: translateX(4px);
 }
 
 .footer-social-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background-color: #FFFFFF;
+  border: 1.5px solid #C4D9C4;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94A3B8;
+  color: #1B4D3E;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(27, 77, 62, 0.06);
 }
 
 .footer-social-btn:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(52, 211, 153, 0.4);
-  color: #34D399;
+  background-color: #1B4D3E;
+  border-color: #1B4D3E;
+  color: #FFFFFF;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 14px rgba(27, 77, 62, 0.22);
 }
 
 /* Hide native Edge / IE password reveal button to prevent duplicate eye icon */

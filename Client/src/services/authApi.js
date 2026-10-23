@@ -23,6 +23,7 @@ authClient.interceptors.request.use(
 
 let isRefreshing = false;
 let failedQueue = [];
+let lastNetworkErrorToastTime = 0;
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -104,8 +105,12 @@ authClient.interceptors.response.use(
       try {
         return await authClient(originalRequest);
       } catch (retryErr) {
-        if (typeof notify !== 'undefined' && notify?.error) {
-          notify.error('Network connection issue. Please verify that the backend server is running.', 'Connection Error');
+        const now = Date.now();
+        if (now - lastNetworkErrorToastTime > 10000) {
+          lastNetworkErrorToastTime = now;
+          if (typeof notify !== 'undefined' && notify?.error) {
+            notify.error('Network connection issue. Please verify that the backend server is running.', 'Connection Error');
+          }
         }
         return Promise.reject(retryErr);
       }
