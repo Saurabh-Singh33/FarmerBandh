@@ -23,6 +23,19 @@ public static class DbSeeder
             catch { /* Column already exists */ }
         }
 
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync("ALTER TABLE `Users` ADD COLUMN IF NOT EXISTS `ProfilePictureUrl` VARCHAR(500) NULL;");
+        }
+        catch
+        {
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync("ALTER TABLE `Users` ADD COLUMN `ProfilePictureUrl` VARCHAR(500) NULL;");
+            }
+            catch { /* Column already exists */ }
+        }
+
         // 1. Seed Users & Farmers & Buyers if missing
         var defaultAdminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL")?.Trim().ToLower() ?? "admin@farmerbandh.com";
         var defaultAdminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "Admin@123";

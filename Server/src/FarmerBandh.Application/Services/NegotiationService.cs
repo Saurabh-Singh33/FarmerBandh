@@ -282,7 +282,9 @@ public class NegotiationService : INegotiationService
             throw new InvalidOperationException("Negotiation is closed. No further messages can be sent.");
 
         var now = DateTime.UtcNow;
-        var isCounter = string.Equals(request.MessageType, "CounterOffer", StringComparison.OrdinalIgnoreCase);
+        var isCounter = string.Equals(request.MessageType, "CounterOffer", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(request.Type, "CounterOffer", StringComparison.OrdinalIgnoreCase);
+        var messageBody = !string.IsNullOrWhiteSpace(request.Body) ? request.Body : request.Text;
 
         if (isCounter)
         {
@@ -337,7 +339,6 @@ public class NegotiationService : INegotiationService
                 negotiation.CurrentOfferPrice = request.OfferPrice!.Value;
             }
 
-
             negotiation.CurrentOfferByUserId = buyerUserId;
             negotiation.CurrentOfferByRole = UserRole.Buyer;
             negotiation.Status = NegotiationStatus.Countered;
@@ -349,7 +350,7 @@ public class NegotiationService : INegotiationService
                 SenderUserId = buyerUserId,
                 SenderRole = UserRole.Buyer,
                 MessageType = NegotiationMessageType.CounterOffer,
-                Body = request.Body,
+                Body = messageBody,
                 OfferPrice = negotiation.CurrentOfferPrice,
                 QuantityQuintal = request.QuantityQuintal ?? negotiation.QuantityQuintal,
                 BundleItemsJson = negotiation.BundleItemsJson,
@@ -360,7 +361,7 @@ public class NegotiationService : INegotiationService
         }
         else
         {
-            if (string.IsNullOrWhiteSpace(request.Body))
+            if (string.IsNullOrWhiteSpace(messageBody))
                 throw new InvalidOperationException("Message body is required.");
 
             negotiation.LastMessageAt = now;
@@ -371,7 +372,7 @@ public class NegotiationService : INegotiationService
                 SenderUserId = buyerUserId,
                 SenderRole = UserRole.Buyer,
                 MessageType = NegotiationMessageType.Text,
-                Body = request.Body,
+                Body = messageBody,
                 BundleItemsJson = negotiation.BundleItemsJson,
                 IsRead = false,
                 CreatedAt = now
@@ -387,11 +388,16 @@ public class NegotiationService : INegotiationService
         if (replyFarmer != null)
         {
             var buyerName = buyer.User?.FullName ?? "Buyer";
+            var notifTitle = isCounter ? "Buyer submitted counter-offer" : "New message from buyer";
+            var notifMsg = isCounter
+                ? $"{buyerName} countered your offer at ₹{negotiation.CurrentOfferPrice:N0} / quintal."
+                : $"{buyerName}: {messageBody}";
+
             await _notificationService.CreateAsync(
                 replyFarmer.UserId,
                 NotificationType.NEGOTIATION_REPLIED,
-                "Negotiation updated",
-                $"{buyerName} sent an update: ₹{negotiation.CurrentOfferPrice:N0} / quintal.",
+                notifTitle,
+                notifMsg,
                 $"/seller/negotiations/{negotiation.Id}",
                 "Negotiation",
                 negotiation.Id
@@ -629,7 +635,9 @@ public class NegotiationService : INegotiationService
             throw new InvalidOperationException("Negotiation is closed. No further messages can be sent.");
 
         var now = DateTime.UtcNow;
-        var isCounter = string.Equals(request.MessageType, "CounterOffer", StringComparison.OrdinalIgnoreCase);
+        var isCounter = string.Equals(request.MessageType, "CounterOffer", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(request.Type, "CounterOffer", StringComparison.OrdinalIgnoreCase);
+        var messageBody = !string.IsNullOrWhiteSpace(request.Body) ? request.Body : request.Text;
 
         if (isCounter)
         {
@@ -696,7 +704,7 @@ public class NegotiationService : INegotiationService
                 SenderUserId = farmerUserId,
                 SenderRole = UserRole.Farmer,
                 MessageType = NegotiationMessageType.CounterOffer,
-                Body = request.Body,
+                Body = messageBody,
                 OfferPrice = negotiation.CurrentOfferPrice,
                 QuantityQuintal = request.QuantityQuintal ?? negotiation.QuantityQuintal,
                 BundleItemsJson = negotiation.BundleItemsJson,
@@ -707,7 +715,7 @@ public class NegotiationService : INegotiationService
         }
         else
         {
-            if (string.IsNullOrWhiteSpace(request.Body))
+            if (string.IsNullOrWhiteSpace(messageBody))
                 throw new InvalidOperationException("Message body is required.");
 
             negotiation.LastMessageAt = now;
@@ -718,7 +726,7 @@ public class NegotiationService : INegotiationService
                 SenderUserId = farmerUserId,
                 SenderRole = UserRole.Farmer,
                 MessageType = NegotiationMessageType.Text,
-                Body = request.Body,
+                Body = messageBody,
                 BundleItemsJson = negotiation.BundleItemsJson,
                 IsRead = false,
                 CreatedAt = now
@@ -734,11 +742,16 @@ public class NegotiationService : INegotiationService
         var buyerUserId = targetBuyer?.Buyer?.UserId;
         if (buyerUserId.HasValue)
         {
+            var notifTitle = isCounter ? "Farmer countered your offer" : "New message from farmer";
+            var notifMsg = isCounter
+                ? $"{farmer.FarmName} countered your offer at ₹{negotiation.CurrentOfferPrice:N0} / quintal."
+                : $"{farmer.FarmName}: {messageBody}";
+
             await _notificationService.CreateAsync(
                 buyerUserId.Value,
                 NotificationType.NEGOTIATION_REPLIED,
-                "Farmer replied to negotiation",
-                $"{farmer.FarmName} countered your offer at ₹{negotiation.CurrentOfferPrice:N0} / quintal.",
+                notifTitle,
+                notifMsg,
                 $"/negotiations/{negotiation.Id}",
                 "Negotiation",
                 negotiation.Id
@@ -997,13 +1010,15 @@ public class NegotiationService : INegotiationService
                 FarmName = n.Farmer?.FarmName ?? "Farmer",
                 Location = n.Farmer?.Location ?? $"{n.Farmer?.District}, {n.Farmer?.State}",
                 Rating = n.Farmer?.Rating ?? 5.0m,
-                Verified = (n.Farmer?.Verified ?? 1) == 1
+                Verified = (n.Farmer?.Verified ?? 1) == 1,
+                AvatarUrl = n.Farmer?.User?.ProfilePictureUrl
             },
             Buyer = new NegotiationBuyerSummaryDto
             {
                 Id = n.Buyer?.Id ?? n.BuyerId,
                 FullName = isBuyer ? buyerName : MaskName(buyerName),
-                MaskedName = MaskName(buyerName)
+                MaskedName = MaskName(buyerName),
+                AvatarUrl = n.Buyer?.User?.ProfilePictureUrl
             },
             Status = n.Status.ToString(),
             InitialPricePerQuintal = n.InitialPricePerQuintal,
@@ -1076,6 +1091,7 @@ public class NegotiationService : INegotiationService
                 SenderName = m.SenderRole == UserRole.Farmer
                     ? (n.Farmer?.FarmName ?? "Farmer")
                     : (isBuyer ? buyerName : MaskName(buyerName)),
+                SenderAvatarUrl = m.SenderUser?.ProfilePictureUrl,
                 MessageType = m.MessageType.ToString(),
                 Body = m.Body,
                 OfferPrice = m.OfferPrice,
@@ -1091,7 +1107,8 @@ public class NegotiationService : INegotiationService
                 FarmName = n.Farmer?.FarmName ?? "Farmer",
                 Location = n.Farmer?.Location ?? $"{n.Farmer?.District}, {n.Farmer?.State}",
                 Rating = n.Farmer?.Rating ?? 5.0m,
-                Verified = (n.Farmer?.Verified ?? 1) == 1
+                Verified = (n.Farmer?.Verified ?? 1) == 1,
+                AvatarUrl = n.Farmer?.User?.ProfilePictureUrl
             },
             Product = new NegotiationProductSummaryDto
             {
@@ -1105,7 +1122,8 @@ public class NegotiationService : INegotiationService
             {
                 Id = n.Buyer?.Id ?? n.BuyerId,
                 FullName = isBuyer ? buyerName : MaskName(buyerName),
-                MaskedName = MaskName(buyerName)
+                MaskedName = MaskName(buyerName),
+                AvatarUrl = n.Buyer?.User?.ProfilePictureUrl
             },
             UnreadCount = unread,
             CanAccept = canAccept,

@@ -17,6 +17,7 @@ public class BuyerProfileDto
     public DateTime MemberSince { get; set; }
     public string Role { get; set; } = "buyer";
     public int TotalOrders { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 }
 
 public class UpdateBuyerProfileRequest
@@ -31,6 +32,7 @@ public class UpdateBuyerProfileRequest
     public string? Pincode { get; set; }
     public string? PreferredState { get; set; }
     public string? PreferredDistrict { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 }
 
 public class ChangeBuyerPasswordRequest

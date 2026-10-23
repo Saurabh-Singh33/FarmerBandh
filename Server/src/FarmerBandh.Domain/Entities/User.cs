@@ -13,6 +13,7 @@ public class User
     public string? State { get; set; }
     public string? District { get; set; }
     public string? City { get; set; }
+    public string? ProfilePictureUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastLoginAt { get; set; }

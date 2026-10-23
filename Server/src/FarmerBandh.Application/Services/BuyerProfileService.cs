@@ -66,7 +66,8 @@ public class BuyerProfileService : IBuyerProfileService
             PreferredDistrict = buyer.PreferredDistrict ?? user.District,
             MemberSince = user.CreatedAt,
             Role = user.Role.ToString().ToLower(),
-            TotalOrders = totalOrders
+            TotalOrders = totalOrders,
+            ProfilePictureUrl = user.ProfilePictureUrl
         };
     }
 
@@ -89,6 +90,13 @@ public class BuyerProfileService : IBuyerProfileService
         }
 
         bool userChanged = false;
+
+        // Profile Picture
+        if (request.ProfilePictureUrl != null && !string.Equals(user.ProfilePictureUrl, request.ProfilePictureUrl.Trim()))
+        {
+            user.ProfilePictureUrl = string.IsNullOrWhiteSpace(request.ProfilePictureUrl) ? null : request.ProfilePictureUrl.Trim();
+            userChanged = true;
+        }
 
         // 1. Email check & update
         if (!string.IsNullOrWhiteSpace(request.Email))

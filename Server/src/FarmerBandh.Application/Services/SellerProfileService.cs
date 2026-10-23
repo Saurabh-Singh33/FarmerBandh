@@ -46,7 +46,8 @@ public class SellerProfileService : ISellerProfileService
             MemberSince = farmer.MemberSince,
             Rating = farmer.Rating,
             Verified = verified,
-            AvatarInitials = initials
+            AvatarInitials = initials,
+            ProfilePictureUrl = user?.ProfilePictureUrl
         };
     }
 
@@ -59,6 +60,12 @@ public class SellerProfileService : ISellerProfileService
         if (user != null)
         {
             bool userChanged = false;
+
+            if (request.ProfilePictureUrl != null && !string.Equals(user.ProfilePictureUrl, request.ProfilePictureUrl.Trim()))
+            {
+                user.ProfilePictureUrl = string.IsNullOrWhiteSpace(request.ProfilePictureUrl) ? null : request.ProfilePictureUrl.Trim();
+                userChanged = true;
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Email))
             {

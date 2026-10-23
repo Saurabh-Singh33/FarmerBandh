@@ -14,6 +14,7 @@ public class SellerProfileDto
     public decimal Rating { get; set; }
     public string Verified { get; set; } = "Unverified";
     public string AvatarInitials { get; set; } = "F";
+    public string? ProfilePictureUrl { get; set; }
 }
 
 public class UpdateSellerProfileRequest
@@ -26,6 +27,7 @@ public class UpdateSellerProfileRequest
     public string? District { get; set; }
     public string? Bio { get; set; }
     public string? Phone { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 }
 
 public class ChangeSellerPasswordRequest

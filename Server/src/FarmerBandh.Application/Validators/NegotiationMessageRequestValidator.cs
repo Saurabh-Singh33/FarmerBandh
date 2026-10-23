@@ -9,10 +9,12 @@ public class NegotiationMessageRequestValidator : AbstractValidator<SendNegotiat
     {
         RuleFor(x => x.MessageType)
             .Must(t => string.Equals(t, "Text", StringComparison.OrdinalIgnoreCase) ||
+                       string.Equals(t, "Message", StringComparison.OrdinalIgnoreCase) ||
                        string.Equals(t, "CounterOffer", StringComparison.OrdinalIgnoreCase))
-            .WithMessage("MessageType must be either 'Text' or 'CounterOffer'.");
+            .WithMessage("MessageType must be 'Text', 'Message', or 'CounterOffer'.");
 
-        When(x => string.Equals(x.MessageType, "Text", StringComparison.OrdinalIgnoreCase), () =>
+        When(x => string.Equals(x.MessageType, "Text", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(x.MessageType, "Message", StringComparison.OrdinalIgnoreCase), () =>
         {
             RuleFor(x => x.Body)
                 .NotEmpty().WithMessage("Message body is required for text messages.")

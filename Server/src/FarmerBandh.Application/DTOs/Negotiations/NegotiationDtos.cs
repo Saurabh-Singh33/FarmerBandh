@@ -36,25 +36,43 @@ public class NegotiationBundleItemDto
 
 public class SendNegotiationMessageRequestDto
 {
-    public string MessageType { get; set; } = "Text"; // "Text" | "CounterOffer"
+    private string _messageType = "Text";
+    public string MessageType
+    {
+        get => _messageType;
+        set => _messageType = string.Equals(value, "Message", StringComparison.OrdinalIgnoreCase) ? "Text" : (value ?? "Text");
+    }
+
     public string Type
     {
         get => MessageType;
         set => MessageType = value;
     }
 
-    public string? Body { get; set; }
-    public string? Text
+    private string? _body;
+    public string? Body
     {
-        get => Body;
-        set => Body = value;
+        get => _body;
+        set => _body = value;
     }
 
-    public decimal? OfferPrice { get; set; }
+    public string? Text
+    {
+        get => _body;
+        set => _body = value;
+    }
+
+    private decimal? _offerPrice;
+    public decimal? OfferPrice
+    {
+        get => _offerPrice;
+        set => _offerPrice = value;
+    }
+
     public decimal? ProposedPrice
     {
-        get => OfferPrice;
-        set => OfferPrice = value;
+        get => _offerPrice;
+        set => _offerPrice = value;
     }
 
     public decimal? QuantityQuintal { get; set; }
@@ -87,6 +105,7 @@ public class NegotiationFarmerSummaryDto
     public string? Location { get; set; }
     public decimal Rating { get; set; }
     public bool Verified { get; set; }
+    public string? AvatarUrl { get; set; }
 }
 
 public class NegotiationBuyerSummaryDto
@@ -94,6 +113,7 @@ public class NegotiationBuyerSummaryDto
     public Guid Id { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string MaskedName { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; }
 }
 
 public class NegotiationMessageDto
@@ -104,6 +124,7 @@ public class NegotiationMessageDto
     public Guid AuthorUserId => SenderUserId;
     public string SenderRole { get; set; } = string.Empty;
     public string SenderName { get; set; } = string.Empty;
+    public string? SenderAvatarUrl { get; set; }
     public string MessageType { get; set; } = string.Empty;
     public string? Body { get; set; }
     public decimal? OfferPrice { get; set; }

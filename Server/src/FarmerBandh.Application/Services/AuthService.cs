@@ -287,6 +287,7 @@ public class AuthService : IAuthService
             State = user.State,
             District = user.District,
             City = user.City,
+            ProfilePictureUrl = user.ProfilePictureUrl,
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             ExpiresAt = expiresAt,

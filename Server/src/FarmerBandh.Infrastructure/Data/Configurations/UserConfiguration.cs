@@ -35,5 +35,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.City)
             .HasMaxLength(100);
+
+        builder.Property(u => u.ProfilePictureUrl)
+            .HasMaxLength(500);
     }
 }
