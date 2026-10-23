@@ -54,3 +54,10 @@ public class UpdateSellerSettingsRequest
     public bool NotifyOnNewReturn { get; set; } = true;
     public bool NotifyOnNewReview { get; set; } = true;
 }
+
+public class DeleteSellerAccountRequest
+{
+    public string Password { get; set; } = string.Empty;
+    public string? Reason { get; set; }
+}
+

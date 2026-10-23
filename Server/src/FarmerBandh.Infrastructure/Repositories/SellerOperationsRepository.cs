@@ -303,6 +303,13 @@ public class SellerOperationsRepository : ISellerOperationsRepository
             .ToListAsync();
     }
 
+    public async Task<List<Product>> GetAllFarmerProductsAsync(Guid farmerId)
+    {
+        return await _context.Products
+            .Where(p => p.FarmerId == farmerId)
+            .ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();

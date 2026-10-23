@@ -77,6 +77,33 @@ public class BuyerProfileController : ControllerBase
         }
     }
 
+    [HttpDelete]
+    [HttpDelete("account")]
+    [HttpPost("delete")]
+    public async Task<IActionResult> DeleteAccount([FromBody] DeleteBuyerAccountRequest request)
+    {
+        var userId = GetUserId();
+        if (userId == Guid.Empty) return Unauthorized();
+
+        try
+        {
+            await _profileService.DeleteAccountAsync(userId, request);
+            return Ok(new { message = "Your buyer account has been deleted successfully." });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new { message = ex.Message });
+        }
+    }
+
     private Guid GetUserId()
     {
         var subClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;

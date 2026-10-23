@@ -52,6 +52,7 @@ public interface ISellerOperationsRepository
     Task<List<Order>> GetOrdersInDateRangeAsync(Guid farmerId, DateTime from, DateTime to);
     Task<List<OrderItem>> GetOrderItemsInDateRangeAsync(Guid farmerId, DateTime from, DateTime to);
     Task<List<Review>> GetReviewsForFarmerAsync(Guid farmerId);
+    Task<List<Product>> GetAllFarmerProductsAsync(Guid farmerId);
 
     Task SaveChangesAsync();
 }

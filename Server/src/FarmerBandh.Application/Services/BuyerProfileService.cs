@@ -1,6 +1,7 @@
 using FarmerBandh.Application.DTOs.Buyer;
 using FarmerBandh.Application.Interfaces;
 using FarmerBandh.Domain.Entities;
+using FarmerBandh.Domain.Enums;
 
 namespace FarmerBandh.Application.Services;
 
@@ -181,6 +182,70 @@ public class BuyerProfileService : IBuyerProfileService
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
         _userRepository.Update(user);
+        await _userRepository.SaveChangesAsync();
+    }
+
+    public async Task DeleteAccountAsync(Guid userId, DeleteBuyerAccountRequest request)
+    {
+        var buyer = await _userRepository.GetBuyerByUserIdAsync(userId);
+        var user = buyer?.User ?? await _userRepository.GetByIdAsync(userId);
+        if (user == null) throw new UnauthorizedAccessException("User profile not found.");
+
+        // 1. Password verification
+        if (string.IsNullOrWhiteSpace(request?.Password))
+        {
+            throw new ArgumentException("Password is required to confirm account deletion.");
+        }
+
+        bool isCurrentValid = false;
+        try
+        {
+            isCurrentValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+        }
+        catch
+        {
+            isCurrentValid = user.PasswordHash == request.Password;
+        }
+
+        if (!isCurrentValid)
+        {
+            throw new ArgumentException("Current password is incorrect. Please verify your password to proceed with account deletion.");
+        }
+
+        // 2. Check for active unfulfilled orders
+        if (buyer != null)
+        {
+            var activeOrdersCount = await _orderRepository.GetActiveBuyerOrdersCountAsync(buyer.Id);
+            if (activeOrdersCount > 0)
+            {
+                throw new InvalidOperationException($"Cannot delete account. You have {activeOrdersCount} active order(s) currently being processed or delivered. Please wait until they are completed or cancelled.");
+            }
+        }
+
+        // 3. Revoke active refresh tokens
+        if (user.RefreshTokens != null)
+        {
+            foreach (var rt in user.RefreshTokens.Where(rt => rt.IsActive))
+            {
+                rt.RevokedAt = DateTime.UtcNow;
+            }
+        }
+
+        // 4. Soft-delete and anonymize user record
+        user.Status = UserStatus.Suspended;
+        user.Email = $"deleted_{Guid.NewGuid():N}_{user.Email}";
+        user.PasswordHash = string.Empty;
+        user.UpdatedAt = DateTime.UtcNow;
+        _userRepository.Update(user);
+
+        // 5. Clear buyer specific details if buyer exists
+        if (buyer != null)
+        {
+            buyer.Phone = null;
+            buyer.DefaultAddressLine = null;
+            buyer.Pincode = null;
+        }
+
         await _userRepository.SaveChangesAsync();
     }
 }

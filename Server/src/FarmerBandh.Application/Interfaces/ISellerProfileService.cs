@@ -9,4 +9,5 @@ public interface ISellerProfileService
     Task ChangePasswordAsync(Guid userId, ChangeSellerPasswordRequest request);
     Task<SellerSettingsDto> GetSettingsAsync(Guid userId);
     Task<SellerSettingsDto> UpdateSettingsAsync(Guid userId, UpdateSellerSettingsRequest request);
+    Task DeleteAccountAsync(Guid userId, DeleteSellerAccountRequest request);
 }

@@ -188,6 +188,91 @@ public class SellerProfileService : ISellerProfileService
         return MapSettingsToDto(settings);
     }
 
+    public async Task DeleteAccountAsync(Guid userId, DeleteSellerAccountRequest request)
+    {
+        var farmer = await _repository.GetFarmerByUserIdAsync(userId);
+        if (farmer == null) throw new UnauthorizedAccessException("Farmer profile not found.");
+
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null) throw new UnauthorizedAccessException("User not found.");
+
+        // 1. Validate password
+        if (string.IsNullOrWhiteSpace(request?.Password) || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        {
+            throw new ArgumentException("Incorrect password. Please verify your current password to proceed with account deletion.");
+        }
+
+        // 2. Check for active unfulfilled orders
+        var pendingOrdersCount = await _repository.GetPendingOrdersCountAsync(farmer.Id);
+        if (pendingOrdersCount > 0)
+        {
+            throw new InvalidOperationException($"Cannot delete account. You have {pendingOrdersCount} active order(s) pending fulfillment or delivery. Please fulfill or resolve them before deleting your account.");
+        }
+
+        // 3. Check for open return requests
+        var openReturnsCount = await _repository.GetOpenReturnsCountAsync(farmer.Id);
+        if (openReturnsCount > 0)
+        {
+            throw new InvalidOperationException($"Cannot delete account. You have {openReturnsCount} open return/exchange request(s) awaiting resolution.");
+        }
+
+        // 4. Check for pending payouts
+        var hasPendingPayout = await _repository.HasPendingPayoutAsync(farmer.Id);
+        if (hasPendingPayout)
+        {
+            throw new InvalidOperationException("Cannot delete account while you have pending or processing payout transfers.");
+        }
+
+        // 5. Delist all farmer's crop listings
+        var products = await _repository.GetAllFarmerProductsAsync(farmer.Id);
+        foreach (var product in products)
+        {
+            product.Status = ProductStatus.Removed;
+            product.AvailableQuantityQuintal = 0;
+            product.UpdatedAt = DateTime.UtcNow;
+        }
+
+        // 6. Delete or disconnect linked bank account
+        var bankAccount = await _repository.GetBankAccountAsync(farmer.Id);
+        if (bankAccount != null)
+        {
+            await _repository.DeleteBankAccountAsync(bankAccount);
+        }
+
+        // 7. Reject any pending verification requests
+        var pendingVerification = await _repository.GetCurrentPendingVerificationRequestAsync(farmer.Id);
+        if (pendingVerification != null)
+        {
+            pendingVerification.Status = VerificationRequestStatus.Rejected;
+            pendingVerification.RejectionReason = "Farmer initiated account closure.";
+            pendingVerification.ReviewedAt = DateTime.UtcNow;
+            await _repository.UpdateVerificationRequestAsync(pendingVerification);
+        }
+
+        // 8. Invalidate active refresh tokens
+        if (user.RefreshTokens != null)
+        {
+            foreach (var rt in user.RefreshTokens.Where(rt => rt.IsActive))
+            {
+                rt.RevokedAt = DateTime.UtcNow;
+            }
+        }
+
+        // 9. Soft-delete and anonymize user record
+        user.Status = UserStatus.Suspended;
+        user.Email = $"deleted_{Guid.NewGuid():N}_{user.Email}";
+        user.PasswordHash = string.Empty;
+        user.UpdatedAt = DateTime.UtcNow;
+        _userRepository.Update(user);
+
+        // 10. Clear farmer contact details
+        farmer.Phone = null;
+        farmer.Bio = $"[Account closed on {DateTime.UtcNow:yyyy-MM-dd}] Reason: {request?.Reason?.Trim() ?? "Not specified"}";
+
+        await _repository.SaveChangesAsync();
+        await _userRepository.SaveChangesAsync();
+    }
+
     private static SellerSettingsDto MapSettingsToDto(SellerSettings s)
     {
         return new SellerSettingsDto

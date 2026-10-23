@@ -211,5 +211,15 @@ public class OrderRepository : IOrderRepository
         _context.Orders.Remove(order);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<int> GetActiveBuyerOrdersCountAsync(Guid buyerId)
+    {
+        return await _context.Orders
+            .CountAsync(o => o.BuyerId == buyerId &&
+                             (o.Status == OrderStatus.Pending ||
+                              o.Status == OrderStatus.Confirmed ||
+                              o.Status == OrderStatus.Packed ||
+                              o.Status == OrderStatus.InTransit));
+    }
 }
 

@@ -527,9 +527,9 @@ public class AdminRepository : IAdminRepository
             ? await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == v.ReviewedByUserId.Value)
             : null;
 
-        var masked = v.AadhaarNumber.Length > 4
+        var masked = !string.IsNullOrEmpty(v.AadhaarNumber) && v.AadhaarNumber.Length > 4
             ? "XXXX-XXXX-" + v.AadhaarNumber[^4..]
-            : v.AadhaarNumber;
+            : (v.AadhaarNumber ?? string.Empty);
 
         return new AdminVerificationDetailDto
         {

@@ -10,5 +10,6 @@ public interface IOrderRepository
     Task<(IEnumerable<Order> Items, int TotalCount)> GetSellerOrdersAsync(Guid sellerId, string? status, string? search, int page, int pageSize);
     Task UpdateOrderAsync(Order order);
     Task DeleteOrderAsync(Order order);
+    Task<int> GetActiveBuyerOrdersCountAsync(Guid buyerId);
 }
 

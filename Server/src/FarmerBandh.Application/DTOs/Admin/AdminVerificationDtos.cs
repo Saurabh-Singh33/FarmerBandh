@@ -34,8 +34,11 @@ public class AdminVerificationDetailDto
     public string Email { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string MaskedAadhaar { get; set; } = string.Empty;
+    public string IdNumber => MaskedAadhaar;
     public string? LandRecordUrl { get; set; }
+    public string? LandDocumentUrl => LandRecordUrl;
     public string? SelfieUrl { get; set; }
+    public string? IdDocumentUrl => SelfieUrl;
     public string? Notes { get; set; }
     public string? RejectionReason { get; set; }
     public DateTime SubmittedAt { get; set; }

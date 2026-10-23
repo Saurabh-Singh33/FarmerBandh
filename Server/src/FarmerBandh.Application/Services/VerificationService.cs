@@ -32,7 +32,7 @@ public class VerificationService : IVerificationService
         var history = await _repository.GetVerificationRequestsHistoryAsync(farmer.Id);
 
         var currentRequestSummary = currentPending != null ? MapToDto(currentPending) : (history.Count > 0 ? MapToDto(history[0]) : null);
-        bool canSubmit = farmer.Verified != 2 && currentPending == null;
+        bool canSubmit = currentPending == null;
 
         return new VerificationStatusDto
         {
@@ -47,11 +47,6 @@ public class VerificationService : IVerificationService
     {
         var farmer = await _repository.GetFarmerByUserIdAsync(userId);
         if (farmer == null) throw new UnauthorizedAccessException("Farmer profile not found.");
-
-        if (farmer.Verified == 2)
-        {
-            throw new InvalidOperationException("Your farm account is already fully verified.");
-        }
 
         var existingPending = await _repository.GetCurrentPendingVerificationRequestAsync(farmer.Id);
         if (existingPending != null)

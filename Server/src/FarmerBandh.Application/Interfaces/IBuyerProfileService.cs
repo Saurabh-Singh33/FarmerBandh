@@ -7,4 +7,5 @@ public interface IBuyerProfileService
     Task<BuyerProfileDto> GetProfileAsync(Guid userId);
     Task<BuyerProfileDto> UpdateProfileAsync(Guid userId, UpdateBuyerProfileRequest request);
     Task ChangePasswordAsync(Guid userId, ChangeBuyerPasswordRequest request);
+    Task DeleteAccountAsync(Guid userId, DeleteBuyerAccountRequest request);
 }
