@@ -53,6 +53,7 @@ export const ChatbotWidget = () => {
   // Voice state: Text-to-Speech (TTS)
   const [speakingMsgIndex, setSpeakingMsgIndex] = useState(null);
   const [autoVoiceEnabled, setAutoVoiceEnabled] = useState(false);
+  const audioRef = useRef(null);
 
   // References
   const messagesEndRef = useRef(null);
@@ -75,9 +76,20 @@ export const ChatbotWidget = () => {
     }
   }, [messages, isOpen, loading]);
 
-  // Cleanup speech synthesis on unmount
+  // Cleanup speech synthesis and audio on unmount & warm voices
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
     return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
@@ -99,7 +111,7 @@ export const ChatbotWidget = () => {
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    // Set recognition language
+    // Set recognition language with regional code
     recognition.lang = activeLang === 'hi' ? 'hi-IN' : (activeLang === 'gu' ? 'gu-IN' : 'en-IN');
 
     recognition.onstart = () => {
@@ -110,8 +122,8 @@ export const ChatbotWidget = () => {
       const transcript = event.results[0][0].transcript;
       if (transcript) {
         setInputText(transcript);
-        // Automatically send after voice capture
-        handleSendMessage(transcript);
+        // User asked by speaking -> KrishiMitra will answer by speaking aloud
+        handleSendMessage(transcript, { isVoiceInput: true });
       }
       setIsListening(false);
     };
@@ -120,7 +132,16 @@ export const ChatbotWidget = () => {
       console.warn('Speech recognition error:', event.error);
       setIsListening(false);
       if (event.error === 'not-allowed') {
-        notify.warning('Microphone permission denied. Please allow microphone access.');
+        notify.warning('Microphone permission denied. Please allow microphone access in browser.');
+      } else if (event.error === 'language-not-supported' && activeLang === 'gu') {
+        // Fallback retry with generic 'gu' if 'gu-IN' is rejected
+        try {
+          recognition.lang = 'gu';
+          recognition.start();
+          setIsListening(true);
+        } catch {
+          notify.info('Gujarati speech service is unavailable in this browser. Please type your message.');
+        }
       }
     };
 
@@ -153,73 +174,202 @@ export const ChatbotWidget = () => {
     }
   };
 
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setSpeakingMsgIndex(null);
+  };
+
+  // Helper to split long text into clean phrase chunks suitable for audio synthesis
+  const splitTextForAudio = (str, maxLen = 170) => {
+    const sentences = str.match(/[^।?!.,\n]+[।?!.,\n]*/g) || [str];
+    const chunks = [];
+    let current = '';
+
+    for (const s of sentences) {
+      if ((current + s).length > maxLen) {
+        if (current.trim()) chunks.push(current.trim());
+        if (s.length > maxLen) {
+          const words = s.split(' ');
+          let wChunk = '';
+          for (const w of words) {
+            if ((wChunk + ' ' + w).length > maxLen) {
+              if (wChunk.trim()) chunks.push(wChunk.trim());
+              wChunk = w;
+            } else {
+              wChunk += (wChunk ? ' ' : '') + w;
+            }
+          }
+          if (wChunk.trim()) current = wChunk.trim();
+          else current = '';
+        } else {
+          current = s;
+        }
+      } else {
+        current += s;
+      }
+    }
+    if (current.trim()) chunks.push(current.trim());
+    return chunks.length > 0 ? chunks : [str];
+  };
+
+  // High-quality sequential audio streaming for Gujarati and unsupported regional voices
+  const playAudioStream = (cleanText, msgIndex, targetLang, fallbackVoice) => {
+    const chunks = splitTextForAudio(cleanText, 170);
+    let chunkIdx = 0;
+    setSpeakingMsgIndex(msgIndex);
+
+    const playNext = () => {
+      if (chunkIdx >= chunks.length) {
+        setSpeakingMsgIndex(null);
+        return;
+      }
+
+      const chunk = chunks[chunkIdx];
+      chunkIdx++;
+
+      // Primary source: Server API TTS endpoint (same-origin proxy)
+      const primaryUrl = chatbotApi.getTtsAudioUrl(chunk, targetLang);
+      // Secondary fallback source: Direct Google Translate TTS endpoint
+      const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(targetLang)}&q=${encodeURIComponent(chunk)}`;
+
+      const audio = new Audio(primaryUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        playNext();
+      };
+
+      audio.onerror = () => {
+        // Fallback to direct Google TTS stream
+        const fallbackAudio = new Audio(directUrl);
+        audioRef.current = fallbackAudio;
+
+        fallbackAudio.onended = () => {
+          playNext();
+        };
+
+        fallbackAudio.onerror = () => {
+          // If network is completely blocked, try Hindi / Indic SpeechSynthesis as last resort
+          if (fallbackVoice && window.speechSynthesis) {
+            const utt = new SpeechSynthesisUtterance(chunk);
+            utt.voice = fallbackVoice;
+            utt.lang = fallbackVoice.lang || 'hi-IN';
+            utt.onend = () => playNext();
+            utt.onerror = () => setSpeakingMsgIndex(null);
+            window.speechSynthesis.speak(utt);
+          } else {
+            setSpeakingMsgIndex(null);
+          }
+        };
+
+        fallbackAudio.play().catch(() => {
+          setSpeakingMsgIndex(null);
+        });
+      };
+
+      audio.play().catch(() => {
+        // If autoplay / audio play was rejected, try direct URL
+        const fallbackAudio = new Audio(directUrl);
+        audioRef.current = fallbackAudio;
+        fallbackAudio.onended = () => {
+          playNext();
+        };
+        fallbackAudio.onerror = () => {
+          setSpeakingMsgIndex(null);
+        };
+        fallbackAudio.play().catch(() => {
+          setSpeakingMsgIndex(null);
+        });
+      });
+    };
+
+    playNext();
+  };
+
   // Text to Speech (TTS)
-  const speakText = (text, index) => {
-    if (!window.speechSynthesis) {
-      notify.error('Speech synthesis is not supported on your device.');
+  const speakText = (text, index, explicitLang) => {
+    if (speakingMsgIndex === index) {
+      stopSpeaking();
       return;
     }
 
     // Stop current speech
-    window.speechSynthesis.cancel();
+    stopSpeaking();
 
-    if (speakingMsgIndex === index) {
-      setSpeakingMsgIndex(null);
-      return;
-    }
-
-    // Clean text of markdown characters before speaking
+    // Clean text of markdown characters, URLs, and formatting
     const cleanText = text
       .replace(/[*_#`[\]()]/g, '')
       .replace(/https?:\/\/\S+/g, 'link')
+      .replace(/[\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}]/gu, '')
       .trim();
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = activeLang === 'hi' ? 'hi-IN' : (activeLang === 'gu' ? 'gu-IN' : 'en-IN');
-    utterance.rate = 0.95; // Slightly slower for agrarian clarity
-    utterance.pitch = 1.0;
+    if (!cleanText) return;
 
-    // Pick a regional voice if available
-    const voices = window.speechSynthesis.getVoices();
-    const langCode = activeLang === 'hi' ? 'hi' : (activeLang === 'gu' ? 'gu' : 'en');
-    const matchedVoice = voices.find(v => v.lang.toLowerCase().startsWith(langCode));
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
+    const langCode = explicitLang || activeLang || 'en';
+
+    // Check if browser native SpeechSynthesis has a dedicated voice for this language
+    const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    const matchedVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(langCode));
+
+    // For Gujarati (or when no native voice is available in the browser), use the high-quality audio stream
+    if (langCode === 'gu' || !matchedVoice) {
+      playAudioStream(cleanText, index, langCode, matchedVoice || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('hi')));
+    } else {
+      // Use browser SpeechSynthesis if native voice exists (common for Hindi & English)
+      try {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = langCode === 'hi' ? 'hi-IN' : (langCode === 'gu' ? 'gu-IN' : 'en-IN');
+        utterance.voice = matchedVoice;
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+
+        utterance.onstart = () => {
+          setSpeakingMsgIndex(index);
+        };
+
+        utterance.onend = () => {
+          setSpeakingMsgIndex(null);
+        };
+
+        utterance.onerror = () => {
+          // Fallback to audio stream if speech synthesis encounters error
+          playAudioStream(cleanText, index, langCode, null);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn('SpeechSynthesis failed, falling back to audio stream:', err);
+        playAudioStream(cleanText, index, langCode, null);
+      }
     }
-
-    utterance.onstart = () => {
-      setSpeakingMsgIndex(index);
-    };
-
-    utterance.onend = () => {
-      setSpeakingMsgIndex(null);
-    };
-
-    utterance.onerror = () => {
-      setSpeakingMsgIndex(null);
-    };
-
-    window.speechSynthesis.speak(utterance);
   };
 
-  const stopSpeaking = () => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      setSpeakingMsgIndex(null);
-    }
-  };
-
-  const handleSendMessage = async (customText) => {
+  const handleSendMessage = async (customText, options = {}) => {
+    const isVoiceInput = options?.isVoiceInput === true;
     const textToSend = (customText || inputText).trim();
     if (!textToSend || loading) return;
 
     // Stop any ongoing speech
     stopSpeaking();
 
+    // Auto-detect question language (Hindi, Gujarati, English)
+    const detectedLang = detectMessageLanguage(textToSend, activeLang);
+    if (detectedLang !== activeLang) {
+      setActiveLang(detectedLang);
+    }
+
     const userMessage = {
       role: 'user',
       content: textToSend,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isVoice: isVoiceInput
     };
 
     const newHistory = [...messages, userMessage];
@@ -235,23 +385,34 @@ export const ChatbotWidget = () => {
 
       const res = await chatbotApi.sendMessage({
         message: textToSend,
-        language: activeLang,
+        language: detectedLang,
         userName: user?.fullName || '',
         history: serverHistory
       });
+
+      const replyLang = res.language || detectedLang;
+      if (replyLang !== activeLang) {
+        setActiveLang(replyLang);
+      }
 
       const botReply = {
         role: 'assistant',
         content: res.reply || 'Thank you for contacting FarmerBandh.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        suggestedFollowUps: res.suggestedFollowUps || []
+        suggestedFollowUps: res.suggestedFollowUps || [],
+        language: replyLang
       };
 
-      setMessages(prev => [...prev, botReply]);
+      const newMsgList = [...newHistory, botReply];
+      setMessages(newMsgList);
 
-      // Auto-voice read aloud if enabled
-      if (autoVoiceEnabled) {
-        speakText(botReply.content, messages.length + 1);
+      // CRITICAL MULTIMODAL RULE:
+      // If user asked by SPEAKING (isVoiceInput === true): KrishiMitra speaks the answer aloud in that language!
+      // If user asked by WRITING (isVoiceInput === false): KrishiMitra answers strictly in WRITING (silent text)!
+      if (isVoiceInput) {
+        speakText(botReply.content, newMsgList.length - 1, replyLang);
+      } else if (autoVoiceEnabled) {
+        speakText(botReply.content, newMsgList.length - 1, replyLang);
       }
     } catch (err) {
       console.error('Chatbot error:', err);
@@ -268,7 +429,8 @@ export const ChatbotWidget = () => {
   };
 
   const handlePromptClick = (promptText) => {
-    handleSendMessage(promptText);
+    // Clicking a written suggestion answers by writing
+    handleSendMessage(promptText, { isVoiceInput: false });
   };
 
   const handleClearChat = () => {
@@ -415,8 +577,12 @@ export const ChatbotWidget = () => {
               <ShieldCheck className="w-3 h-3 text-amber-700" />
               {isAdmin ? 'Admin: Privileged access' : 'Scope: FarmerBandh only'}
             </span>
-            <span className="text-[9px] text-amber-800 font-bold uppercase tracking-wider">
-              {activeLang === 'hi' ? 'हिन्दी' : (activeLang === 'gu' ? 'ગુજરાતી' : 'English')} Voice
+            <span className="text-[9px] text-amber-800 font-bold tracking-tight">
+              {activeLang === 'hi' 
+                ? '🎤 बोलें = बोलकर उत्तर | ⌨️ लिखें = लिखकर उत्तर' 
+                : (activeLang === 'gu' 
+                    ? '🎤 બોલો = બોલીને ઉત્તર | ⌨️ લખો = લખીને ઉત્તર' 
+                    : '🎤 Speak = Speaks | ⌨️ Write = Writes')}
             </span>
           </div>
 
@@ -525,7 +691,7 @@ export const ChatbotWidget = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSendMessage();
+                handleSendMessage(inputText, { isVoiceInput: false });
               }}
               className="flex items-center gap-1.5"
             >
@@ -660,6 +826,70 @@ function getErrorMessage(lang) {
     default:
       return 'Sorry, there was an issue connecting to the assistant. Please try again.';
   }
+}
+
+export function detectMessageLanguage(text, fallbackLang = 'en') {
+  if (!text || typeof text !== 'string') return fallbackLang;
+  const trimmed = text.trim();
+
+  // 1. Unicode script detection: Devanagari -> Hindi
+  if (/[\u0900-\u097F]/.test(trimmed)) {
+    return 'hi';
+  }
+
+  // 2. Unicode script detection: Gujarati script -> Gujarati
+  if (/[\u0A80-\u0AFF]/.test(trimmed)) {
+    return 'gu';
+  }
+
+  // 3. Romanized keywords detection (Hinglish / Gujlish)
+  const lower = trimmed.toLowerCase();
+  const words = lower.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+
+  const hindiTerms = [
+    'namaste', 'kaise', 'kaisa', 'kya', 'hai', 'hain', 'ho', 'karo', 'kisan', 'fasal',
+    'bhav', 'daam', 'kharidna', 'bechna', 'kharid', 'bech', 'paise', 'bhai',
+    'mera', 'meri', 'mere', 'aapka', 'aapki', 'aapke', 'tumhara', 'aap', 'mujhe',
+    'hum', 'nahi', 'nahin', 'molbhav', 'kheti', 'mandi', 'dhanyawad'
+  ];
+
+  const gujaratiTerms = [
+    'kem', 'cho', 'tamaru', 'maru', 'mane', 'pak', 'khedut',
+    'su', 'shu', 'che', 'nathi', 'karvu', 'kharidi', 'vechan', 'aabhar'
+  ];
+
+  let hindiCount = 0;
+  let gujaratiCount = 0;
+
+  for (const w of words) {
+    if (hindiTerms.includes(w)) hindiCount++;
+    if (gujaratiTerms.includes(w)) gujaratiCount++;
+  }
+
+  if (hindiCount >= 2 || (hindiCount === 1 && words.length <= 4)) {
+    return 'hi';
+  }
+
+  if (gujaratiCount >= 2 || (gujaratiCount === 1 && words.length <= 4)) {
+    return 'gu';
+  }
+
+  const englishTerms = [
+    'what', 'how', 'who', 'where', 'when', 'why', 'can', 'could', 'is', 'are',
+    'the', 'your', 'my', 'you', 'hello', 'hi', 'work', 'help', 'crop', 'crops',
+    'price', 'negotiate', 'pay', 'payment', 'delivery', 'buy', 'sell', 'order'
+  ];
+
+  let englishCount = 0;
+  for (const w of words) {
+    if (englishTerms.includes(w)) englishCount++;
+  }
+
+  if (englishCount >= 1) {
+    return 'en';
+  }
+
+  return fallbackLang;
 }
 
 export default ChatbotWidget;

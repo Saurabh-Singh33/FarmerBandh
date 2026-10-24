@@ -21,6 +21,11 @@ export const chatbotApi = {
     });
     return res.data;
   },
+
+  getTtsAudioUrl: (text, language = 'gu') => {
+    const clean = encodeURIComponent(text.substring(0, 250));
+    return `${API_BASE_URL}/chatbot/tts?lang=${encodeURIComponent(language)}&text=${clean}`;
+  },
 };
 
 export default chatbotApi;

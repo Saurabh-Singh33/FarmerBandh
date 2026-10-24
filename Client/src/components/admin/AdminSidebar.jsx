@@ -20,7 +20,8 @@ import {
   User,
   LogOut,
   Store,
-  Bell
+  Bell,
+  Mail
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications, notify } from '../../context/NotificationContext';
@@ -53,6 +54,7 @@ export const AdminSidebar = () => {
       title: 'OPERATIONS',
       items: [
         { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+        { name: 'Direct Inquiries', path: '/admin/contacts', icon: Mail },
         { name: 'Users Directory', path: '/admin/users', icon: Users },
         { name: 'Farmers Directory', path: '/admin/farmers', icon: Tractor },
         { name: 'Verifications', path: '/admin/verifications', icon: UserCheck },

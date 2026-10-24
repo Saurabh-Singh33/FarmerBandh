@@ -60,6 +60,7 @@ import { Categories as AdminCategories } from '../pages/admin/Categories';
 import { AdminSettings } from '../pages/admin/AdminSettings';
 import { ActivityLogs as AdminActivityLogs } from '../pages/admin/ActivityLogs';
 import { AdminProfile } from '../pages/admin/AdminProfile';
+import { AdminContactMessages } from '../pages/admin/AdminContactMessages';
 import { Notifications } from '../pages/shared/Notifications';
 import { NotificationPreferences } from '../pages/shared/NotificationPreferences';
 import { NotFound } from '../pages/shared/NotFound';
@@ -499,6 +500,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute role="admin">
             <AdminProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/contacts"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminContactMessages />
           </ProtectedRoute>
         }
       />

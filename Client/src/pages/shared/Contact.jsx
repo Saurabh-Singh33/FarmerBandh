@@ -15,21 +15,25 @@ import {
   ShieldCheck,
   User,
   Briefcase,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
 import { InstagramIcon, FacebookIcon, TwitterIcon, SproutIcon } from '../../components/SocialIcons';
+import { contactApi } from '../../services/contactApi';
 
 export const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    userType: 'farmer',
+    userType: 'general',
     subject: 'General',
+    customSubject: '',
     message: ''
   });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const errs = {};
@@ -41,28 +45,51 @@ export const Contact = () => {
     }
     if (!formData.message.trim()) {
       errs.message = 'Please provide a message.';
-    } else if (formData.message.trim().length < 10) {
-      errs.message = 'Message must be at least 10 characters.';
+    } else if (formData.message.trim().length < 5) {
+      errs.message = 'Message must be at least 5 characters.';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    setSubmitted(true);
-    toast.success("Thanks — our operations desk will get back to you soon.", 'Message Received');
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      userType: 'farmer',
-      subject: 'General',
-      message: ''
-    });
-    setErrors({});
+    setIsSubmitting(true);
+    try {
+      const finalSubject = formData.subject === 'Other' && formData.customSubject.trim()
+        ? formData.customSubject.trim()
+        : (formData.subject || 'General Inquiry');
+
+      await contactApi.submit({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone?.trim() || null,
+        userType: formData.userType || 'general',
+        subject: finalSubject,
+        message: formData.message.trim()
+      });
+
+      setSubmitted(true);
+      toast.success("Thanks — your message has been sent directly to the Admin operations desk.", 'Message Delivered');
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        userType: 'general',
+        subject: 'General',
+        customSubject: '',
+        message: ''
+      });
+      setErrors({});
+    } catch (err) {
+      console.error('Contact submission error:', err);
+      const errMsg = err.response?.data?.message || err.message || 'Failed to submit contact message. Please try again.';
+      toast.error(errMsg, 'Submission Failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -543,6 +570,7 @@ export const Contact = () => {
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
                   {[
+                    { id: 'general', label: '💬 Visitor / Any Person' },
                     { id: 'farmer', label: '🧑‍🌾 Farmer / Producer' },
                     { id: 'buyer', label: '🛒 Wholesale Buyer' },
                     { id: 'partner', label: '🤝 Partner / Other' }
@@ -727,8 +755,44 @@ export const Contact = () => {
                   <option value="Partnership">Wholesale Buying & Bulk Freight (थोक व्यापार)</option>
                   <option value="Payouts">Bank Payouts & NEFT Escrow (भुगतान सहायता)</option>
                   <option value="Dispute">Produce Quality & Return Support (शिकायत समाधान)</option>
-                  <option value="Press">Media & Institutional Partnerships (अन्य)</option>
+                  <option value="Other">Write Custom Topic / Other (अन्य कोई विषय)...</option>
                 </select>
+
+                {formData.subject === 'Other' && (
+                  <div style={{ marginTop: '0.65rem' }}>
+                    <label
+                      htmlFor="contact-custom-subject"
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        color: '#1B4D3E',
+                        marginBottom: '0.35rem'
+                      }}
+                    >
+                      Specify Your Topic (अपना विषय लिखें):
+                    </label>
+                    <input
+                      id="contact-custom-subject"
+                      type="text"
+                      value={formData.customSubject || ''}
+                      onChange={(e) => setFormData({ ...formData, customSubject: e.target.value })}
+                      placeholder="e.g. Question about bulk delivery, app feedback, partnership inquiry..."
+                      className="contact-input"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 0.95rem',
+                        borderRadius: '10px',
+                        border: '1px solid #D1D5DB',
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        backgroundColor: '#FFFFFF',
+                        transition: 'all 0.15s ease'
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Message */}
@@ -776,16 +840,17 @@ export const Contact = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   style={{
-                    backgroundColor: '#1B4D3E',
+                    backgroundColor: isSubmitting ? '#9CA3AF' : '#1B4D3E',
                     color: '#FFFFFF',
                     padding: '0.9rem 2.4rem',
                     borderRadius: '9999px',
                     border: 'none',
                     fontWeight: 700,
                     fontSize: '0.98rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(27,77,62,0.25)',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    boxShadow: isSubmitting ? 'none' : '0 4px 14px rgba(27,77,62,0.25)',
                     alignSelf: 'flex-start',
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -793,8 +858,17 @@ export const Contact = () => {
                     transition: 'all 0.15s ease'
                   }}
                 >
-                  <span>Submit Message (संदेश भेजें)</span>
-                  <Send size={15} />
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Submitting (भेजा जा रहा है...)...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit Message (संदेश भेजें)</span>
+                      <Send size={15} />
+                    </>
+                  )}
                 </button>
 
                 <div style={{ fontSize: '0.78rem', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
