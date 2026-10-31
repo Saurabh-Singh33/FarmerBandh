@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   TrendingUp,
   ShoppingBag,
@@ -127,6 +128,28 @@ export const Analytics = () => {
             );
           })}
         </div>
+
+        {/* Mandi Price Comparison Link Button */}
+        <Link
+          to="/mandi-prices"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            backgroundColor: '#ECFDF5',
+            color: '#065F46',
+            border: '1.5px solid #A7F3D0',
+            borderRadius: '8px',
+            padding: '7px 14px',
+            fontSize: '0.86rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+          }}
+        >
+          <TrendingUp size={15} color="#059669" />
+          <span>Mandi Parity Trends</span>
+        </Link>
       </div>
 
       {/* KPI Overview Row */}

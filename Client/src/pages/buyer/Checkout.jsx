@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, CreditCard, CheckCircle, Plus, ShieldCheck, Truck, ArrowLeft, ArrowRight, AlertCircle, Check, Clock, Megaphone } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { addressApi } from '../../services/addressApi';
 import { orderApi } from '../../services/orderApi';
 import { notify } from '../../context/NotificationContext';
@@ -10,6 +11,7 @@ import { RazorpayPaymentModal, RAZORPAY_PAYMENT_LINK_ID, RAZORPAY_PAYMENT_LINK_U
 export const Checkout = () => {
   const navigate = useNavigate();
   const { cart, fetchCart } = useCart();
+  const { user } = useAuth();
 
   const [step, setStep] = useState(1);
 
@@ -758,7 +760,7 @@ export const Checkout = () => {
         onClose={() => setShowRazorpayModal(false)}
         orderTotal={cart?.totalAmount || 100000}
         customerPhone={addresses.find((a) => a.id === selectedAddressId)?.phone || '+919508461241'}
-        customerEmail="saurabhsinghdeveloper591@gmail.com"
+        customerEmail={user?.email || 'saurabhsinghdeveloper591@gmail.com'}
         onSuccess={handleRazorpaySuccess}
       />
     </div>

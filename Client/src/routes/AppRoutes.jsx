@@ -63,6 +63,7 @@ import { AdminProfile } from '../pages/admin/AdminProfile';
 import { AdminContactMessages } from '../pages/admin/AdminContactMessages';
 import { Notifications } from '../pages/shared/Notifications';
 import { NotificationPreferences } from '../pages/shared/NotificationPreferences';
+import { MandiPriceComparison } from '../pages/shared/MandiPriceComparison';
 import { NotFound } from '../pages/shared/NotFound';
 
 export const AppRoutes = () => {
@@ -73,6 +74,9 @@ export const AppRoutes = () => {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/help" element={<Help />} />
+      <Route path="/mandi-prices" element={<MandiPriceComparison />} />
+      <Route path="/mandi-comparison" element={<MandiPriceComparison />} />
+      <Route path="/seller/mandi-prices" element={<MandiPriceComparison />} />
       <Route path="/auth" element={<LoginRegister />} />
       <Route path="/products/:idOrSlug" element={<ProductDetails />} />
       <Route path="/farmers/:id" element={<FarmerPublicProfile />} />

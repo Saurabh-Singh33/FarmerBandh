@@ -33,7 +33,7 @@ export const AdminDashboard = () => {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const res = await adminDashboardApi.GetDashboard ? adminDashboardApi.GetDashboard() : adminDashboardApi.getDashboard();
+      const res = await adminDashboardApi.getDashboard();
       setData(res);
     } catch (err) {
       notify.error(err.response?.data?.message || err.message || 'Failed to load admin dashboard.');

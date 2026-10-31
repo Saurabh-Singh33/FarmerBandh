@@ -6,6 +6,10 @@ export const adminDashboardApi = {
   getDashboard: async () => {
     const res = await apiClient.get('/admin/dashboard');
     return res.data;
+  },
+  GetDashboard: async () => {
+    const res = await apiClient.get('/admin/dashboard');
+    return res.data;
   }
 };
 

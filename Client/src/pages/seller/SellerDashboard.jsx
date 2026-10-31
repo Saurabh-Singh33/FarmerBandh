@@ -262,6 +262,84 @@ export const SellerDashboard = () => {
         />
       </div>
 
+      {/* Mandi Parity Banner */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #ECFDF5 0%, #E6F4EA 100%)',
+          border: '1.5px solid #A7F3D0',
+          borderRadius: '14px',
+          padding: '1.25rem 1.5rem',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          marginBottom: '1.5rem',
+          boxShadow: '0 2px 8px rgba(16, 185, 129, 0.08)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              backgroundColor: '#10B981',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <TrendingUp size={22} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#065F46' }}>
+                Indian Mandi vs. App Price Comparison
+              </h4>
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  backgroundColor: '#D1FAE5',
+                  color: '#047857',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  border: '1px solid #6EE7B7'
+                }}
+              >
+                Government Agmarknet Sync
+              </span>
+            </div>
+            <p style={{ margin: '4px 0 0 0', fontSize: '0.84rem', color: '#047857' }}>
+              Track day-wise and week-wise APMC mandi rates across India. Ensure your farm produce captures higher direct margins!
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to="/mandi-prices"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            backgroundColor: '#1B4D3E',
+            color: '#FFFFFF',
+            textDecoration: 'none',
+            fontSize: '0.88rem',
+            fontWeight: 600,
+            padding: '8px 16px',
+            borderRadius: '8px',
+            transition: 'background-color 0.15s ease'
+          }}
+        >
+          <span>Compare Mandi Rates</span>
+          <ArrowRight size={14} />
+        </Link>
+      </div>
+
       {/* Main 2-Column Section */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '1.5rem' }}>
         {/* Left Column: Revenue Chart & Recent Orders */}

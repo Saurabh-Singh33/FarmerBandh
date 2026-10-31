@@ -275,6 +275,51 @@ export const ProductDetails = () => {
               )}
             </div>
 
+            {/* Mandi Benchmark Parity Card */}
+            <div
+              style={{
+                backgroundColor: '#ECFDF5',
+                border: '1px solid #A7F3D0',
+                borderRadius: '8px',
+                padding: '0.75rem 1rem',
+                marginBottom: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                flexWrap: 'wrap'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#10B981',
+                    display: 'inline-block'
+                  }}
+                />
+                <span style={{ fontSize: '0.84rem', color: '#065F46', fontWeight: 600 }}>
+                  Direct Farm Price • ₹{(product.pricePerQuintal / 100).toFixed(2)}/kg equivalent
+                </span>
+              </div>
+              <Link
+                to="/mandi-prices"
+                style={{
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  color: '#1B4D3E',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                Compare vs Indian Mandi Rates →
+              </Link>
+            </div>
+
             {/* Specs Summary */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem', backgroundColor: '#F9FBF8', padding: '1rem', borderRadius: '8px', border: '1px solid #F3F4F6' }}>
               <div>

@@ -14,6 +14,7 @@ import {
   Package,
   Wallet,
   BarChart3,
+  TrendingUp,
   ShieldCheck,
   Settings,
   Bell
@@ -102,6 +103,12 @@ export const FarmerSidebar = () => {
           name: 'Analytics',
           path: '/seller/analytics',
           icon: BarChart3
+        },
+        {
+          name: 'Mandi Price Parity',
+          path: '/mandi-prices',
+          icon: TrendingUp,
+          badge: 'Govt Sync'
         }
       ]
     },

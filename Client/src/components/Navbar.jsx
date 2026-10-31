@@ -176,6 +176,7 @@ export const Navbar = () => {
   if (!user) {
     const guestNavLinks = [
       { label: 'Home', path: '/' },
+      { label: 'Mandi Rates', path: '/mandi-prices', badge: 'Live' },
       { label: 'About', path: '/about' },
       { label: 'Help', path: '/help' },
       { label: 'Contact', path: '/contact' }
@@ -245,10 +246,28 @@ export const Navbar = () => {
                     color: isActive ? '#1B4D3E' : '#4B5563',
                     position: 'relative',
                     padding: '0.4rem 0',
-                    transition: 'color 0.15s ease'
+                    transition: 'color 0.15s ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
                   }}
                 >
                   {link.label}
+                  {link.badge && (
+                    <span
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        padding: '1px 6px',
+                        borderRadius: '9999px',
+                        backgroundColor: '#ECFDF5',
+                        color: '#065F46',
+                        border: '1px solid #A7F3D0'
+                      }}
+                    >
+                      {link.badge}
+                    </span>
+                  )}
                   {isActive && (
                     <span style={{
                       position: 'absolute',
@@ -413,6 +432,34 @@ export const Navbar = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', overflowX: 'auto', padding: '0.2rem 0.5rem', scrollbarWidth: 'none' }}>
         <Link to="/marketplace" style={{ textDecoration: 'none', color: '#374151', fontSize: '0.92rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
           Marketplace
+        </Link>
+        <Link
+          to="/mandi-prices"
+          style={{
+            textDecoration: 'none',
+            color: '#065F46',
+            fontSize: '0.86rem',
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            backgroundColor: '#ECFDF5',
+            padding: '3px 10px',
+            borderRadius: '9999px',
+            border: '1px solid #A7F3D0'
+          }}
+        >
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: '#10B981',
+              display: 'inline-block'
+            }}
+          />
+          Mandi Rates
         </Link>
         {(!user || user?.role?.toLowerCase() === 'buyer') && (
           <>
