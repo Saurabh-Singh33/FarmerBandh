@@ -15,6 +15,18 @@ public class AdminDashboardDto
     public List<UserChartPoint> userGrowthChart { get; set; } = new();
     public List<CategorySplitPoint> categorySplit { get; set; } = new();
     public List<RecentActivityItem> recentActivity { get; set; } = new();
+    public List<AdminRecentOrderDto> recentOrders { get; set; } = new();
+}
+
+public class AdminRecentOrderDto
+{
+    public Guid id { get; set; }
+    public string orderNumber { get; set; } = string.Empty;
+    public string buyerName { get; set; } = string.Empty;
+    public string sellerName { get; set; } = string.Empty;
+    public decimal totalAmount { get; set; }
+    public string status { get; set; } = string.Empty;
+    public DateTime createdAt { get; set; }
 }
 
 public class UserKpis

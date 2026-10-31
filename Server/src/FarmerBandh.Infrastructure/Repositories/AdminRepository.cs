@@ -135,6 +135,24 @@ public class AdminRepository : IAdminRepository
             })
             .ToListAsync();
 
+        // Recent Orders (last 6)
+        var recentOrdersList = await _context.Orders
+            .Include(o => o.Buyer).ThenInclude(b => b.User)
+            .Include(o => o.Seller).ThenInclude(f => f.User)
+            .OrderByDescending(o => o.PlacedAt)
+            .Take(6)
+            .Select(o => new AdminRecentOrderDto
+            {
+                id = o.Id,
+                orderNumber = o.OrderNumber,
+                buyerName = o.Buyer != null && o.Buyer.User != null ? o.Buyer.User.FullName : "Customer",
+                sellerName = o.Seller != null && o.Seller.User != null ? o.Seller.User.FullName : (o.Seller != null && !string.IsNullOrEmpty(o.Seller.FarmName) ? o.Seller.FarmName : "Farmer"),
+                totalAmount = o.TotalAmount,
+                status = o.Status.ToString(),
+                createdAt = o.PlacedAt
+            })
+            .ToListAsync();
+
         return new AdminDashboardDto
         {
             users = new UserKpis
@@ -199,7 +217,8 @@ public class AdminRepository : IAdminRepository
             ordersChart = ordersChart,
             userGrowthChart = userGrowthChart,
             categorySplit = categorySplit,
-            recentActivity = recentLogs
+            recentActivity = recentLogs,
+            recentOrders = recentOrdersList
         };
     }
     #endregion

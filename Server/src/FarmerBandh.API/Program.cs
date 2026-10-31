@@ -118,6 +118,9 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 
+// Government Mandi & Market Parity Services
+builder.Services.AddScoped<IMandiPriceService, MandiPriceService>();
+
 // Hosted background service for expiring stale negotiations every 15 min
 builder.Services.AddHostedService<NegotiationExpiryService>();
 
@@ -288,10 +291,7 @@ static void LoadDotEnvFiles()
                     {
                         var key = trimmed.Substring(0, eqIdx).Trim();
                         var val = trimmed.Substring(eqIdx + 1).Trim().Trim('"', '\'');
-                        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(key)))
-                        {
-                            Environment.SetEnvironmentVariable(key, val);
-                        }
+                        Environment.SetEnvironmentVariable(key, val);
                     }
                 }
             }

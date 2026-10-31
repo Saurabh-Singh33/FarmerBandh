@@ -17,6 +17,7 @@ public class OrderService : IOrderService
     private readonly ICartService _cartService;
     private readonly ITimelineService _timelineService;
     private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
 
     public OrderService(
         IOrderRepository orderRepository,
@@ -27,7 +28,8 @@ public class OrderService : IOrderService
         IPlatformSettingRepository settingRepository,
         ICartService cartService,
         ITimelineService timelineService,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IEmailService emailService)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
@@ -38,6 +40,7 @@ public class OrderService : IOrderService
         _cartService = cartService;
         _timelineService = timelineService;
         _notificationService = notificationService;
+        _emailService = emailService;
     }
 
     public async Task<OrderPlacementResultDto> CreateOrderAsync(Guid userId, CreateOrderRequest request)
@@ -258,6 +261,27 @@ public class OrderService : IOrderService
         }
 
         await _cartRepository.ClearCartAsync(cart.Id);
+
+        // Send order confirmation email via Gmail SMTP
+        if (!string.IsNullOrWhiteSpace(buyer?.User?.Email))
+        {
+            var buyerEmail = buyer.User.Email;
+            var buyerName = buyer.User.FullName;
+            foreach (var order in createdOrders)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailService.SendOrderConfirmationEmailAsync(order, buyerEmail, buyerName);
+                    }
+                    catch
+                    {
+                        // Background dispatch failure should not block order placement
+                    }
+                });
+            }
+        }
 
         var summaries = createdOrders.Select(o => MapToSummary(o)).ToList();
 

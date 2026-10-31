@@ -30,9 +30,9 @@ public class EmailService : IEmailService
 
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass))
         {
-            _logger.LogInformation(
-                "SMTP credentials not fully configured in environment (SMTP_HOST, SMTP_USER, SMTP_PASS). Skipping email dispatch to {ToEmail}.",
-                toEmail);
+            var warning = $"SMTP credentials not fully configured in environment (host='{host}', user='{user}', pass set: {!string.IsNullOrWhiteSpace(pass)}). Skipping email dispatch to {toEmail}.";
+            _logger.LogInformation(warning);
+            TryAppendDebugLog(warning);
             return false;
         }
 
@@ -42,6 +42,9 @@ public class EmailService : IEmailService
         }
 
         var enableSsl = !bool.TryParse(sslStr, out var ssl) || ssl;
+
+        // Clean password of any spaces provided by Google app password UI
+        pass = pass.Replace(" ", "");
 
         try
         {
@@ -62,18 +65,23 @@ public class EmailService : IEmailService
 
             using var client = new SmtpClient(host, port)
             {
+                UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(user, pass),
                 EnableSsl = enableSsl,
-                Timeout = 15000 // 15 seconds timeout
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 20000
             };
 
+            TryAppendDebugLog($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] Attempting to send '{subject}' to '{toEmail}' from '{fromEmail}' via {host}:{port} (User: {user})");
             await client.SendMailAsync(message);
             _logger.LogInformation("Email successfully sent to {ToEmail} (Subject: {Subject})", toEmail, subject);
+            TryAppendDebugLog($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] SUCCESS: Email successfully delivered to {toEmail}");
             return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send email to {ToEmail} via SMTP {Host}:{Port}", toEmail, host, port);
+            TryAppendDebugLog($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] ERROR sending to {toEmail}: {ex.Message}\n{ex.StackTrace}");
             return false;
         }
     }
@@ -261,8 +269,216 @@ public class EmailService : IEmailService
         return await SendEmailAsync(message.Email, subject, html);
     }
 
+    public async Task<bool> SendOrderConfirmationEmailAsync(Order order, string buyerEmail, string buyerName)
+    {
+        if (string.IsNullOrWhiteSpace(buyerEmail))
+            return false;
+
+        var subject = $"Order Confirmed: #{order.OrderNumber} — FarmerBandh Agrarian Marketplace";
+
+        var itemsHtml = string.Empty;
+        if (order.Items != null && order.Items.Any())
+        {
+            foreach (var it in order.Items)
+            {
+                itemsHtml += $"""
+                <tr style='border-bottom: 1px solid #f1f5f9;'>
+                  <td style='padding: 10px 0; font-weight: 600; color: #1e293b;'>{WebUtility.HtmlEncode(it.ProductNameSnapshot)}</td>
+                  <td style='padding: 10px 0; text-align: center; color: #64748b;'>{it.QuantityQuintal} Qtl</td>
+                  <td style='padding: 10px 0; text-align: right; color: #64748b;'>₹{it.UnitPricePerQuintal:N2}</td>
+                  <td style='padding: 10px 0; text-align: right; font-weight: 700; color: #0f172a;'>₹{it.LineTotal:N2}</td>
+                </tr>
+                """;
+            }
+        }
+        else
+        {
+            itemsHtml = $"""
+            <tr style='border-bottom: 1px solid #f1f5f9;'>
+              <td colspan='4' style='padding: 10px 0; font-weight: 600; color: #1e293b;'>Agricultural Produce Order #{order.OrderNumber}</td>
+            </tr>
+            """;
+        }
+
+        var slotFormatted = $"{order.DeliverySlotDate:dd MMM yyyy} ({order.DeliverySlotWindow})";
+        var addressFormatted = $"{order.DeliveryLine1}, {order.DeliveryCity}, {order.DeliveryState} - {order.DeliveryPincode}";
+
+        var html = $$"""
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #1e293b; }
+    .card { background: #ffffff; max-width: 620px; margin: 0 auto; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .header { background: linear-gradient(135deg, #1B4D3E 0%, #064E3B 100%); padding: 32px 28px; color: #ffffff; text-align: center; }
+    .header h2 { margin: 8px 0 0 0; font-size: 24px; font-weight: 800; }
+    .header p { margin: 0; color: #a7f3d0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+    .body { padding: 28px; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; margin-bottom: 18px; }
+    .order-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+    .table-container { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+    .table-container th { text-align: left; padding: 8px 0; border-bottom: 2px solid #e2e8f0; color: #64748b; font-size: 12px; text-transform: uppercase; }
+    .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #475569; }
+    .grand-total { display: flex; justify-content: space-between; padding: 12px 0 0 0; margin-top: 10px; border-top: 2px solid #e2e8f0; font-size: 18px; font-weight: 800; color: #064e3b; }
+    .escrow-banner { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 16px; margin-top: 24px; font-size: 13px; color: #166534; line-height: 1.5; }
+    .footer { background: #f8fafc; padding: 20px 28px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class='card'>
+    <div class='header'>
+      <p>FarmerBandh Escrow Platform</p>
+      <h2>Order Confirmed!</h2>
+    </div>
+    <div class='body'>
+      <span class='badge'>✓ Payment & Escrow Secured</span>
+      <p style='margin: 0 0 16px 0; font-size: 15px;'>Dear <strong>{{WebUtility.HtmlEncode(buyerName)}}</strong>,</p>
+      <p style='margin: 0 0 20px 0; font-size: 14px; color: #475569; line-height: 1.6;'>
+        Thank you for choosing FarmerBandh. Your order has been registered and funds are securely held in Razorpay Escrow until successful delivery by our verified agricultural producer.
+      </p>
+
+      <div class='order-box'>
+        <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
+          <span style='font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 700;'>Order Number</span>
+          <span style='font-size: 13px; font-weight: 800; color: #0f172a;'>#{{order.OrderNumber}}</span>
+        </div>
+        <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
+          <span style='font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 700;'>Delivery Schedule</span>
+          <span style='font-size: 13px; font-weight: 600; color: #0f172a;'>{{slotFormatted}}</span>
+        </div>
+        <div style='display: flex; justify-content: space-between;'>
+          <span style='font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 700;'>Destination</span>
+          <span style='font-size: 13px; font-weight: 600; color: #0f172a; text-align: right; max-width: 60%;'>{{WebUtility.HtmlEncode(addressFormatted)}}</span>
+        </div>
+      </div>
+
+      <table class='table-container'>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style='text-align: center;'>Qty</th>
+            <th style='text-align: right;'>Rate</th>
+            <th style='text-align: right;'>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{itemsHtml}}
+        </tbody>
+      </table>
+
+      <div style='background: #f8fafc; border-radius: 10px; padding: 14px 18px;'>
+        <div class='total-row'>
+          <span>Items Subtotal:</span>
+          <span>₹{{order.Subtotal:N2}}</span>
+        </div>
+        {{(order.DiscountAmount > 0 ? $"<div class='total-row' style='color:#059669;'><span>Discount / Savings:</span><span>-₹{order.DiscountAmount:N2}</span></div>" : "")}}
+        <div class='total-row'>
+          <span>Delivery & Transport:</span>
+          <span>₹{{order.DeliveryFee:N2}}</span>
+        </div>
+        <div class='total-row'>
+          <span>Platform & Escrow Fee:</span>
+          <span>₹{{order.PlatformFee:N2}}</span>
+        </div>
+        <div class='total-row'>
+          <span>GST / Tax:</span>
+          <span>₹{{order.TaxAmount:N2}}</span>
+        </div>
+        <div class='grand-total'>
+          <span>Total Paid (INR):</span>
+          <span>₹{{order.TotalAmount:N2}}</span>
+        </div>
+      </div>
+
+      <div class='escrow-banner'>
+        <strong>🛡️ Razorpay Escrow Guarantee:</strong> Payment is held safely in escrow. If there is any discrepancy in crop grade or delivery, our buyer dispute window protects 100% of your funds.
+      </div>
+
+      <p style='margin: 24px 0 6px 0; font-size: 13px; color: #64748b;'>
+        Questions? Contact FarmerBandh Support at <strong>saurabhsinghdeveloper591@gmail.com</strong> or call <strong>1800-123-456</strong>.
+      </p>
+    </div>
+    <div class='footer'>
+      &copy; {{DateTime.UtcNow.Year}} FarmerBandh Platform Ltd. • Direct Agrarian Market Gateway
+    </div>
+  </div>
+</body>
+</html>
+""";
+
+        return await SendEmailAsync(buyerEmail, subject, html);
+    }
+
     private string? GetConfigValue(string key)
     {
-        return Environment.GetEnvironmentVariable(key) ?? _config[key];
+        // 1. Check live .env file first (guarantees up-to-date values without needing server restart)
+        var dotEnvVal = ReadFromDotEnv(key);
+        if (!string.IsNullOrWhiteSpace(dotEnvVal))
+            return dotEnvVal;
+
+        // 2. Check environment variable
+        var envVal = Environment.GetEnvironmentVariable(key);
+        if (!string.IsNullOrWhiteSpace(envVal))
+            return envVal;
+
+        // 3. Fallback to IConfiguration
+        return _config[key];
+    }
+
+    private static string? ReadFromDotEnv(string key)
+    {
+        try
+        {
+            var searchDirs = new[]
+            {
+                Directory.GetCurrentDirectory(),
+                Path.Combine(Directory.GetCurrentDirectory(), ".."),
+                Path.Combine(Directory.GetCurrentDirectory(), "..", ".."),
+                AppDomain.CurrentDomain.BaseDirectory
+            };
+
+            foreach (var dir in searchDirs)
+            {
+                var filePath = Path.Combine(dir, ".env");
+                if (File.Exists(filePath))
+                {
+                    foreach (var line in File.ReadAllLines(filePath))
+                    {
+                        var trimmed = line.Trim();
+                        if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith('#'))
+                            continue;
+
+                        var eqIdx = trimmed.IndexOf('=');
+                        if (eqIdx > 0)
+                        {
+                            var currentKey = trimmed.Substring(0, eqIdx).Trim();
+                            if (string.Equals(currentKey, key, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return trimmed.Substring(eqIdx + 1).Trim().Trim('"', '\'');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Ignore file access issues
+        }
+        return null;
+    }
+
+    private static void TryAppendDebugLog(string message)
+    {
+        try
+        {
+            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "smtp_debug.log");
+            File.AppendAllText(logPath, $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}] {message}\n");
+        }
+        catch
+        {
+            // Ignore logging errors
+        }
     }
 }

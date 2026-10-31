@@ -219,7 +219,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Buyer?> GetBuyerByUserIdAsync(Guid userId)
     {
-        return await _context.Buyers.FirstOrDefaultAsync(b => b.UserId == userId);
+        return await _context.Buyers.Include(b => b.User).FirstOrDefaultAsync(b => b.UserId == userId);
     }
 
     public async Task<Product> CreateAsync(Product product)

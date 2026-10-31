@@ -8,4 +8,5 @@ public interface IEmailService
     Task<bool> SendContactInquiryAdminAlertAsync(ContactMessage message);
     Task<bool> SendContactInquiryAcknowledgmentAsync(ContactMessage message);
     Task<bool> SendAdminReplyToUserAsync(ContactMessage message, string replyText);
+    Task<bool> SendOrderConfirmationEmailAsync(Order order, string buyerEmail, string buyerName);
 }
