@@ -25,6 +25,22 @@ import {
 } from 'lucide-react';
 import { mandiApi } from '../../services/mandiApi';
 
+const FALLBACK_DISTRICTS_BY_STATE = {
+  'Bihar': ['All Districts', 'Patna', 'Muzaffarpur', 'Purnia', 'Begusarai', 'Bhagalpur', 'Gaya', 'Samastipur', 'Darbhanga', 'Nalanda', 'Rohtas', 'Bhojpur', 'Vaishali', 'East Champaran', 'West Champaran', 'Katihar', 'Saharsa'],
+  'Kerala': ['All Districts', 'Alappuzha', 'Ernakulam', 'Kottayam', 'Kozhikode', 'Palakkad', 'Thrissur', 'Thiruvananthapuram'],
+  'Gujarat': ['All Districts', 'Ahmedabad', 'Rajkot', 'Surat', 'Mehsana', 'Vadodara', 'Bhavnagar'],
+  'Maharashtra': ['All Districts', 'Nashik', 'Pune', 'Mumbai', 'Nagpur', 'Ahmednagar', 'Solapur'],
+  'Punjab': ['All Districts', 'Ludhiana', 'Amritsar', 'Bathinda', 'Jalandhar', 'Patiala'],
+  'Uttar Pradesh': ['All Districts', 'Lucknow', 'Agra', 'Kanpur', 'Varanasi', 'Aligarh', 'Bareilly'],
+  'Madhya Pradesh': ['All Districts', 'Indore', 'Neemuch', 'Mandsaur', 'Ujjain', 'Bhopal'],
+  'Rajasthan': ['All Districts', 'Jaipur', 'Kota', 'Jodhpur', 'Bikaner', 'Sri Ganganagar', 'Alwar', 'Nagaur'],
+  'Haryana': ['All Districts', 'Karnal', 'Hisar', 'Ambala', 'Sirsa', 'Kurukshetra', 'Rohtak'],
+  'Karnataka': ['All Districts', 'Bengaluru', 'Kolar', 'Belagavi', 'Davanagere', 'Mysuru', 'Shivamogga'],
+  'Andhra Pradesh': ['All Districts', 'Guntur', 'Krishna', 'Kurnool', 'East Godavari', 'West Godavari', 'Visakhapatnam'],
+  'Tamil Nadu': ['All Districts', 'Coimbatore', 'Madurai', 'Erode', 'Salem', 'Thanjavur', 'Tiruchirappalli'],
+  'West Bengal': ['All Districts', 'Hooghly', 'Burdwan', 'Murshidabad', 'Nadia', 'North 24 Parganas', 'Malda']
+};
+
 export const MandiPriceComparison = () => {
   // Controls state
   const [selectedCommodity, setSelectedCommodity] = useState('Wheat');
@@ -56,7 +72,13 @@ export const MandiPriceComparison = () => {
     'Punjab',
     'Madhya Pradesh',
     'Uttar Pradesh',
-    'Rajasthan'
+    'Rajasthan',
+    'Haryana',
+    'Karnataka',
+    'Andhra Pradesh',
+    'Tamil Nadu',
+    'Bihar',
+    'West Bengal'
   ]);
   const [districts, setDistricts] = useState(['All Districts']);
 
@@ -93,6 +115,14 @@ export const MandiPriceComparison = () => {
 
   // Update district options when selectedState changes
   useEffect(() => {
+    if (selectedState && FALLBACK_DISTRICTS_BY_STATE[selectedState]) {
+      setDistricts(FALLBACK_DISTRICTS_BY_STATE[selectedState]);
+      setSelectedDistrict('All Districts');
+    } else if (selectedState === 'All India') {
+      setDistricts(['All Districts']);
+      setSelectedDistrict('All Districts');
+    }
+
     const fetchDistricts = async () => {
       try {
         const dList = await mandiApi.getDistricts(selectedState === 'All India' ? null : selectedState);
