@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using FarmerBandh.Application.DTOs.CartAndOrders;
 using FarmerBandh.Application.DTOs.Catalog;
@@ -145,7 +146,7 @@ public class OrdersController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             return Forbid();
         }

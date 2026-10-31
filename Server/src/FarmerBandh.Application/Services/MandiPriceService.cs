@@ -287,14 +287,21 @@ public class MandiPriceService : IMandiPriceService
 
     public Task<List<string>> GetDistrictsAsync(string? state = null)
     {
-        var allDistricts = new Dictionary<string, string[]>
+        var allDistricts = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
             ["Kerala"] = new[] { "All Districts", "Alappuzha", "Ernakulam", "Kottayam", "Kozhikode", "Palakkad", "Thrissur", "Thiruvananthapuram" },
             ["Gujarat"] = new[] { "All Districts", "Ahmedabad", "Rajkot", "Surat", "Mehsana", "Vadodara", "Bhavnagar" },
             ["Maharashtra"] = new[] { "All Districts", "Nashik", "Pune", "Mumbai", "Nagpur", "Ahmednagar", "Solapur" },
             ["Punjab"] = new[] { "All Districts", "Ludhiana", "Amritsar", "Bathinda", "Jalandhar", "Patiala" },
             ["Uttar Pradesh"] = new[] { "All Districts", "Lucknow", "Agra", "Kanpur", "Varanasi", "Aligarh", "Bareilly" },
-            ["Madhya Pradesh"] = new[] { "All Districts", "Indore", "Neemuch", "Mandsaur", "Ujjain", "Bhopal" }
+            ["Madhya Pradesh"] = new[] { "All Districts", "Indore", "Neemuch", "Mandsaur", "Ujjain", "Bhopal" },
+            ["Bihar"] = new[] { "All Districts", "Patna", "Muzaffarpur", "Purnia", "Begusarai", "Bhagalpur", "Gaya", "Samastipur", "Darbhanga", "Nalanda", "Rohtas", "Bhojpur", "Vaishali", "East Champaran", "West Champaran", "Katihar", "Saharsa", "Supaul", "Madhepura", "Khagaria", "Munger", "Jamui", "Lakhisarai", "Sheikhpura", "Nawada", "Aurangabad", "Jehanabad", "Arwal", "Kaimur", "Buxar", "Sitamarhi", "Sheohar", "Kishanganj", "Araria", "Banka", "Siwan", "Gopalganj", "Saran" },
+            ["Rajasthan"] = new[] { "All Districts", "Jaipur", "Kota", "Jodhpur", "Bikaner", "Sri Ganganagar", "Alwar", "Nagaur", "Tonk", "Bharatpur" },
+            ["Haryana"] = new[] { "All Districts", "Karnal", "Hisar", "Ambala", "Sirsa", "Kurukshetra", "Rohtak", "Sonipat", "Fatehabad" },
+            ["Karnataka"] = new[] { "All Districts", "Bengaluru", "Kolar", "Belagavi", "Davanagere", "Mysuru", "Shivamogga", "Tumakuru", "Hubballi-Dharwad" },
+            ["Andhra Pradesh"] = new[] { "All Districts", "Guntur", "Krishna", "Kurnool", "East Godavari", "West Godavari", "Visakhapatnam", "Anantapur", "Chittoor" },
+            ["Tamil Nadu"] = new[] { "All Districts", "Coimbatore", "Madurai", "Erode", "Salem", "Thanjavur", "Tiruchirappalli", "Dindigul", "Vellore" },
+            ["West Bengal"] = new[] { "All Districts", "Hooghly", "Burdwan", "Murshidabad", "Nadia", "North 24 Parganas", "Malda", "South 24 Parganas", "Birbhum" }
         };
 
         if (!string.IsNullOrWhiteSpace(state) && allDistricts.TryGetValue(state, out var dists))
@@ -591,7 +598,16 @@ public class MandiPriceService : IMandiPriceService
 
             // Uttar Pradesh Mandis
             new MandiRecordDto { State = "Uttar Pradesh", District = "Agra", Market = "Agra Mandi", Commodity = "Potato", Variety = "Chipsona", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 1150, MaxPrice = 1450, ModalPrice = 1320, Unit = "₹/Quintal" },
-            new MandiRecordDto { State = "Uttar Pradesh", District = "Lucknow", Market = "Lucknow APMC", Commodity = "Wheat", Variety = "Sharbati", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 2350, MaxPrice = 2600, ModalPrice = 2480, Unit = "₹/Quintal" }
+            new MandiRecordDto { State = "Uttar Pradesh", District = "Lucknow", Market = "Lucknow APMC", Commodity = "Wheat", Variety = "Sharbati", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 2350, MaxPrice = 2600, ModalPrice = 2480, Unit = "₹/Quintal" },
+
+            // Bihar Mandis
+            new MandiRecordDto { State = "Bihar", District = "Patna", Market = "Patna APMC", Commodity = "Wheat", Variety = "Sharbati / Lokwan", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 2250, MaxPrice = 2520, ModalPrice = 2380, Unit = "₹/Quintal" },
+            new MandiRecordDto { State = "Bihar", District = "Muzaffarpur", Market = "Muzaffarpur Mandi", Commodity = "Wheat", Variety = "Desi Kalyan", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 2200, MaxPrice = 2480, ModalPrice = 2340, Unit = "₹/Quintal" },
+            new MandiRecordDto { State = "Bihar", District = "Purnia", Market = "Gulabbagh APMC", Commodity = "Yellow Maize", Variety = "Hybrid Yellow", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 1950, MaxPrice = 2250, ModalPrice = 2120, Unit = "₹/Quintal" },
+            new MandiRecordDto { State = "Bihar", District = "Purnia", Market = "Gulabbagh APMC", Commodity = "Wheat", Variety = "Sharbati", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 2220, MaxPrice = 2490, ModalPrice = 2360, Unit = "₹/Quintal" },
+            new MandiRecordDto { State = "Bihar", District = "Begusarai", Market = "Begusarai Mandi", Commodity = "Wheat", Variety = "Lokwan", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 2240, MaxPrice = 2500, ModalPrice = 2370, Unit = "₹/Quintal" },
+            new MandiRecordDto { State = "Bihar", District = "Rohtas", Market = "Sasaram APMC", Commodity = "Basmati Rice", Variety = "1121 Pusa", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 4600, MaxPrice = 5200, ModalPrice = 4950, Unit = "₹/Quintal" },
+            new MandiRecordDto { State = "Bihar", District = "Bhagalpur", Market = "Bhagalpur Mandi", Commodity = "Chana (Gram)", Variety = "Desi Bold", Grade = "FAQ", ArrivalDate = todayStr, MinPrice = 4850, MaxPrice = 5300, ModalPrice = 5100, Unit = "₹/Quintal" }
         };
 
         // Filter master records
