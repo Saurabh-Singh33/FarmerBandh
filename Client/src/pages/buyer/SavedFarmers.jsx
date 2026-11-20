@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { savedFarmerApi } from '../../services/savedFarmerApi';
 import FarmerCard from '../../components/FarmerCard';
 import { notify } from '../../context/NotificationContext';
+import { Bookmark, Search, ArrowRight, Store, Sprout } from 'lucide-react';
 
 export default function SavedFarmers() {
   const [farmers, setFarmers] = useState([]);
@@ -60,68 +61,81 @@ export default function SavedFarmers() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div style={{ maxWidth: '1120px', margin: '2rem auto 4rem auto', padding: '0 1.25rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
             Saved Farmers & Direct Growers
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Keep track of your trusted suppliers, add private notes, and access their fresh listings.
+          <p style={{ fontSize: '0.92rem', color: '#6B7280', margin: '6px 0 0 0' }}>
+            Keep track of your trusted suppliers, add private notes, and access their fresh listings directly.
           </p>
         </div>
 
         <Link
           to="/marketplace"
-          className="self-start sm:self-auto text-xs font-bold px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 shadow-2xs"
+          className="farmer-btn-primary"
+          style={{ padding: '9px 18px', fontSize: '0.82rem' }}
         >
-          + Discover Farmers in Marketplace
+          <Sprout size={15} /> Discover Farmers in Marketplace
         </Link>
       </div>
 
       {/* Search Bar */}
       {farmers.length > 0 && (
-        <div className="mb-6">
+        <div style={{ position: 'relative', marginBottom: '1.75rem' }}>
+          <Search size={16} color="#9CA3AF" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search saved farmers by name, location, or notes..."
-            className="w-full text-xs p-3 rounded-2xl border border-gray-200 bg-white shadow-2xs focus:outline-none focus:ring-1 focus:ring-emerald-600"
+            placeholder="Search saved farmers by farm name, location, or private notes..."
+            style={{
+              width: '100%',
+              padding: '12px 14px 12px 40px',
+              borderRadius: '14px',
+              border: '1.5px solid #E5E7EB',
+              backgroundColor: '#FFFFFF',
+              fontSize: '0.88rem',
+              outline: 'none',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              boxSizing: 'border-box'
+            }}
           />
         </div>
       )}
 
       {/* Content */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
           {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="bg-white rounded-2xl p-6 border border-gray-100 animate-pulse h-48" />
+            <div key={n} style={{ backgroundColor: '#FFFFFF', borderRadius: '20px', border: '1px solid #E5E7EB', padding: '1.5rem', height: '160px' }} className="pulse-glow" />
           ))}
         </div>
       ) : farmers.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-xs">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-800 text-2xl flex items-center justify-center mx-auto mb-4 font-bold">
-            🔖
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', border: '1px solid #E5E7EB', padding: '4rem 2rem', textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem auto' }}>
+            <Bookmark size={30} />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-1">No saved farmers yet</h3>
-          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
-            When you find a farmer whose quality and harvest you love, bookmark them to reorder quickly and keep personal supplier notes.
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>No Saved Farmers Yet</h3>
+          <p style={{ fontSize: '0.92rem', color: '#6B7280', maxWidth: '460px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
+            When you find a farmer whose produce quality and harvest you trust, bookmark them to reorder quickly and keep personal supplier notes.
           </p>
           <Link
             to="/marketplace"
-            className="inline-block px-5 py-2.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold shadow-xs transition-colors"
+            className="farmer-btn-primary"
+            style={{ display: 'inline-flex', padding: '10px 22px' }}
           >
-            Explore Marketplace
+            Explore Marketplace <ArrowRight size={15} />
           </Link>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center text-xs text-gray-500">
-          No saved farmers matched your search "{search}".
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '20px', border: '1px solid #E5E7EB', padding: '3rem 2rem', textAlign: 'center', fontSize: '0.9rem', color: '#6B7280' }}>
+          No saved farmers matched your search "<strong>{search}</strong>".
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem' }}>
           {filtered.map((item) => (
             <FarmerCard
               key={item.id || item.farmerId}

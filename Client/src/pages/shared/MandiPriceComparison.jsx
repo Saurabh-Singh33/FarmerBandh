@@ -6,6 +6,7 @@ import {
   Search,
   Building2,
   ChevronRight,
+  ChevronDown,
   ArrowUpRight,
   ArrowDownRight,
   Download,
@@ -428,39 +429,51 @@ export const MandiPriceComparison = () => {
         {/* Refined 2-Column Hero Banner */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #0E3528 0%, #174837 50%, #1B4D3E 100%)',
+            background: 'linear-gradient(135deg, #1E6B52 0%, #29856A 45%, #3B9F80 100%)',
             borderRadius: '24px',
             padding: '2.5rem',
             color: '#FFFFFF',
             position: 'relative',
             overflow: 'hidden',
             marginBottom: '2rem',
-            boxShadow: '0 20px 40px -15px rgba(27, 77, 62, 0.28)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            boxShadow: '0 20px 45px -15px rgba(28, 95, 74, 0.25), 0 4px 12px rgba(0, 0, 0, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.32)'
           }}
         >
-          {/* Decorative Background Elements */}
+          {/* Decorative Ambient Background Glows */}
           <div
             style={{
               position: 'absolute',
-              top: '-40px',
+              top: '-60px',
               right: '-40px',
-              width: '320px',
-              height: '320px',
+              width: '400px',
+              height: '400px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(52, 211, 153, 0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(167, 243, 208, 0.35) 0%, transparent 70%)',
               pointerEvents: 'none'
             }}
           />
           <div
             style={{
               position: 'absolute',
-              bottom: '-60px',
-              left: '30%',
+              bottom: '-70px',
+              left: '25%',
+              width: '320px',
+              height: '320px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(253, 230, 138, 0.2) 0%, transparent 70%)',
+              pointerEvents: 'none'
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: '10%',
+              left: '-40px',
               width: '260px',
               height: '260px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 65%)',
               pointerEvents: 'none'
             }}
           />
@@ -477,36 +490,37 @@ export const MandiPriceComparison = () => {
           >
             {/* Left Column: Title & Mission */}
             <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '1.15rem' }}>
                 <span
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '4px 12px',
+                    padding: '6px 14px',
                     borderRadius: '9999px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.22)',
                     backdropFilter: 'blur(10px)',
                     fontSize: '0.76rem',
                     fontWeight: 700,
                     letterSpacing: '0.04em',
                     textTransform: 'uppercase',
-                    color: '#6EE7B7',
-                    border: '1px solid rgba(110, 231, 183, 0.3)'
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
                   }}
                 >
-                  <Sparkles size={13} color="#F59E0B" /> Live Agmarknet APMC & Farm Gate Intel
+                  <Sparkles size={13} color="#FDE047" /> Live Agmarknet APMC & Farm Gate Intel
                 </span>
               </div>
 
               <h1
                 style={{
-                  fontFamily: 'Playfair Display, Georgia, serif',
-                  fontSize: '2.6rem',
-                  fontWeight: 700,
+                  fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  fontSize: '2.45rem',
+                  fontWeight: 800,
                   lineHeight: 1.15,
                   margin: '0 0 1rem 0',
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.025em',
                   color: '#FFFFFF'
                 }}
               >
@@ -515,9 +529,11 @@ export const MandiPriceComparison = () => {
                   style={{
                     display: 'block',
                     color: '#A7F3D0',
-                    fontSize: '1.9rem',
-                    fontWeight: 600,
-                    marginTop: '4px'
+                    fontSize: '1.75rem',
+                    fontWeight: 700,
+                    marginTop: '6px',
+                    letterSpacing: '-0.015em',
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.12)'
                   }}
                 >
                   Live Price & Arbitrage Tracker
@@ -527,10 +543,11 @@ export const MandiPriceComparison = () => {
               <p
                 style={{
                   fontSize: '0.98rem',
-                  lineHeight: 1.6,
-                  color: '#D1FAE5',
+                  lineHeight: 1.65,
+                  color: '#F0FDF4',
                   margin: '0 0 1.5rem 0',
-                  maxWidth: '580px'
+                  maxWidth: '560px',
+                  fontWeight: 400
                 }}
               >
                 Direct farm gate listings compared against real-time official APMC Mandi auction spot rates.
@@ -544,14 +561,18 @@ export const MandiPriceComparison = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '4px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.32)',
                     fontSize: '0.8rem',
-                    color: '#F0FDF4'
+                    fontWeight: 600,
+                    color: '#FFFFFF',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)'
                   }}
                 >
-                  <CheckCircle2 size={13} color="#34D399" />
+                  <CheckCircle2 size={14} color="#A7F3D0" />
                   Verified Direct Listings
                 </span>
                 <span
@@ -559,14 +580,18 @@ export const MandiPriceComparison = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '4px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.32)',
                     fontSize: '0.8rem',
-                    color: '#F0FDF4'
+                    fontWeight: 600,
+                    color: '#FFFFFF',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)'
                   }}
                 >
-                  <Building2 size={13} color="#FBBF24" />
+                  <Building2 size={14} color="#FDE047" />
                   2,700+ APMC Yards
                 </span>
                 <span
@@ -574,29 +599,32 @@ export const MandiPriceComparison = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '4px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.32)',
                     fontSize: '0.8rem',
-                    color: '#F0FDF4'
+                    fontWeight: 600,
+                    color: '#FFFFFF',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)'
                   }}
                 >
-                  <Zap size={13} color="#6EE7B7" />
+                  <Zap size={14} color="#6EE7B7" />
                   Zero-Lag In-Memory Sync
                 </span>
               </div>
             </div>
 
-            {/* Right Column: Floating Parity Spotlight Card */}
+            {/* Right Column: Floating Parity Spotlight Card (Clean Elevated Contrast) */}
             <div>
               <div
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.09)',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
                   padding: '1.75rem',
-                  boxShadow: '0 20px 35px rgba(0, 0, 0, 0.18)'
+                  boxShadow: '0 20px 45px -12px rgba(15, 60, 45, 0.22), 0 4px 12px rgba(0, 0, 0, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.95)'
                 }}
               >
                 <div
@@ -606,7 +634,7 @@ export const MandiPriceComparison = () => {
                     justifyContent: 'space-between',
                     marginBottom: '1rem',
                     paddingBottom: '0.75rem',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
+                    borderBottom: '1px solid #F1F5F9'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -615,17 +643,17 @@ export const MandiPriceComparison = () => {
                         width: '8px',
                         height: '8px',
                         borderRadius: '50%',
-                        backgroundColor: '#34D399',
-                        boxShadow: '0 0 10px #34D399'
+                        backgroundColor: '#10B981',
+                        boxShadow: '0 0 10px #10B981'
                       }}
                     />
                     <span
                       style={{
-                        fontSize: '0.74rem',
-                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
                         letterSpacing: '0.06em',
                         textTransform: 'uppercase',
-                        color: '#A7F3D0'
+                        color: '#065F46'
                       }}
                     >
                       Market Parity Spotlight
@@ -634,13 +662,13 @@ export const MandiPriceComparison = () => {
 
                   <span
                     style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      color: '#FEF3C7',
-                      backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                      padding: '2px 8px',
-                      borderRadius: '6px',
-                      border: '1px solid rgba(245, 158, 11, 0.3)'
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      color: '#92400E',
+                      backgroundColor: '#FEF3C7',
+                      padding: '3px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #FDE68A'
                     }}
                   >
                     {selectedCommodity}
@@ -648,10 +676,10 @@ export const MandiPriceComparison = () => {
                 </div>
 
                 <div style={{ marginBottom: '1.25rem' }}>
-                  <div style={{ fontSize: '0.82rem', color: '#D1D5DB', marginBottom: '4px' }}>
-                    Regional Benchmark: {selectedState === 'All India' ? 'National APMC Average' : selectedState}
+                  <div style={{ fontSize: '0.82rem', color: '#64748B', marginBottom: '6px', fontWeight: 500 }}>
+                    Regional Benchmark: <strong style={{ color: '#1E293B' }}>{selectedState === 'All India' ? 'National APMC Average' : selectedState}</strong>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <span
                       style={{
                         display: 'inline-flex',
@@ -659,17 +687,18 @@ export const MandiPriceComparison = () => {
                         gap: '6px',
                         padding: '6px 14px',
                         borderRadius: '12px',
-                        backgroundColor: diffAmount >= 0 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(59, 130, 246, 0.25)',
-                        border: `1.5px solid ${diffAmount >= 0 ? '#34D399' : '#60A5FA'}`,
-                        color: '#FFFFFF',
-                        fontWeight: 700,
-                        fontSize: '1rem'
+                        backgroundColor: diffAmount >= 0 ? '#ECFDF5' : '#EFF6FF',
+                        border: `1.5px solid ${diffAmount >= 0 ? '#A7F3D0' : '#BFDBFE'}`,
+                        color: diffAmount >= 0 ? '#065F46' : '#1D4ED8',
+                        fontWeight: 800,
+                        fontSize: '0.98rem',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
                       }}
                     >
-                      {diffAmount >= 0 ? <ArrowUpRight size={18} color="#34D399" /> : <ArrowDownRight size={18} color="#93C5FD" />}
+                      {diffAmount >= 0 ? <ArrowUpRight size={17} color="#059669" /> : <ArrowDownRight size={17} color="#2563EB" />}
                       {diffAmount >= 0 ? '+' : ''}₹{formatNum(diffAmount)}/{unit === 'kg' ? 'kg' : 'Qtl'} ({diffPercentage > 0 ? `+${diffPercentage}%` : `${diffPercentage}%`})
                     </span>
-                    <span style={{ fontSize: '0.78rem', color: '#D1FAE5', fontWeight: 500 }}>
+                    <span style={{ fontSize: '0.82rem', color: diffAmount >= 0 ? '#047857' : '#1E40AF', fontWeight: 600 }}>
                       {diffAmount >= 0 ? 'Net Direct Farmer Premium' : 'Direct Buyer Saving'}
                     </span>
                   </div>
@@ -681,43 +710,45 @@ export const MandiPriceComparison = () => {
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gap: '12px',
-                    paddingTop: '0.5rem'
+                    paddingTop: '0.25rem'
                   }}
                 >
                   <div
                     style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                      borderRadius: '12px',
+                      backgroundColor: '#F0FDF4',
+                      borderRadius: '14px',
                       padding: '12px 14px',
-                      border: '1px solid rgba(255, 255, 255, 0.08)'
+                      border: '1.5px solid #A7F3D0',
+                      boxShadow: '0 2px 6px rgba(16, 185, 129, 0.04)'
                     }}
                   >
-                    <div style={{ fontSize: '0.72rem', color: '#A7F3D0', fontWeight: 600, textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#065F46', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       FarmerBandh App
                     </div>
-                    <div style={{ fontSize: '1.45rem', fontWeight: 700, color: '#FFFFFF', marginTop: '2px' }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#064E3B', marginTop: '2px', letterSpacing: '-0.02em' }}>
                       ₹{formatNum(curAppPrice)}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#D1D5DB' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#059669', fontWeight: 500 }}>
                       {unitSymbol} (Direct Farm)
                     </div>
                   </div>
 
                   <div
                     style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                      borderRadius: '12px',
+                      backgroundColor: '#FFFBEB',
+                      borderRadius: '14px',
                       padding: '12px 14px',
-                      border: '1px solid rgba(255, 255, 255, 0.08)'
+                      border: '1.5px solid #FDE68A',
+                      boxShadow: '0 2px 6px rgba(245, 158, 11, 0.04)'
                     }}
                   >
-                    <div style={{ fontSize: '0.72rem', color: '#FCD34D', fontWeight: 600, textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#B45309', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       Mandi Modal Rate
                     </div>
-                    <div style={{ fontSize: '1.45rem', fontWeight: 700, color: '#FDE68A', marginTop: '2px' }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#92400E', marginTop: '2px', letterSpacing: '-0.02em' }}>
                       ₹{formatNum(curMandiPrice)}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#D1D5DB' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#D97706', fontWeight: 500 }}>
                       {unitSymbol} (APMC Clearing)
                     </div>
                   </div>
@@ -760,12 +791,12 @@ export const MandiPriceComparison = () => {
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: '#4B5563',
+                    color: '#475569',
                     marginBottom: '6px',
-                    letterSpacing: '0.03em'
+                    letterSpacing: '0.04em'
                   }}
                 >
-                  <Wheat size={13} color="#1B4D3E" /> Commodity / Crop
+                  <Wheat size={13} color="#1E6B52" /> Commodity / Crop
                 </label>
                 <div style={{ position: 'relative' }}>
                   <select
@@ -773,20 +804,27 @@ export const MandiPriceComparison = () => {
                     onChange={(e) => setSelectedCommodity(e.target.value)}
                     style={{
                       appearance: 'none',
-                      backgroundColor: '#F8FAF7',
-                      border: '1.5px solid #CBD5E1',
+                      backgroundColor: '#FFFFFF',
+                      border: '1.5px solid #E2E8F0',
                       borderRadius: '12px',
                       padding: '9px 36px 9px 14px',
                       fontSize: '0.92rem',
                       fontWeight: 600,
-                      color: '#111827',
+                      color: '#0F172A',
                       cursor: 'pointer',
                       outline: 'none',
                       minWidth: '175px',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                       transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#1B4D3E')}
-                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#10B981';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#E2E8F0';
+                      e.target.style.boxShadow = 'none';
+                    }}
                   >
                     {commodities.map((c) => (
                       <option key={c} value={c}>
@@ -794,14 +832,14 @@ export const MandiPriceComparison = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronRight
+                  <ChevronDown
                     size={16}
-                    color="#6B7280"
+                    color="#64748B"
                     style={{
                       position: 'absolute',
                       right: '12px',
                       top: '50%',
-                      transform: 'translateY(-50%) rotate(90deg)',
+                      transform: 'translateY(-50%)',
                       pointerEvents: 'none'
                     }}
                   />
@@ -818,9 +856,9 @@ export const MandiPriceComparison = () => {
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: '#4B5563',
+                    color: '#475569',
                     marginBottom: '6px',
-                    letterSpacing: '0.03em'
+                    letterSpacing: '0.04em'
                   }}
                 >
                   <MapPin size={13} color="#D97706" /> State
@@ -831,20 +869,27 @@ export const MandiPriceComparison = () => {
                     onChange={(e) => setSelectedState(e.target.value)}
                     style={{
                       appearance: 'none',
-                      backgroundColor: '#F8FAF7',
-                      border: '1.5px solid #CBD5E1',
+                      backgroundColor: '#FFFFFF',
+                      border: '1.5px solid #E2E8F0',
                       borderRadius: '12px',
                       padding: '9px 36px 9px 14px',
                       fontSize: '0.92rem',
                       fontWeight: 600,
-                      color: '#111827',
+                      color: '#0F172A',
                       cursor: 'pointer',
                       outline: 'none',
                       minWidth: '160px',
-                      transition: 'border-color 0.2s ease'
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#1B4D3E')}
-                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#10B981';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#E2E8F0';
+                      e.target.style.boxShadow = 'none';
+                    }}
                   >
                     {states.map((s) => (
                       <option key={s} value={s}>
@@ -852,14 +897,14 @@ export const MandiPriceComparison = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronRight
+                  <ChevronDown
                     size={16}
-                    color="#6B7280"
+                    color="#64748B"
                     style={{
                       position: 'absolute',
                       right: '12px',
                       top: '50%',
-                      transform: 'translateY(-50%) rotate(90deg)',
+                      transform: 'translateY(-50%)',
                       pointerEvents: 'none'
                     }}
                   />
@@ -876,9 +921,9 @@ export const MandiPriceComparison = () => {
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: '#4B5563',
+                    color: '#475569',
                     marginBottom: '6px',
-                    letterSpacing: '0.03em'
+                    letterSpacing: '0.04em'
                   }}
                 >
                   <Building2 size={13} color="#059669" /> District / Mandi
@@ -889,20 +934,27 @@ export const MandiPriceComparison = () => {
                     onChange={(e) => setSelectedDistrict(e.target.value)}
                     style={{
                       appearance: 'none',
-                      backgroundColor: '#F8FAF7',
-                      border: '1.5px solid #CBD5E1',
+                      backgroundColor: '#FFFFFF',
+                      border: '1.5px solid #E2E8F0',
                       borderRadius: '12px',
                       padding: '9px 36px 9px 14px',
                       fontSize: '0.92rem',
                       fontWeight: 600,
-                      color: '#111827',
+                      color: '#0F172A',
                       cursor: 'pointer',
                       outline: 'none',
                       minWidth: '160px',
-                      transition: 'border-color 0.2s ease'
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#1B4D3E')}
-                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#10B981';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#E2E8F0';
+                      e.target.style.boxShadow = 'none';
+                    }}
                   >
                     {districts.map((d) => (
                       <option key={d} value={d}>
@@ -910,14 +962,14 @@ export const MandiPriceComparison = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronRight
+                  <ChevronDown
                     size={16}
-                    color="#6B7280"
+                    color="#64748B"
                     style={{
                       position: 'absolute',
                       right: '12px',
                       top: '50%',
-                      transform: 'translateY(-50%) rotate(90deg)',
+                      transform: 'translateY(-50%)',
                       pointerEvents: 'none'
                     }}
                   />
@@ -935,9 +987,9 @@ export const MandiPriceComparison = () => {
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: '#4B5563',
+                    color: '#475569',
                     marginBottom: '6px',
-                    letterSpacing: '0.03em'
+                    letterSpacing: '0.04em'
                   }}
                 >
                   Comparison Mode
@@ -956,8 +1008,8 @@ export const MandiPriceComparison = () => {
                     onClick={() => handleGranularityChange('day')}
                     style={{
                       border: 'none',
-                      backgroundColor: granularity === 'day' ? '#1B4D3E' : 'transparent',
-                      color: granularity === 'day' ? '#FFFFFF' : '#4B5563',
+                      backgroundColor: granularity === 'day' ? '#1E6B52' : 'transparent',
+                      color: granularity === 'day' ? '#FFFFFF' : '#475569',
                       fontWeight: 600,
                       fontSize: '0.84rem',
                       padding: '7px 15px',
@@ -966,7 +1018,7 @@ export const MandiPriceComparison = () => {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '5px',
-                      boxShadow: granularity === 'day' ? '0 2px 6px rgba(27, 77, 62, 0.25)' : 'none',
+                      boxShadow: granularity === 'day' ? '0 2px 6px rgba(30, 107, 82, 0.22)' : 'none',
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -978,8 +1030,8 @@ export const MandiPriceComparison = () => {
                     onClick={() => handleGranularityChange('week')}
                     style={{
                       border: 'none',
-                      backgroundColor: granularity === 'week' ? '#1B4D3E' : 'transparent',
-                      color: granularity === 'week' ? '#FFFFFF' : '#4B5563',
+                      backgroundColor: granularity === 'week' ? '#1E6B52' : 'transparent',
+                      color: granularity === 'week' ? '#FFFFFF' : '#475569',
                       fontWeight: 600,
                       fontSize: '0.84rem',
                       padding: '7px 15px',
@@ -988,7 +1040,7 @@ export const MandiPriceComparison = () => {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '5px',
-                      boxShadow: granularity === 'week' ? '0 2px 6px rgba(27, 77, 62, 0.25)' : 'none',
+                      boxShadow: granularity === 'week' ? '0 2px 6px rgba(30, 107, 82, 0.22)' : 'none',
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -1006,9 +1058,9 @@ export const MandiPriceComparison = () => {
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: '#4B5563',
+                    color: '#475569',
                     marginBottom: '6px',
-                    letterSpacing: '0.03em'
+                    letterSpacing: '0.04em'
                   }}
                 >
                   Span
@@ -1031,7 +1083,7 @@ export const MandiPriceComparison = () => {
                           style={{
                             border: 'none',
                             backgroundColor: pointCount === num ? '#FFFFFF' : 'transparent',
-                            color: pointCount === num ? '#1B4D3E' : '#64748B',
+                            color: pointCount === num ? '#1E6B52' : '#64748B',
                             fontWeight: pointCount === num ? 700 : 500,
                             boxShadow: pointCount === num ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
                             fontSize: '0.82rem',
@@ -1052,7 +1104,7 @@ export const MandiPriceComparison = () => {
                           style={{
                             border: 'none',
                             backgroundColor: pointCount === num ? '#FFFFFF' : 'transparent',
-                            color: pointCount === num ? '#1B4D3E' : '#64748B',
+                            color: pointCount === num ? '#1E6B52' : '#64748B',
                             fontWeight: pointCount === num ? 700 : 500,
                             boxShadow: pointCount === num ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
                             fontSize: '0.82rem',
@@ -1076,9 +1128,9 @@ export const MandiPriceComparison = () => {
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: '#4B5563',
+                    color: '#475569',
                     marginBottom: '6px',
-                    letterSpacing: '0.03em'
+                    letterSpacing: '0.04em'
                   }}
                 >
                   Unit
@@ -1098,7 +1150,7 @@ export const MandiPriceComparison = () => {
                     style={{
                       border: 'none',
                       backgroundColor: unit === 'quintal' ? '#FFFFFF' : 'transparent',
-                      color: unit === 'quintal' ? '#1B4D3E' : '#64748B',
+                      color: unit === 'quintal' ? '#1E6B52' : '#64748B',
                       fontWeight: unit === 'quintal' ? 700 : 500,
                       boxShadow: unit === 'quintal' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
                       fontSize: '0.82rem',
@@ -1116,7 +1168,7 @@ export const MandiPriceComparison = () => {
                     style={{
                       border: 'none',
                       backgroundColor: unit === 'kg' ? '#FFFFFF' : 'transparent',
-                      color: unit === 'kg' ? '#1B4D3E' : '#64748B',
+                      color: unit === 'kg' ? '#1E6B52' : '#64748B',
                       fontWeight: unit === 'kg' ? 700 : 500,
                       boxShadow: unit === 'kg' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
                       fontSize: '0.82rem',
@@ -1144,24 +1196,24 @@ export const MandiPriceComparison = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    backgroundColor: '#F8FAF7',
-                    border: '1.5px solid #CBD5E1',
-                    color: '#1B4D3E',
+                    backgroundColor: '#ECFDF5',
+                    border: '1.5px solid #A7F3D0',
+                    color: '#065F46',
                     borderRadius: '12px',
-                    padding: '9px 15px',
-                    fontSize: '0.86rem',
+                    padding: '9px 16px',
+                    fontSize: '0.88rem',
                     fontWeight: 700,
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+                    boxShadow: '0 1px 3px rgba(16, 185, 129, 0.08)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#ECFDF5';
-                    e.currentTarget.style.borderColor = '#10B981';
+                    e.currentTarget.style.backgroundColor = '#D1FAE5';
+                    e.currentTarget.style.borderColor = '#6EE7B7';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F8FAF7';
-                    e.currentTarget.style.borderColor = '#CBD5E1';
+                    e.currentTarget.style.backgroundColor = '#ECFDF5';
+                    e.currentTarget.style.borderColor = '#A7F3D0';
                   }}
                 >
                   <RefreshCw size={15} className={loading ? 'spin-animate' : ''} />
@@ -1209,14 +1261,14 @@ export const MandiPriceComparison = () => {
                       onClick={() => setSelectedCommodity(c)}
                       style={{
                         border: 'none',
-                        backgroundColor: isActive ? '#1B4D3E' : '#F1F5F9',
+                        backgroundColor: isActive ? '#1E6B52' : '#F1F5F9',
                         color: isActive ? '#FFFFFF' : '#475569',
                         borderRadius: '9999px',
                         padding: '4px 14px',
                         fontSize: '0.82rem',
                         fontWeight: isActive ? 700 : 500,
                         cursor: 'pointer',
-                        boxShadow: isActive ? '0 2px 6px rgba(27, 77, 62, 0.22)' : 'none',
+                        boxShadow: isActive ? '0 2px 6px rgba(30, 107, 82, 0.22)' : 'none',
                         transition: 'all 0.15s ease'
                       }}
                     >

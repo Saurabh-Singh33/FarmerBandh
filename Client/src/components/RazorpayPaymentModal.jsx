@@ -27,26 +27,28 @@ import {
 import { notify } from '../context/NotificationContext';
 import { authClient } from '../services/authApi';
 
-export const RAZORPAY_PAYMENT_LINK_ID = 'plink_Tqe4bgUXaopgZ0';
-export const RAZORPAY_PAYMENT_LINK_URL = 'https://rzp.io/rzp/MkpDZkX';
+export const RAZORPAY_PAYMENT_LINK_ID = 'plink_U2CqOn54TpAx8O';
+export const RAZORPAY_PAYMENT_LINK_URL = 'https://razorpay.com/payment-link/plink_U2CqOn54TpAx8O/test';
 
 /**
  * RazorpayPaymentModal
  * High-polish interactive Razorpay payment modal reproducing the exact UI from Razorpay Payment Link
- * Link: https://rzp.io/rzp/MkpDZkX (ID: plink_Tqe4bgUXaopgZ0)
+ * Link: https://razorpay.com/payment-link/plink_U2CqOn54TpAx8O/test (ID: plink_U2CqOn54TpAx8O)
  */
 export const RazorpayPaymentModal = ({
   isOpen,
   onClose,
-  orderTotal = 100000,
+  orderTotal = 10000,
   orderNumber,
   customerPhone = '+919508461241',
   customerEmail = 'saurabhsinghdeveloper591@gmail.com',
   onSuccess,
   readOnly = false
 }) => {
-  const defaultAmount = orderTotal && orderTotal > 0 ? orderTotal : 100000;
+  const defaultAmount = orderTotal && orderTotal > 0 ? orderTotal : 10000;
   const [selectedAmount, setSelectedAmount] = useState(defaultAmount);
+  const [paymentType, setPaymentType] = useState('full'); // 'full' | 'part'
+  const [customPartAmount, setCustomPartAmount] = useState(defaultAmount);
 
   // Contact details
   const cleanPhone = (customerPhone || '').replace(/^\+91/, '').trim() || '9508461241';
@@ -65,8 +67,10 @@ export const RazorpayPaymentModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      const initAmt = orderTotal && orderTotal > 0 ? orderTotal : 100000;
+      const initAmt = orderTotal && orderTotal > 0 ? orderTotal : 10000;
       setSelectedAmount(initAmt);
+      setCustomPartAmount(initAmt);
+      setPaymentType('full');
       setPaymentStep('contact');
       setPaymentResult(null);
       setIsEmailSent(false);
@@ -150,6 +154,16 @@ export const RazorpayPaymentModal = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <a
+              href={RAZORPAY_PAYMENT_LINK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md transition-all flex items-center gap-1 shadow-xs"
+              title="Open official Razorpay link directly in new tab"
+            >
+              <ExternalLink size={12} />
+              <span>Open Link</span>
+            </a>
             <button
               onClick={handleCopyLink}
               className="text-[11px] text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-600 px-2.5 py-1 rounded-md transition-all flex items-center gap-1"
@@ -224,6 +238,107 @@ export const RazorpayPaymentModal = ({
                   <span className="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
                     <Check className="w-3 h-3" /> Full Escrow Protected
                   </span>
+                </div>
+              </div>
+
+              {/* Select A Payment Type: Pay in full vs Part Payment */}
+              <div className="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-bold text-slate-900 tracking-tight">
+                    Select A Payment Type
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    {RAZORPAY_PAYMENT_LINK_ID}
+                  </span>
+                </div>
+                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                  Payment options
+                </div>
+
+                <div className="space-y-2">
+                  {/* Pay in full */}
+                  <div
+                    onClick={() => {
+                      setPaymentType('full');
+                      setSelectedAmount(defaultAmount);
+                    }}
+                    className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                      paymentType === 'full'
+                        ? 'border-blue-600 bg-white ring-2 ring-blue-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Pay in full</div>
+                      <div className="text-[11px] text-slate-500">
+                        Pay ₹{defaultAmount.toLocaleString('en-IN')} now
+                      </div>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${
+                      paymentType === 'full' ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300'
+                    }`}>
+                      {paymentType === 'full' && <Check size={12} className="stroke-[3]" />}
+                    </div>
+                  </div>
+
+                  {/* Part Payment */}
+                  <div
+                    onClick={() => {
+                      setPaymentType('part');
+                      if (customPartAmount > 0) setSelectedAmount(customPartAmount);
+                    }}
+                    className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                      paymentType === 'part'
+                        ? 'border-blue-600 bg-white ring-2 ring-blue-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-xs font-bold text-slate-900">Part Payment</div>
+                        <div className="text-[11px] text-slate-500">
+                          Pay a part of the total amount (more or less than ₹10,000)
+                        </div>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${
+                        paymentType === 'part' ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300'
+                      }`}>
+                        {paymentType === 'part' && <Check size={12} className="stroke-[3]" />}
+                      </div>
+                    </div>
+
+                    {paymentType === 'part' && (
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <span className="text-xs font-bold text-slate-600">₹</span>
+                        <input
+                          type="number"
+                          min="1"
+                          value={customPartAmount}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            setCustomPartAmount(val);
+                            setSelectedAmount(val > 0 ? val : 1);
+                          }}
+                          placeholder="Enter custom amount"
+                          className="w-full px-2.5 py-1 text-xs font-bold rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-900"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 pt-2.5 border-t border-slate-200">
+                  <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">
+                    {RAZORPAY_PAYMENT_LINK_URL}
+                  </span>
+                  <a
+                    href={RAZORPAY_PAYMENT_LINK_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 hover:underline ml-2 flex-shrink-0"
+                  >
+                    <ExternalLink size={11} /> Open Link
+                  </a>
                 </div>
               </div>
 
@@ -372,14 +487,26 @@ export const RazorpayPaymentModal = ({
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleProceedToPay}
-                    className="mt-4 w-full py-3 bg-[#0B132B] hover:bg-black text-white font-extrabold text-sm rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
-                  >
-                    <span>{language === 'en' ? 'Continue to Pay' : 'आगे बढ़ें'}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
+                  <div className="mt-4 space-y-2">
+                    <button
+                      type="button"
+                      onClick={handleProceedToPay}
+                      className="w-full py-3 bg-[#0B132B] hover:bg-black text-white font-extrabold text-sm rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
+                    >
+                      <span>{language === 'en' ? `Continue (₹${selectedAmount.toLocaleString('en-IN')})` : `आगे बढ़ें (₹${selectedAmount.toLocaleString('en-IN')})`}</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    <a
+                      href={RAZORPAY_PAYMENT_LINK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <ExternalLink size={13} />
+                      <span>Open Official Link Directly (New Tab)</span>
+                    </a>
+                  </div>
 
                   <div className="text-[10px] text-center text-slate-400 mt-3 leading-relaxed">
                     By proceeding, you agree to Razorpay's{' '}

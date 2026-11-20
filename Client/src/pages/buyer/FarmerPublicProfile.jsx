@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { farmerApi } from '../../services/farmerApi';
 import { savedFarmerApi } from '../../services/savedFarmerApi';
 import { useAuth } from '../../context/AuthContext';
@@ -7,9 +7,31 @@ import StarRating from '../../components/StarRating';
 import { notify } from '../../context/NotificationContext';
 import { getProductImageUrl } from '../../services/productImages';
 import BundleNegotiateModal from '../../components/BundleNegotiateModal';
+import {
+  ArrowLeft,
+  Sprout,
+  BadgeCheck,
+  MapPin,
+  Calendar,
+  Star,
+  Bookmark,
+  BookmarkCheck,
+  Handshake,
+  PackageCheck,
+  Clock,
+  Layers,
+  MessageSquare,
+  Sparkles,
+  ChevronRight,
+  Edit3,
+  X,
+  Store,
+  ShoppingBag
+} from 'lucide-react';
 
 export default function FarmerPublicProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [profile, setProfile] = useState(null);
@@ -90,13 +112,21 @@ export default function FarmerPublicProfile() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8 animate-pulse space-y-6">
-        <div className="h-48 bg-gray-200 rounded-3xl" />
-        <div className="h-24 bg-gray-200 rounded-2xl" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="h-64 bg-gray-200 rounded-2xl" />
-          <div className="h-64 bg-gray-200 rounded-2xl" />
-          <div className="h-64 bg-gray-200 rounded-2xl" />
+      <div style={{ maxWidth: '1120px', margin: '2rem auto', padding: '0 1.25rem', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '24px', padding: '2.5rem', marginBottom: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ width: '84px', height: '84px', borderRadius: '22px', backgroundColor: '#E2E8F0' }} className="pulse-glow" />
+            <div style={{ flex: 1 }}>
+              <div style={{ height: '32px', width: '280px', backgroundColor: '#E2E8F0', borderRadius: '8px', marginBottom: '12px' }} className="pulse-glow" />
+              <div style={{ height: '18px', width: '180px', backgroundColor: '#F1F5F9', borderRadius: '6px' }} className="pulse-glow" />
+            </div>
+          </div>
+          <div style={{ height: '14px', width: '80%', backgroundColor: '#F1F5F9', borderRadius: '6px' }} className="pulse-glow" />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} style={{ height: '110px', backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '18px' }} className="pulse-glow" />
+          ))}
         </div>
       </div>
     );
@@ -104,79 +134,116 @@ export default function FarmerPublicProfile() {
 
   if (!profile) {
     return (
-      <div className="max-w-md mx-auto text-center py-16">
-        <h2 className="text-xl font-bold text-gray-800">Farmer Profile Not Found</h2>
-        <Link to="/marketplace" className="text-emerald-700 text-sm font-semibold underline mt-2 inline-block">
-          Return to Marketplace
+      <div style={{ maxWidth: '550px', margin: '4rem auto', textAlign: 'center', padding: '3rem 1.5rem', backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#FEF2F2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem auto' }}>
+          <Store size={32} />
+        </div>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>Farmer Profile Not Found</h2>
+        <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: '1.5rem' }}>The producer storefront you are looking for does not exist or is currently offline.</p>
+        <Link to="/marketplace" className="farmer-btn-primary" style={{ display: 'inline-flex' }}>
+          <ArrowLeft size={16} /> Return to Marketplace
         </Link>
       </div>
     );
   }
 
-  const memberYear = profile.memberSince ? new Date(profile.memberSince).getFullYear() : '2025';
+  const memberYear = profile.memberSince ? new Date(profile.memberSince).getFullYear() : '2026';
+  const initialLetter = profile.farmName ? profile.farmName.charAt(0).toUpperCase() : 'F';
+  const locationText = [profile.district, profile.state].filter(Boolean).join(', ') || profile.location || 'India';
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="farmer-store-container">
       {/* Top Breadcrumb */}
-      <div className="mb-4">
+      <div style={{ marginBottom: '1.25rem' }}>
         <Link
           to="/marketplace"
-          className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            color: '#15803D',
+            fontSize: '0.88rem',
+            fontWeight: 700,
+            textDecoration: 'none',
+            transition: 'color 0.15s ease'
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#14532D')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#15803D')}
         >
-          ← Back to Marketplace
+          <ArrowLeft size={16} /> Back to Marketplace
         </Link>
       </div>
 
       {/* Hero Profile Card */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-xs p-6 sm:p-8 mb-6 relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-emerald-100 text-emerald-900 flex items-center justify-center font-black text-3xl border border-emerald-200 shrink-0 shadow-2xs">
-              {profile.farmName ? profile.farmName.charAt(0).toUpperCase() : 'F'}
+      <div className="farmer-store-hero">
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem' }}>
+          {/* Avatar and Identity */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
+            <div className="farmer-store-avatar">
+              {initialLetter}
             </div>
+
             <div>
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', margin: 0 }}>
                   {profile.farmName}
                 </h1>
                 {profile.verified && (
-                  <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    ✓ Verified Producer
+                  <span className="farmer-verified-pill">
+                    <BadgeCheck size={14} color="#059669" /> Verified Producer
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-600 font-medium">
-                Operated by {profile.fullName || 'Registered Farmer'}
+
+              <p style={{ fontSize: '0.92rem', color: '#4B5563', fontWeight: 500, margin: '2px 0 8px 0' }}>
+                Operated by <strong style={{ color: '#1F2937' }}>{profile.fullName || 'Registered Farmer'}</strong>
               </p>
-              <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 flex-wrap">
-                <span>📍 {[profile.district, profile.state].filter(Boolean).join(', ') || profile.location || 'India'}</span>
-                <span>·</span>
-                <span>🌾 Member since {memberYear}</span>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.82rem', color: '#6B7280', flexWrap: 'wrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <MapPin size={14} color="#059669" /> {locationText}
+                </span>
+                <span>•</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Calendar size={14} color="#6B7280" /> Member since {memberYear}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Action / Bookmark Button */}
           {user?.role?.toLowerCase() === 'buyer' && (
-            <div className="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
               <button
+                type="button"
                 onClick={handleToggleSave}
                 disabled={savingBookmark}
-                className={`px-5 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-2xs flex items-center gap-2 ${
-                  isSaved
-                    ? 'bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100'
-                    : 'bg-[#15803D] hover:bg-[#166534] text-white'
-                }`}
+                className={isSaved ? 'farmer-btn-saved' : 'farmer-btn-primary'}
+                style={{ opacity: savingBookmark ? 0.7 : 1 }}
               >
-                <span>{isSaved ? '★' : '☆'}</span>
+                {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
                 <span>{isSaved ? 'Saved Supplier' : 'Save Farmer'}</span>
               </button>
+
               {isSaved && (
                 <button
+                  type="button"
                   onClick={() => setShowNoteModal(true)}
-                  className="text-xs text-gray-500 hover:text-gray-800 underline self-start sm:self-auto"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#059669',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 4px'
+                  }}
                 >
-                  Edit Note ({savedNotes ? '1 note' : 'Add note'})
+                  <Edit3 size={12} /> {savedNotes ? 'Edit Private Note' : 'Add Note'}
                 </button>
               )}
             </div>
@@ -185,9 +252,11 @@ export default function FarmerPublicProfile() {
 
         {/* Farmer Bio / Story */}
         {profile.bio && (
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">About the Farm</h3>
-            <p className="text-sm text-gray-700 leading-relaxed max-w-3xl">
+          <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid #F3F4F6' }}>
+            <h3 style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9CA3AF', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Store size={13} color="#059669" /> About the Farm & Cultivation
+            </h3>
+            <p style={{ fontSize: '0.92rem', color: '#374151', lineHeight: '1.65', margin: 0, maxWidth: '850px' }}>
               {profile.bio}
             </p>
           </div>
@@ -195,136 +264,216 @@ export default function FarmerPublicProfile() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-2xs text-center">
-          <div className="text-xs font-semibold text-gray-500 uppercase">Customer Rating</div>
-          <div className="flex items-center justify-center gap-1.5 mt-1.5">
-            <StarRating rating={profile.rating || 0} size="sm" readOnly />
-            <span className="text-lg font-black text-gray-900">{Number(profile.rating || 0).toFixed(1)}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        {/* Metric 1 */}
+        <div className="farmer-stat-card">
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: '#6B7280', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <Star size={13} color="#F59E0B" fill="#F59E0B" /> Customer Rating
           </div>
-          <div className="text-[11px] text-gray-400 mt-0.5">{profile.ratingCount || 0} reviews</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '6px' }}>
+            <StarRating rating={profile.rating || 0} size="sm" readOnly />
+            <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#111827' }}>
+              {Number(profile.rating || 0).toFixed(1)}
+            </span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#9CA3AF', marginTop: '2px' }}>
+            {profile.ratingCount || 0} reviews
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-2xs text-center">
-          <div className="text-xs font-semibold text-gray-500 uppercase">Fulfilled Orders</div>
-          <div className="text-2xl font-black text-emerald-800 mt-1">
+        {/* Metric 2 */}
+        <div className="farmer-stat-card">
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: '#6B7280', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <PackageCheck size={13} color="#059669" /> Fulfilled Orders
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#15803D', marginTop: '6px' }}>
             {profile.completedOrdersCount || 0}
           </div>
-          <div className="text-[11px] text-gray-400 mt-0.5">Delivered to buyers</div>
+          <div style={{ fontSize: '0.75rem', color: '#9CA3AF', marginTop: '2px' }}>
+            Delivered to buyers
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-2xs text-center">
-          <div className="text-xs font-semibold text-gray-500 uppercase">Avg Response Time</div>
-          <div className="text-2xl font-black text-gray-900 mt-1">
+        {/* Metric 3 */}
+        <div className="farmer-stat-card">
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: '#6B7280', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <Clock size={13} color="#0284C7" /> Avg Response Time
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', marginTop: '6px' }}>
             {profile.avgResponseTimeHours ? `~${profile.avgResponseTimeHours}h` : '< 4h'}
           </div>
-          <div className="text-[11px] text-gray-400 mt-0.5">On negotiations & orders</div>
+          <div style={{ fontSize: '0.75rem', color: '#9CA3AF', marginTop: '2px' }}>
+            On negotiations & orders
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-2xs text-center">
-          <div className="text-xs font-semibold text-gray-500 uppercase">Active Crops</div>
-          <div className="text-2xl font-black text-emerald-800 mt-1">
+        {/* Metric 4 */}
+        <div className="farmer-stat-card">
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: '#6B7280', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <Sprout size={13} color="#059669" /> Active Crops
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#15803D', marginTop: '6px' }}>
             {listings.length}
           </div>
-          <div className="text-[11px] text-gray-400 mt-0.5">Available for dispatch</div>
+          <div style={{ fontSize: '0.75rem', color: '#9CA3AF', marginTop: '2px' }}>
+            Available for dispatch
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-4 border-b border-gray-200 mb-6">
+      {/* Tabs Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', borderBottom: '2px solid #E5E7EB', marginBottom: '1.75rem' }}>
         <button
+          type="button"
           onClick={() => setActiveTab('LISTINGS')}
-          className={`pb-3 text-sm font-bold transition-all relative ${
-            activeTab === 'LISTINGS'
-              ? 'text-emerald-800 border-b-2 border-emerald-800'
-              : 'text-gray-500 hover:text-gray-800'
-          }`}
+          className={`farmer-tab-btn ${activeTab === 'LISTINGS' ? 'active' : ''}`}
         >
-          Active Listings ({listings.length})
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Sprout size={16} /> Active Listings ({listings.length})
+          </span>
         </button>
+
         <button
+          type="button"
           onClick={() => setActiveTab('REVIEWS')}
-          className={`pb-3 text-sm font-bold transition-all relative ${
-            activeTab === 'REVIEWS'
-              ? 'text-emerald-800 border-b-2 border-emerald-800'
-              : 'text-gray-500 hover:text-gray-800'
-          }`}
+          className={`farmer-tab-btn ${activeTab === 'REVIEWS' ? 'active' : ''}`}
         >
-          Customer Reviews ({reviews.length})
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <MessageSquare size={16} /> Customer Reviews ({reviews.length})
+          </span>
         </button>
       </div>
 
       {/* Tab 1: Listings Grid */}
       {activeTab === 'LISTINGS' && (
         <div>
+          {/* Multi-Crop Bundle Negotiation Banner */}
           {listings.length >= 2 && (
-            <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg font-bold shrink-0">
-                  🤝
+            <div style={{
+              background: 'linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%)',
+              border: '1.5px solid #A7F3D0',
+              borderRadius: '20px',
+              padding: '1.25rem 1.5rem',
+              marginBottom: '2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              boxShadow: '0 4px 16px rgba(16, 185, 129, 0.08)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '14px',
+                  backgroundColor: '#15803D',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(21, 128, 61, 0.25)',
+                  flexShrink: 0
+                }}>
+                  <Handshake size={22} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
-                    Multi-Crop Bulk Negotiation
+                  <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#14532D', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Multi-Crop Bulk Negotiation Available
                   </div>
-                  <div className="text-xs text-emerald-800">
-                    Want to buy multiple crops (e.g. Wheat + Rice) together? Negotiate a custom bundle price with {profile.farmName}!
+                  <div style={{ fontSize: '0.85rem', color: '#166534', marginTop: '2px' }}>
+                    Want to purchase multiple crops together? Negotiate a custom discounted package directly with {profile.farmName}.
                   </div>
                 </div>
               </div>
+
               <button
                 type="button"
                 onClick={() => setIsBundleModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold shadow-2xs transition-all hover:scale-[1.02] shrink-0 cursor-pointer"
+                className="farmer-btn-primary"
+                style={{ padding: '9px 18px', fontSize: '0.82rem' }}
               >
-                Negotiate Bundle ({listings.length} crops)
+                <Sparkles size={14} /> Negotiate Bundle ({listings.length} crops)
               </button>
             </div>
           )}
 
           {listings.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center text-gray-500 text-sm">
-              This farmer currently has no active listings available.
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '24px', padding: '3.5rem 2rem', textAlign: 'center', color: '#6B7280', fontSize: '0.92rem' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#F3F4F6', color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+                <Sprout size={28} />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111827', marginBottom: '0.4rem' }}>No Active Produce Listed</h3>
+              <p style={{ margin: 0 }}>This farmer currently has no active listings available for dispatch.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.5rem' }}>
               {listings.map((p) => {
                 const img = p.imageUrl || getProductImageUrl(p.name, p.categoryName);
                 return (
-                  <div
-                    key={p.id}
-                    className="bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
-                  >
+                  <div key={p.id} className="crop-listing-card">
                     <div>
-                      <img
-                        src={img}
-                        alt={p.name}
-                        className="w-full h-44 object-cover"
-                      />
-                      <div className="p-4">
-                        <div className="text-[11px] uppercase tracking-wider font-bold text-emerald-700">
-                          {p.categoryName || 'Agricultural Produce'}
+                      {/* Product Image with Category Pill */}
+                      <div style={{ position: 'relative', width: '100%', height: '190px', backgroundColor: '#F3F4F6', overflow: 'hidden' }}>
+                        <img
+                          src={img}
+                          alt={p.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/images/products/wheat-grain.jpg';
+                          }}
+                        />
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '10px',
+                          left: '12px',
+                          backgroundColor: 'rgba(21, 128, 61, 0.92)',
+                          backdropFilter: 'blur(6px)',
+                          color: '#FFFFFF',
+                          padding: '3px 10px',
+                          borderRadius: '12px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Sprout size={12} /> {p.categoryName || 'Produce'}
                         </div>
-                        <h4 className="font-bold text-gray-900 text-base mt-0.5 line-clamp-1">
+                      </div>
+
+                      {/* Card Content */}
+                      <div style={{ padding: '1.25rem' }}>
+                        <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Grade {p.grade || 'A'} • Direct Farm Harvest
+                        </div>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#111827', margin: '4px 0 10px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {p.name}
                         </h4>
-                        <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-                          <span>Available: {p.availableQuantityQuintal} Qtl</span>
-                          <span>Min Order: {p.minOrderQuantityQuintal || 1} Qtl</span>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem', color: '#6B7280', paddingTop: '8px', borderTop: '1px solid #F3F4F6' }}>
+                          <span>Available: <strong style={{ color: '#111827' }}>{p.availableQuantityQuintal} Qtl</strong></span>
+                          <span>Min: <strong style={{ color: '#111827' }}>{p.minOrderQuantityQuintal || 1} Qtl</strong></span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-4 pt-0 border-t border-gray-50 flex items-center justify-between mt-2">
+                    {/* Card Footer */}
+                    <div style={{ padding: '1rem 1.25rem', backgroundColor: '#FAFDF9', borderTop: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
-                        <div className="text-base font-black text-emerald-900">
+                        <span style={{ fontSize: '0.7rem', color: '#6B7280', display: 'block' }}>Farm Price</span>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#15803D', lineHeight: 1.1 }}>
                           ₹{Number(p.pricePerQuintal).toLocaleString('en-IN')}
-                          <span className="text-[11px] font-normal text-gray-500"> / Qtl</span>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#6B7280' }}> / Qtl</span>
                         </div>
                       </div>
+
                       <Link
                         to={`/products/${p.slug || p.id}`}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold transition-colors shadow-2xs"
+                        className="farmer-btn-primary"
+                        style={{ padding: '8px 16px', fontSize: '0.82rem', borderRadius: '12px' }}
                       >
                         View & Buy →
                       </Link>
@@ -339,51 +488,63 @@ export default function FarmerPublicProfile() {
 
       {/* Tab 2: Reviews List */}
       {activeTab === 'REVIEWS' && (
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {reviews.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center text-gray-500 text-sm">
-              No customer reviews yet for this farmer.
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '24px', padding: '3.5rem 2rem', textAlign: 'center', color: '#6B7280', fontSize: '0.92rem' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#F3F4F6', color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+                <MessageSquare size={28} />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111827', marginBottom: '0.4rem' }}>No Customer Reviews Yet</h3>
+              <p style={{ margin: 0 }}>Be the first verified customer to purchase produce and share your feedback for {profile.farmName}.</p>
             </div>
           ) : (
             reviews.map((rev) => (
-              <div key={rev.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-xs">
-                <div className="flex items-start justify-between gap-4 mb-2">
+              <div key={rev.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '18px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-gray-900 text-sm">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 800, color: '#111827', fontSize: '0.95rem' }}>
                         {rev.buyerName || 'Verified Buyer'}
                       </span>
                       {rev.isVerifiedPurchase && (
-                        <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.2 rounded-full font-bold">
+                        <span style={{ fontSize: '0.72rem', backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0', padding: '2px 8px', borderRadius: '20px', fontWeight: 700 }}>
                           ✓ Verified Purchase
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
                       <StarRating rating={rev.rating} size="sm" readOnly />
                       {rev.productName && (
-                        <span className="text-xs text-gray-400">for {rev.productName}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>for <strong style={{ color: '#374151' }}>{rev.productName}</strong></span>
                       )}
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400">
+
+                  <span style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>
                     {new Date(rev.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
 
                 {rev.title && (
-                  <h5 className="font-bold text-gray-900 text-sm mt-2">{rev.title}</h5>
+                  <h5 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111827', margin: '0.5rem 0 0.25rem 0' }}>
+                    {rev.title}
+                  </h5>
                 )}
+
                 {rev.body && (
-                  <p className="text-xs text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">
+                  <p style={{ fontSize: '0.88rem', color: '#374151', lineHeight: '1.6', margin: '0.25rem 0 0 0', whiteSpace: 'pre-wrap' }}>
                     {rev.body}
                   </p>
                 )}
 
                 {rev.farmerReply && (
-                  <div className="mt-3 p-3 rounded-xl bg-emerald-50/60 border border-emerald-100 text-xs">
-                    <span className="font-bold text-emerald-900 block mb-0.5">Farmer's Response:</span>
-                    <p className="text-emerald-800">{rev.farmerReply}</p>
+                  <div style={{ marginTop: '1rem', padding: '0.85rem 1rem', borderRadius: '14px', backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7', fontSize: '0.84rem' }}>
+                    <span style={{ fontWeight: 800, color: '#14532D', display: 'block', marginBottom: '2px' }}>
+                      Farmer's Response:
+                    </span>
+                    <p style={{ color: '#166534', margin: 0, lineHeight: '1.5' }}>
+                      {rev.farmerReply}
+                    </p>
                   </div>
                 )}
               </div>
@@ -394,31 +555,43 @@ export default function FarmerPublicProfile() {
 
       {/* Note Modal */}
       {showNoteModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-xl">
-            <h3 className="text-base font-bold text-gray-900 mb-1">
-              Private Note for {profile.farmName}
-            </h3>
-            <p className="text-xs text-gray-500 mb-4">
-              This note is only visible to you. Use it to keep track of quality, delivery times, or negotiated pricing agreements.
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', zIndex: 1000 }}>
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '2rem', maxWidth: '480px', width: '100%', boxShadow: '0 20px 30px rgba(0,0,0,0.15)', border: '1px solid #E5E7EB' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#111827', margin: 0 }}>
+                Private Note for {profile.farmName}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowNoteModal(false)}
+                style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p style={{ fontSize: '0.82rem', color: '#6B7280', marginBottom: '1.25rem', lineHeight: '1.5' }}>
+              This private note is only visible to your buyer account. Keep track of harvest quality, dispatch timelines, or custom wholesale agreements.
             </p>
             <textarea
               value={savedNotes}
               onChange={(e) => setSavedNotes(e.target.value)}
-              placeholder="e.g. Reliable delivery of Sharbati wheat, responds fast on WhatsApp..."
+              placeholder="e.g. Consistent high-grade Sharbati wheat, responds promptly on WhatsApp, clean bagging..."
               rows={4}
-              className="w-full text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-1 focus:ring-emerald-600 mb-4"
+              style={{ width: '100%', padding: '12px', borderRadius: '14px', border: '1.5px solid #D1D5DB', fontSize: '0.88rem', fontFamily: 'inherit', outline: 'none', marginBottom: '1.25rem', boxSizing: 'border-box' }}
             />
-            <div className="flex justify-end gap-2">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
+                type="button"
                 onClick={() => setShowNoteModal(false)}
-                className="px-4 py-2 rounded-xl text-xs text-gray-500 hover:text-gray-700 font-semibold"
+                style={{ padding: '8px 16px', borderRadius: '12px', background: 'none', border: '1px solid #E5E7EB', fontSize: '0.82rem', color: '#4B5563', fontWeight: 600, cursor: 'pointer' }}
               >
-                Close
+                Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSaveNote}
-                className="px-4 py-2 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold shadow-2xs"
+                className="farmer-btn-primary"
+                style={{ padding: '8px 18px', fontSize: '0.82rem' }}
               >
                 Save Note
               </button>
@@ -426,6 +599,7 @@ export default function FarmerPublicProfile() {
           </div>
         </div>
       )}
+
       {/* Multi-Crop Bundle Negotiate Modal */}
       {isBundleModalOpen && profile && (
         <BundleNegotiateModal
@@ -434,7 +608,7 @@ export default function FarmerPublicProfile() {
           farmerGroup={{
             farmerId: profile.id,
             farmerName: profile.farmName,
-            farmerLocation: `${profile.district || ''}, ${profile.state || ''}`.replace(/^,\s*/, ''),
+            farmerLocation: locationText,
             items: listings.map((l) => ({
               productId: l.id,
               productName: l.name,

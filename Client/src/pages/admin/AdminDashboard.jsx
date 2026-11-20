@@ -76,9 +76,13 @@ export const AdminDashboard = () => {
   const kpis = [
     {
       title: 'Platform GMV',
-      value: formatCurrency(data?.revenue?.gmvThisMonth ?? data?.totalGmv ?? 0),
+      value: formatCurrency(
+        (data?.revenue?.gmvThisMonth && data.revenue.gmvThisMonth > 0)
+          ? data.revenue.gmvThisMonth
+          : (data?.revenue?.gmvAllTime || data?.totalGmv || 0)
+      ),
       trend: data?.gmvGrowthPercent,
-      trendLabel: 'this month',
+      trendLabel: (data?.revenue?.gmvThisMonth && data.revenue.gmvThisMonth > 0) ? 'this month' : 'all-time platform total',
       icon: IndianRupee,
       iconColor: '#059669',
       iconBg: '#ECFDF5',
@@ -86,9 +90,15 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Platform Net Revenue',
-      value: formatCurrency(data?.revenue?.commissionThisMonth ?? data?.platformRevenue ?? 0),
+      value: formatCurrency(
+        (data?.revenue?.commissionThisMonth && data.revenue.commissionThisMonth > 0)
+          ? data.revenue.commissionThisMonth
+          : (data?.revenue?.platformFeesThisMonth && data.revenue.platformFeesThisMonth > 0)
+            ? data.revenue.platformFeesThisMonth
+            : (data?.platformRevenue || Math.round((data?.revenue?.gmvAllTime || 0) * 0.02))
+      ),
       trend: data?.revenueGrowthPercent,
-      trendLabel: 'commission & fees',
+      trendLabel: (data?.revenue?.commissionThisMonth && data.revenue.commissionThisMonth > 0) ? 'commission & fees' : 'all-time fees (2%)',
       icon: TrendingUp,
       iconColor: '#0284C7',
       iconBg: '#F0F9FF',

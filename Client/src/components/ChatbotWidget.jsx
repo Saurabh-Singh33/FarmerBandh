@@ -312,11 +312,22 @@ export const ChatbotWidget = () => {
 
     if (!cleanText) return;
 
-    const langCode = explicitLang || activeLang || 'en';
+    // Determine language: prioritize explicitLang, then detect from text content, then fallback to activeLang
+    let langCode = explicitLang;
+    if (!langCode || !['en', 'hi', 'gu'].includes(langCode)) {
+      langCode = detectMessageLanguage(cleanText, activeLang || 'en');
+    }
 
     // Check if browser native SpeechSynthesis has a dedicated voice for this language
     const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-    const matchedVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(langCode));
+    let matchedVoice = null;
+    if (langCode === 'hi') {
+      matchedVoice = voices.find(v => v.lang && (v.lang === 'hi-IN' || v.lang.toLowerCase().startsWith('hi')));
+    } else if (langCode === 'en') {
+      matchedVoice = voices.find(v => v.lang && (v.lang === 'en-IN' || v.lang.toLowerCase().startsWith('en')));
+    } else if (langCode === 'gu') {
+      matchedVoice = voices.find(v => v.lang && (v.lang === 'gu-IN' || v.lang.toLowerCase().startsWith('gu')));
+    }
 
     // For Gujarati (or when no native voice is available in the browser), use the high-quality audio stream
     if (langCode === 'gu' || !matchedVoice) {
@@ -619,7 +630,7 @@ export const ChatbotWidget = () => {
                           <span className="text-[9px] text-slate-400">{msg.timestamp}</span>
                           <button
                             type="button"
-                            onClick={() => speakText(msg.content, idx)}
+                            onClick={() => speakText(msg.content, idx, msg.language)}
                             className={`flex items-center gap-1 px-1.5 py-0.5 rounded font-semibold text-[9px] transition-colors ${
                               isSpeakingThis
                                 ? 'bg-amber-100 text-amber-800 animate-pulse'
@@ -842,50 +853,64 @@ export function detectMessageLanguage(text, fallbackLang = 'en') {
     return 'gu';
   }
 
-  // 3. Romanized keywords detection (Hinglish / Gujlish)
+  // 3. Romanized keywords detection (Hinglish / Gujlish / English)
   const lower = trimmed.toLowerCase();
   const words = lower.split(/[^a-zA-Z0-9]+/).filter(Boolean);
 
-  const hindiTerms = [
-    'namaste', 'kaise', 'kaisa', 'kya', 'hai', 'hain', 'ho', 'karo', 'kisan', 'fasal',
-    'bhav', 'daam', 'kharidna', 'bechna', 'kharid', 'bech', 'paise', 'bhai',
-    'mera', 'meri', 'mere', 'aapka', 'aapki', 'aapke', 'tumhara', 'aap', 'mujhe',
-    'hum', 'nahi', 'nahin', 'molbhav', 'kheti', 'mandi', 'dhanyawad'
-  ];
-
   const gujaratiTerms = [
-    'kem', 'cho', 'tamaru', 'maru', 'mane', 'pak', 'khedut',
-    'su', 'shu', 'che', 'nathi', 'karvu', 'kharidi', 'vechan', 'aabhar'
+    'kem', 'cho', 'chho', 'tame', 'tamaru', 'tamari', 'tamara', 'maru', 'mari',
+    'mane', 'su', 'shu', 'che', 'chhe', 'nathi', 'nthi', 'karvu', 'karvanu',
+    'aapo', 'khedut', 'vechan', 'kharidi', 'aabhar', 'joie', 'joye', 'haji',
+    'paisa', 'kyare', 'kya', 'kemne', 'tethi', 'pan', 'dungli', 'bataka', 'ghau',
+    'dangar', 'chokha', 'tameta', 'lasun', 'mitra'
   ];
 
-  let hindiCount = 0;
-  let gujaratiCount = 0;
-
-  for (const w of words) {
-    if (hindiTerms.includes(w)) hindiCount++;
-    if (gujaratiTerms.includes(w)) gujaratiCount++;
-  }
-
-  if (hindiCount >= 2 || (hindiCount === 1 && words.length <= 4)) {
-    return 'hi';
-  }
-
-  if (gujaratiCount >= 2 || (gujaratiCount === 1 && words.length <= 4)) {
-    return 'gu';
-  }
+  const hindiTerms = [
+    'namaste', 'namaskar', 'kaise', 'kaisa', 'kaisi', 'kya', 'kyun', 'hai', 'hain',
+    'ho', 'hu', 'hoon', 'karo', 'karna', 'kisan', 'fasal', 'bhav', 'daam',
+    'kharidna', 'kharid', 'bechna', 'becho', 'bech', 'paise', 'rupaye', 'bhai',
+    'mera', 'meri', 'mere', 'aapka', 'aapki', 'aapke', 'tumhara', 'tumhari',
+    'aap', 'tum', 'mujhe', 'hum', 'nahi', 'nahin', 'mat', 'molbhav', 'kheti',
+    'mandi', 'dhanyawad', 'shukriya', 'batao', 'bataiye', 'chahiye', 'kitna',
+    'kitne', 'kab', 'kahan', 'kaun', 'gehu', 'chawal', 'dhan', 'pyaz', 'aalu',
+    'tamatar', 'lahsun', 'makka', 'accha', 'theek'
+  ];
 
   const englishTerms = [
-    'what', 'how', 'who', 'where', 'when', 'why', 'can', 'could', 'is', 'are',
-    'the', 'your', 'my', 'you', 'hello', 'hi', 'work', 'help', 'crop', 'crops',
-    'price', 'negotiate', 'pay', 'payment', 'delivery', 'buy', 'sell', 'order'
+    'what', 'how', 'who', 'where', 'when', 'why', 'can', 'could', 'would', 'should',
+    'is', 'are', 'am', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had',
+    'the', 'this', 'that', 'these', 'those', 'your', 'my', 'our', 'their', 'you',
+    'hello', 'hi', 'hey', 'work', 'help', 'crop', 'crops', 'price', 'prices',
+    'negotiate', 'negotiation', 'pay', 'payment', 'payments', 'delivery', 'slot',
+    'slots', 'buy', 'buying', 'sell', 'selling', 'order', 'orders', 'farmer',
+    'farmers', 'farmerbandh', 'krishimitra', 'razorpay', 'dispute', 'kyc',
+    'produce', 'harvest', 'quintal', 'grade', 'market', 'marketplace'
   ];
 
+  let gujaratiCount = 0;
+  let hindiCount = 0;
   let englishCount = 0;
+
   for (const w of words) {
+    if (gujaratiTerms.includes(w)) gujaratiCount++;
+    if (hindiTerms.includes(w)) hindiCount++;
     if (englishTerms.includes(w)) englishCount++;
   }
 
-  if (englishCount >= 1) {
+  if (gujaratiCount > 0 && gujaratiCount >= hindiCount && gujaratiCount >= englishCount) {
+    return 'gu';
+  }
+
+  if (hindiCount > 0 && hindiCount >= gujaratiCount && hindiCount >= englishCount) {
+    return 'hi';
+  }
+
+  if (englishCount > 0) {
+    return 'en';
+  }
+
+  // If text contains mostly ASCII letters and no Indic words, default to English
+  if (words.length > 0 && trimmed.split('').every(c => c.charCodeAt(0) < 128)) {
     return 'en';
   }
 

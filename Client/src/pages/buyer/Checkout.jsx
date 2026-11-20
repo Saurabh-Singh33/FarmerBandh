@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, CreditCard, CheckCircle, Plus, ShieldCheck, Truck, ArrowLeft, ArrowRight, AlertCircle, Check, Clock, Megaphone } from 'lucide-react';
+import { MapPin, Calendar, CreditCard, CheckCircle, Plus, ShieldCheck, Truck, ArrowLeft, ArrowRight, AlertCircle, Check, Clock, Megaphone, ExternalLink } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { addressApi } from '../../services/addressApi';
@@ -54,13 +54,15 @@ export const Checkout = () => {
     setLoadingAddresses(true);
     try {
       const data = await addressApi.listAddresses();
-      setAddresses(data || []);
-      const defaultAddr = data?.find((a) => a.isDefault) || data?.[0];
+      const list = Array.isArray(data) ? data : (data?.data || data?.items || []);
+      setAddresses(list);
+      const defaultAddr = list.find((a) => a.isDefault) || list[0];
       if (defaultAddr) {
         setSelectedAddressId(defaultAddr.id);
       }
     } catch (err) {
       console.error('Failed to load addresses:', err);
+      setAddresses([]);
     } finally {
       setLoadingAddresses(false);
     }
@@ -439,26 +441,38 @@ export const Checkout = () => {
                       </div>
 
                       {pm.isRazorpay && paymentMethod === pm.id && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowRazorpayModal(true);
-                          }}
-                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
-                        >
-                          {razorpayPaidData ? '✓ Paid / Edit' : 'Open Razorpay UI'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={RAZORPAY_PAYMENT_LINK_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Open Razorpay Link
+                          </a>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setShowRazorpayModal(true);
+                            }}
+                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+                          >
+                            {razorpayPaidData ? '✓ Paid / Edit' : 'Pay in Modal'}
+                          </button>
+                        </div>
                       )}
                     </div>
 
                     {pm.isRazorpay && paymentMethod === pm.id && (
                       <div className="mt-3 pt-3 border-t border-emerald-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-semibold text-slate-700">Gateway:</span>
-                          <span className="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-blue-700 font-bold">
-                            Razorpay Verified
+                          <span className="font-semibold text-slate-700">Official Link:</span>
+                          <span className="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-blue-700 font-bold truncate max-w-[280px]">
+                            {RAZORPAY_PAYMENT_LINK_URL}
                           </span>
                         </div>
                         {razorpayPaidData ? (
@@ -467,7 +481,7 @@ export const Checkout = () => {
                           </div>
                         ) : (
                           <span className="text-[11px] text-blue-800 font-medium">
-                            Click 'Open Razorpay UI' or proceed to place order to pay securely
+                            Click 'Open Razorpay Link' to pay on official page or 'Pay in Modal'
                           </span>
                         )}
                       </div>
