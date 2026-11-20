@@ -43,16 +43,28 @@ public class AdminRepository : IAdminRepository
         var cancelledOrders = await _context.Orders.CountAsync(o => o.Status == OrderStatus.Cancelled);
         var disputedOrders = await _context.Disputes.CountAsync(d => d.Status == DisputeStatus.Open || d.Status == DisputeStatus.Escalated);
 
-        // Revenue
-        var allDelivered = await _context.Orders
-            .Where(o => o.Status == OrderStatus.Delivered)
+        // Revenue & GMV calculation
+        // Non-cancelled orders represent platform Gross Merchandise Value (GMV)
+        var validOrders = await _context.Orders
+            .Where(o => o.Status != OrderStatus.Cancelled)
             .ToListAsync();
-        var monthDelivered = allDelivered.Where(o => o.DeliveredAt >= startOfMonth || o.PlacedAt >= startOfMonth).ToList();
+        var monthValidOrders = validOrders.Where(o => (o.DeliveredAt.HasValue && o.DeliveredAt >= startOfMonth) || o.PlacedAt >= startOfMonth).ToList();
 
-        var gmvAllTime = allDelivered.Sum(o => o.TotalAmount);
-        var gmvThisMonth = monthDelivered.Sum(o => o.TotalAmount);
-        var platformFeesThisMonth = monthDelivered.Sum(o => o.PlatformFee);
-        var commissionThisMonth = Math.Round(gmvThisMonth * 0.02m, 2);
+        // If no orders in current calendar month, fallback to the rolling 30-day window or all-time valid orders
+        if (monthValidOrders.Count == 0 && validOrders.Count > 0)
+        {
+            var rolling30Days = now.AddDays(-30);
+            monthValidOrders = validOrders.Where(o => (o.DeliveredAt ?? o.PlacedAt) >= rolling30Days).ToList();
+            if (monthValidOrders.Count == 0)
+            {
+                monthValidOrders = validOrders;
+            }
+        }
+
+        var gmvAllTime = validOrders.Sum(o => o.TotalAmount);
+        var gmvThisMonth = monthValidOrders.Sum(o => o.TotalAmount);
+        var platformFeesThisMonth = monthValidOrders.Sum(o => o.PlatformFee > 0 ? o.PlatformFee : Math.Round(o.TotalAmount * 0.02m, 2));
+        var commissionThisMonth = platformFeesThisMonth > 0 ? platformFeesThisMonth : Math.Round(gmvThisMonth * 0.02m, 2);
 
         // Listings
         var activeListings = await _context.Products.CountAsync(p => p.Status == ProductStatus.Active);
@@ -90,7 +102,7 @@ public class AdminRepository : IAdminRepository
             var mEnd = mStart.AddMonths(1);
             var mLabel = mDate.ToString("yyyy-MM");
 
-            var mRev = allDelivered.Where(o => (o.DeliveredAt ?? o.PlacedAt) >= mStart && (o.DeliveredAt ?? o.PlacedAt) < mEnd).Sum(o => o.TotalAmount);
+            var mRev = validOrders.Where(o => (o.DeliveredAt ?? o.PlacedAt) >= mStart && (o.DeliveredAt ?? o.PlacedAt) < mEnd).Sum(o => o.TotalAmount);
             var mOrders = await _context.Orders.CountAsync(o => o.PlacedAt >= mStart && o.PlacedAt < mEnd);
             var mUsers = await _context.Users.CountAsync(u => u.CreatedAt >= mStart && u.CreatedAt < mEnd);
 

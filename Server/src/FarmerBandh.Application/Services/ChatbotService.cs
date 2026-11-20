@@ -27,10 +27,28 @@ public class ChatbotService : IChatbotService
 
     public async Task<ChatbotResponseDto> ProcessMessageAsync(ChatbotRequestDto request, string? userRole, string? userName)
     {
-        var lang = DetectLanguage(request.Message, request.Language);
+        var rawMessage = request.Message ?? string.Empty;
+        var lang = DetectLanguage(rawMessage, request.Language);
         var isAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
         var isFarmer = string.Equals(userRole, "Farmer", StringComparison.OrdinalIgnoreCase);
         var isBuyer = string.Equals(userRole, "Buyer", StringComparison.OrdinalIgnoreCase);
+
+        var userText = rawMessage.Trim().ToLowerInvariant();
+
+        // 1. Strict Project Scope Enforcement:
+        // Must ONLY answer questions about FarmerBandh platform operations, crops, orders, payments, delivery, disputes, KYC, or polite greetings.
+        // If question is external, refuse immediately in the exact user language!
+        if (IsExternalQuestion(userText) || (!IsFarmerBandhRelated(userText) && !IsPureGreeting(userText) && !IsIdentityOrWorkQuery(userText)))
+        {
+            var refusal = GetScopeRefusalReply(lang);
+            return new ChatbotResponseDto
+            {
+                Reply = refusal,
+                Language = lang,
+                IsAdminMode = isAdmin,
+                SuggestedFollowUps = GenerateFollowUps(lang, isAdmin, isFarmer)
+            };
+        }
 
         var apiKey = Environment.GetEnvironmentVariable("OPENROUTER_API_KEY")
             ?? _configuration["OPENROUTER_API_KEY"]
@@ -230,9 +248,11 @@ public class ChatbotService : IChatbotService
         sb.AppendLine("When asked what your actual work is, what you do, or who you are, give a direct, thorough, and helpful answer summarizing your key services: crop marketplace trading in quintals (Grade A/B/C), direct price bargaining with farmers, Razorpay/COD payments, delivery slots, escrow dispute resolution, and farmer KYC verification.");
 
         sb.AppendLine();
-        sb.AppendLine("CRITICAL RULE #1 - STRICT PROJECT SCOPE ONLY:");
+        sb.AppendLine("CRITICAL RULE #1 - STRICT PROJECT SCOPE ONLY (FARMERBANDH BOUNDARY):");
+        sb.AppendLine("You are KrishiMitra, the dedicated, official AI assistant built EXCLUSIVELY for FarmerBandh.");
         sb.AppendLine("You MUST ONLY answer questions strictly regarding FarmerBandh, its features, farming crops marketplace, volume quintal trading, harvest grades, bargaining & negotiations, delivery slots, tracking, returns, disputes, Razorpay payment links, farmer verification KYC, and agrarian payouts.");
-        sb.AppendLine("If the user asks ANY question outside of FarmerBandh (e.g. general coding, trivia, movies, politics, science, math, other apps, personal advice), you MUST politely refuse and state that you are exclusively designed to assist with FarmerBandh agrarian platform operations.");
+        sb.AppendLine("You are STRICTLY FORBIDDEN from answering any question outside FarmerBandh (e.g. general coding/programming, general knowledge/trivia, movies, actors, songs, politics, weather, recipes, homework, science, math, other apps, personal advice).");
+        sb.AppendLine("If the user asks ANY question outside of FarmerBandh, you MUST politely refuse in the matching language, stating clearly that you are exclusively designed to assist with FarmerBandh platform operations.");
 
         sb.AppendLine();
         sb.AppendLine("CRITICAL RULE #2 - ROLE-BASED ADMIN SECURITY:");
@@ -255,12 +275,12 @@ public class ChatbotService : IChatbotService
         }
 
         sb.AppendLine();
-        sb.AppendLine("CRITICAL RULE #3 - MULTILINGUAL VOICE & TEXT OUTPUT:");
-        sb.AppendLine($"The requested response language is: '{lang.ToUpperInvariant()}'.");
-        sb.AppendLine("- If 'HI' (Hindi): Respond in natural, warm, polite Hindi in Devanagari script (हिन्दी).");
-        sb.AppendLine("- If 'GU' (Gujarati): Respond in natural, warm, polite Gujarati in Gujarati script (ગુજરાતી).");
-        sb.AppendLine("- If 'EN' (English): Respond in clear, friendly, and professional English.");
-        sb.AppendLine("If the user sends greetings like 'Kaise ho', 'Hello', 'Namaste', respond warmly (e.g. 'मैं बिल्कुल ठीक हूँ, पूछने के लिए धन्यवाद!...') and offer assistance on FarmerBandh.");
+        sb.AppendLine("CRITICAL RULE #3 - EXACT LANGUAGE MATCHING MANDATE (ENGLISH / HINDI / GUJARATI):");
+        sb.AppendLine($"The detected question language is: '{lang.ToUpperInvariant()}'.");
+        sb.AppendLine("- IF ENGLISH: The user asked in English. Your entire response MUST be in clear, professional English. NEVER reply in Hindi or Gujarati.");
+        sb.AppendLine("- IF HINDI (HI): The user asked in Hindi (Devanagari or Hinglish). Your entire response MUST be in natural, polite Hindi in Devanagari script (हिन्दी). NEVER reply in English.");
+        sb.AppendLine("- IF GUJARATI (GU): The user asked in Gujarati (Gujarati script or Gujlish). Your entire response MUST be in natural, polite Gujarati in Gujarati script (ગુજરાતી). NEVER reply in English or Hindi.");
+        sb.AppendLine("If the user sends greetings, respond warmly in the exact matching language.");
         sb.AppendLine("Keep sentences concise, clear, and easy to be read aloud via Text-to-Speech (TTS). Avoid unnecessary asterisks or complicated markdown tables that sound confusing when spoken.");
 
         sb.AppendLine();
@@ -269,8 +289,8 @@ public class ChatbotService : IChatbotService
         sb.AppendLine("- Volume: Produce sold in Quintals (1 Quintal = 100 kg).");
         sb.AppendLine("- Grades: Grade A (Premium export-ready), Grade B (Standard commercial), Grade C (Processing/Economy).");
         sb.AppendLine("- Negotiations: Buyers can negotiate prices and bundle multiple crop items together.");
-        sb.AppendLine("- Payment Methods: Razorpay Payment Link (Link ID: plink_Tqe4bgUXaopgZ0, URL: https://rzp.io/rzp/MkpDZkX), UPI/GPay/PhonePe, Credit/Debit Cards, NetBanking, and Cash on Delivery (COD).");
-        sb.AppendLine("- Flexible Payments: Buyers can pay custom/flexible amounts (less or more than ₹100,000, including advance token deposits or full amounts).");
+        sb.AppendLine("- Payment Methods: Razorpay Payment Link (Link ID: plink_U2CqOn54TpAx8O, URL: https://razorpay.com/payment-link/plink_U2CqOn54TpAx8O/test), UPI/GPay/PhonePe, Credit/Debit Cards, NetBanking, and Cash on Delivery (COD).");
+        sb.AppendLine("- Flexible Payments: Buyers can pay custom/flexible amounts (less or more than ₹10,000, including full payment or part payment).");
         sb.AppendLine("- Delivery: Morning (8 AM - 12 PM), Afternoon (12 PM - 4 PM), Evening (4 PM - 8 PM) slots.");
         sb.AppendLine("- Returns & Disputes: 48-hour return window for damaged or sub-grade produce.");
         sb.AppendLine("- Farmer Onboarding: 3-step KYC: Land record (7/12 extract), Govt ID (Aadhaar), and Bank/UPI details.");
@@ -292,42 +312,58 @@ public class ChatbotService : IChatbotService
         if (text.Any(c => c >= 0x0A80 && c <= 0x0AFF))
             return "gu";
 
-        // 2. Romanized keywords detection (Hinglish / Gujlish)
+        // 2. Romanized keywords detection (Hinglish / Gujlish / English)
         var lower = text.ToLowerInvariant();
-        var words = lower.Split(new[] { ' ', '.', ',', '?', '!', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-
-        var hindiTerms = new HashSet<string>
-        {
-            "namaste", "kaise", "kaisa", "kya", "hai", "hain", "karo", "kisan", "fasal",
-            "bhav", "daam", "kharidna", "bechna", "kharid", "bech", "paise", "bhai",
-            "mera", "meri", "mere", "aapka", "aapki", "aapke", "tumhara", "aap", "mujhe",
-            "hum", "nahi", "nahin", "molbhav", "kheti", "mandi", "dhanyawad"
-        };
+        var words = lower.Split(new[] { ' ', '.', ',', '?', '!', '\n', '\r', '\t', ':', ';', '-', '/' }, StringSplitOptions.RemoveEmptyEntries);
 
         var gujaratiTerms = new HashSet<string>
         {
-            "kem", "cho", "tamaru", "maru", "mane", "pak", "khedut",
-            "su", "shu", "che", "nathi", "karvu", "kharidi", "vechan", "aabhar"
+            "kem", "cho", "chho", "tame", "tamaru", "tamari", "tamara", "maru", "mari",
+            "mane", "su", "shu", "che", "chhe", "nathi", "nthi", "karvu", "karvanu",
+            "aapo", "khedut", "vechan", "kharidi", "aabhar", "joie", "joye", "haji",
+            "paisa", "kyare", "kya", "kemne", "tethi", "pan", "dungli", "bataka", "ghau",
+            "dangar", "chokha", "tameta", "lasun", "mitra"
         };
 
-        var hindiCount = words.Count(w => hindiTerms.Contains(w));
-        var gujaratiCount = words.Count(w => gujaratiTerms.Contains(w));
-
-        if (hindiCount >= 2 || (hindiCount == 1 && words.Length <= 4))
-            return "hi";
-
-        if (gujaratiCount >= 2 || (gujaratiCount == 1 && words.Length <= 4))
-            return "gu";
+        var hindiTerms = new HashSet<string>
+        {
+            "namaste", "namaskar", "kaise", "kaisa", "kaisi", "kya", "kyun", "hai", "hain",
+            "ho", "hu", "hoon", "karo", "karna", "kisan", "fasal", "bhav", "daam",
+            "kharidna", "kharid", "bechna", "becho", "bech", "paise", "rupaye", "bhai",
+            "mera", "meri", "mere", "aapka", "aapki", "aapke", "tumhara", "tumhari",
+            "aap", "tum", "mujhe", "hum", "nahi", "nahin", "mat", "molbhav", "kheti",
+            "mandi", "dhanyawad", "shukriya", "batao", "bataiye", "chahiye", "kitna",
+            "kitne", "kab", "kahan", "kaun", "gehu", "chawal", "dhan", "pyaz", "aalu",
+            "tamatar", "lahsun", "makka", "accha", "theek"
+        };
 
         var englishTerms = new HashSet<string>
         {
-            "what", "how", "who", "where", "when", "why", "can", "could", "is", "are",
-            "the", "your", "my", "you", "hello", "hi", "work", "help", "crop", "crops",
-            "price", "negotiate", "pay", "payment", "delivery", "buy", "sell", "order"
+            "what", "how", "who", "where", "when", "why", "can", "could", "would", "should",
+            "is", "are", "am", "was", "were", "do", "does", "did", "have", "has", "had",
+            "the", "this", "that", "these", "those", "your", "my", "our", "their", "you",
+            "hello", "hi", "hey", "work", "help", "crop", "crops", "price", "prices",
+            "negotiate", "negotiation", "pay", "payment", "payments", "delivery", "slot",
+            "slots", "buy", "buying", "sell", "selling", "order", "orders", "farmer",
+            "farmers", "farmerbandh", "krishimitra", "razorpay", "dispute", "kyc",
+            "produce", "harvest", "quintal", "grade", "market", "marketplace"
         };
 
+        var gujaratiCount = words.Count(w => gujaratiTerms.Contains(w));
+        var hindiCount = words.Count(w => hindiTerms.Contains(w));
         var englishCount = words.Count(w => englishTerms.Contains(w));
-        if (englishCount >= 1)
+
+        if (gujaratiCount > 0 && gujaratiCount >= hindiCount && gujaratiCount >= englishCount)
+            return "gu";
+
+        if (hindiCount > 0 && hindiCount >= gujaratiCount && hindiCount >= englishCount)
+            return "hi";
+
+        if (englishCount > 0)
+            return "en";
+
+        // If text contains ASCII letters with no Indic markers, default to English
+        if (words.Length > 0 && text.All(c => c < 128))
             return "en";
 
         return NormalizeLanguage(defaultLang);
@@ -450,9 +486,9 @@ public class ChatbotService : IChatbotService
         {
             return lang switch
             {
-                "hi" => "फार्मरबंध सुरक्षित व लचीली भुगतान सुविधाएं प्रदान करता है:\n1. रेज़रपे पेमेंट लिंक: (plink_Tqe4bgUXaopgZ0 / https://rzp.io/rzp/MkpDZkX) द्वारा खरीदार ₹1,00,000 या अपनी सुविधानुसार कम/ज्यादा टोकन राशि UPI (GPay, PhonePe), कार्ड या नेटबैंकिंग से चुका सकते हैं।\n2. कैश ऑन डिलीवरी (COD): माल की डिलीवरी और जांच के बाद मौके पर नकद भुगतान।\n3. एस्क्रो सुरक्षा: खरीदार द्वारा चुकाई गई राशि डिलीवरी पूरी होने और 48 घंटे के निरीक्षण के बाद ही किसान के खाते में सुरक्षित ट्रांसफर की जाती है।",
-                "gu" => "ફાર્મરબંધ સુરક્ષિત અને લવચીક ચુકવણી વિકલ્પો પ્રદાન કરે છે:\n૧. રેઝરપે પેમેન્ટ લિંક: (plink_Tqe4bgUXaopgZ0 / https://rzp.io/rzp/MkpDZkX) દ્વારા ખરીદદારો ₹૧,૦૦,૦૦૦ અથવા ઈચ્છા મુજબ ઓછી/વધુ ટોકન રકમ UPI, કાર્ડ કે નેટબેંકિંગથી ચૂકવી શકે છે.\n૨. કેશ ઓન ડિલિવરી (COD): માલ ડિલિવરી સમયે રૂબરૂ ચુકવણી.\n૩. એસ્ક્રો સુરક્ષા: ચુકવણી માલની ગુણવત્તા ચકાસ્યા પછી જ ખેડૂતને ટ્રાન્સફર થાય છે.",
-                _ => "FarmerBandh offers secure and flexible payment options:\n1. Razorpay Payment Link: (Link ID: plink_Tqe4bgUXaopgZ0, https://rzp.io/rzp/MkpDZkX) allows buyers to pay the default ₹100,000 or any custom flexible advance token amount via UPI (GPay, PhonePe), Cards, or NetBanking.\n2. Cash on Delivery (COD): Pay directly upon physical crop delivery and inspection.\n3. Escrow Security: Payments are securely held until delivery inspection is verified, protecting both farmer and buyer."
+                "hi" => "फार्मरबंध सुरक्षित व लचीली भुगतान सुविधाएं प्रदान करता है:\n1. रेज़रपे पेमेंट लिंक: (plink_U2CqOn54TpAx8O / https://razorpay.com/payment-link/plink_U2CqOn54TpAx8O/test) द्वारा खरीदार ₹10,000 या अपनी सुविधानुसार कम/ज्यादा पार्ट पेमेंट राशि UPI (GPay, PhonePe), कार्ड या नेटबैंकिंग से चुका सकते हैं।\n2. कैश ऑन डिलीवरी (COD): माल की डिलीवरी और जांच के बाद मौके पर नकद भुगतान।\n3. एस्क्रो सुरक्षा: खरीदार द्वारा चुकाई गई राशि डिलीवरी पूरी होने और 48 घंटे के निरीक्षण के बाद ही किसान के खाते में सुरक्षित ट्रांसफर की जाती है।",
+                "gu" => "ફાર્મરબંધ સુરક્ષિત અને લવચીક ચુકવણી વિકલ્પો પ્રદાન કરે છે:\n૧. રેઝરપે પેમેન્ટ લિંક: (plink_U2CqOn54TpAx8O / https://razorpay.com/payment-link/plink_U2CqOn54TpAx8O/test) દ્વારા ખરીદદારો ₹૧૦,૦૦૦ અથવા ઈચ્છા મુજબ ઓછી/વધુ પાર્ટ પેમેન્ટ રકમ UPI, કાર્ડ કે નેટબેંકિંગથી ચૂકવી શકે છે.\n૨. કેશ ઓન ડિલિવરી (COD): માલ ડિલિવરી સમયે રૂબરૂ ચુકવણી.\n૩. એસ્ક્રો સુરક્ષા: ચુકવણી માલની ગુણવત્તા ચકાસ્યા પછી જ ખેડૂતને ટ્રાન્સફર થાય છે.",
+                _ => "FarmerBandh offers secure and flexible payment options:\n1. Razorpay Payment Link: (Link ID: plink_U2CqOn54TpAx8O, https://razorpay.com/payment-link/plink_U2CqOn54TpAx8O/test) allows buyers to pay the default ₹10,000 or any custom flexible part payment amount (more or less than ₹10,000) via UPI (GPay, PhonePe), Cards, or NetBanking.\n2. Cash on Delivery (COD): Pay directly upon physical crop delivery and inspection.\n3. Escrow Security: Payments are securely held until delivery inspection is verified, protecting both farmer and buyer."
             };
         }
 
@@ -549,13 +585,73 @@ public class ChatbotService : IChatbotService
     {
         var externalKeywords = new[]
         {
-            "write code", "python", "javascript", "c#", "java", "react", "html", "css",
-            "who is the president", "capital of", "weather in", "movie", "song", "actor",
-            "cricket score", "ipl", "formula", "recipe for pizza", "tell me a joke",
-            "cryptocurrency", "bitcoin", "stock market", "world war", "physics", "chemistry"
+            // Programming & Tech outside FarmerBandh
+            "write code", "python", "javascript", "c#", "java", "react", "html", "css", "sql", "php", "c++", "programming", "software", "algorithm",
+            // General World Knowledge & Trivia
+            "who is the president", "who is the prime minister", "capital of", "weather in", "temperature in",
+            "movie", "film", "actor", "actress", "song", "lyrics", "cricket score", "ipl score", "football score", "messi", "ronaldo", "world cup",
+            "formula", "recipe", "pizza", "burger", "cake", "biryani", "how to cook",
+            "joke", "tell me a joke", "cryptocurrency", "bitcoin", "ethereum", "stock market", "share market",
+            "world war", "physics", "chemistry", "biology", "math", "calculus", "essay on", "homework",
+            "medicine for", "doctor for", "symptom", "disease cure", "horoscope", "astrology",
+            "flight ticket", "train ticket", "hotel booking", "amazon prime", "netflix"
         };
 
         return externalKeywords.Any(k => text.Contains(k));
+    }
+
+    private static bool IsFarmerBandhRelated(string text)
+    {
+        var terms = new[]
+        {
+            // Platform & Core
+            "farmerbandh", "krishimitra", "farm", "farmer", "farmers", "buyer", "buyers", "seller", "sellers",
+            "kisan", "khedut", "agriculture", "agrarian", "marketplace", "market", "mandi", "apmc",
+            "direct trade", "platform", "middleman", "broker", "commission", "agent",
+            // Crops & Produce (English, Hindi, Gujarati, Romanized)
+            "crop", "crops", "produce", "harvest", "grain", "grains", "vegetable", "vegetables", "fruit", "fruits",
+            "wheat", "rice", "paddy", "basmati", "onion", "potato", "tomato", "cabbage", "garlic", "ginger", "maize", "corn",
+            "cotton", "pulses", "dal", "quintal", "quintals", "qtl", "kg", "kilo", "grade", "grade a", "grade b", "grade c",
+            "फसल", "फसलें", "उपज", "अनाज", "गेहूं", "चावल", "धान", "प्याज", "आलू", "टमाटर", "लहसुन", "मक्का", "कपास", "दाल", "क्विंटल", "किलो",
+            "પાક", "ઉપજ", "અનાજ", "શાકભાજી", "ઘઉં", "ડાંગર", "ચોખા", "ડુંગળી", "બટાકા", "ટામેટા", "લસણ", "મકાઈ", "કપાસ",
+            "gehu", "chawal", "dhan", "pyaz", "aalu", "tamatar", "lahsun", "makka", "ghau", "dangar", "dungli", "bataka", "tameta",
+            // Trade, Buy & Sell
+            "buy", "buying", "purchase", "sell", "selling", "order", "orders", "list", "listing", "listings", "cart", "checkout",
+            "खरीद", "खरीदना", "बेच", "बेचना", "बिक्री", "ऑर्डर", "લિસ્ટ", "ખરીદ", "ખરીદી", "વેચ", "વેચાણ",
+            "kharid", "kharidna", "bech", "bechna", "vech", "vechan",
+            // Negotiation & Price
+            "price", "prices", "rate", "rates", "cost", "negotiat", "bargain", "discount", "counter", "spread", "arbitrage",
+            "भाव", "दाम", "कीमत", "मोलभाव", "सौदा", "छूट", "कम", "ભાવ", "કિંમત", "વાટાઘાટો", "ઓછો", "સસ્તો",
+            "bhav", "daam", "keemat", "molbhav",
+            // Payment & Razorpay
+            "pay", "payment", "payments", "razorpay", "plink", "cod", "cash on delivery", "advance", "token", "upi", "gpay", "phonepe", "paytm", "netbanking", "escrow", "payout", "payouts", "bank",
+            "भुगतान", "पैसे", "रुपये", "रेज़रपे", "कैश", "सीओडी", "टोकन", "खाता", "एस्क्रो",
+            "ચુકવણી", "પૈસા", "રૂપિયા", "રેઝરપે", "રોકડ", "ટોકન", "ખાતું", "એસ્ક્રો",
+            "paise", "rupaye", "paisa", "rupya",
+            // Delivery & Logistics
+            "delivery", "slot", "slots", "dispatch", "track", "tracking", "transport", "vehicle", "morning", "afternoon", "evening", "doorstep",
+            "डिलीवरी", "स्लॉट", "ट्रैकिंग", "गाड़ी", "ડિલિવરી", "સ્લોટ", "ટ્રેકિંગ",
+            // Disputes & Returns
+            "dispute", "disputes", "return", "returns", "refund", "refunds", "damaged", "rotten", "spoiled", "48 hour", "inspection",
+            "विवाद", "रिफंड", "खराब", "शिकायत", "વાપસી", "વિવાદ", "રિફંડ", "નુકસાન",
+            // KYC & Verification
+            "kyc", "verify", "verification", "verified", "7/12", "satbara", "aadhaar", "aadhar", "patta", "land record", "passbook", "badge",
+            "सत्यापन", "खतौनी", "सातबारा", "आधार", "दस्तावेज", "ચકાસણી", "૭/૧૨",
+            // Admin
+            "admin", "arbitrat", "approve", "settings", "commission"
+        };
+
+        return terms.Any(t => text.Contains(t));
+    }
+
+    private static string GetScopeRefusalReply(string lang)
+    {
+        return lang switch
+        {
+            "hi" => "नमस्ते! मैं कृषिमित्र हूँ, फार्मरबंध का समर्पित एआई सहायक। मैं केवल फार्मरबंध प्लेटफॉर्म (फसल खरीद-बिक्री, भाव मोलभाव, रेज़रपे भुगतान, डिलीवरी स्लॉट और किसान सत्यापन) से जुड़े प्रश्नों में ही आपकी सहायता कर सकता हूँ। बाहरी या सामान्य ज्ञान के प्रश्नों का उत्तर देना मेरे कार्यक्षेत्र से बाहर है।",
+            "gu" => "નમસ્તે! હું કૃષિમિત્ર છું, ફાર્મરબંધનું સમર્પિત AI સહાયક. હું ફક્ત ફાર્મરબંધ પ્લેટફોર્મ (પાક ખરીદ-વેચાણ, ભાવ વાટાઘાટો, રેઝરપે ચુકવણી, ડિલિવરી સ્લોટ અને ખેડૂત ચકાસણી) સંબંધિત પ્રશ્નોમાં જ તમને મદદ કરી શકું છું. બહારના કે સામાન્ય જ્ઞાનના પ્રશ્નોનો જવાબ આપવો મારા કાર્યક્ષેત્ર બહાર છે.",
+            _ => "Hello! I am KrishiMitra, the dedicated AI assistant for FarmerBandh. I can only assist with questions directly related to the FarmerBandh platform (such as crop marketplace, price negotiations, Razorpay payments, delivery tracking, and farmer KYC verification). External topics or general questions are outside my scope."
+        };
     }
 
     private static List<string> GenerateFollowUps(string lang, bool isAdmin, bool isFarmer)

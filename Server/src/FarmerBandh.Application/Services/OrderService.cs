@@ -644,7 +644,7 @@ public class OrderService : IOrderService
 
         await _orderRepository.UpdateOrderAsync(order);
 
-        var paymentRef = !string.IsNullOrWhiteSpace(request.PaymentId) ? request.PaymentId : request.PaymentLinkId ?? "plink_Tqe4bgUXaopgZ0";
+        var paymentRef = !string.IsNullOrWhiteSpace(request.PaymentId) ? request.PaymentId : request.PaymentLinkId ?? "plink_U2CqOn54TpAx8O";
         var role = isBuyer ? UserRole.Buyer : UserRole.Farmer;
         await _timelineService.LogStatusChangeAsync(
             order.Id,
